@@ -3,6 +3,7 @@ import { useGameState } from '../../hooks/useGameState'
 import { PLAYER_COLORS } from '../../utils/constants'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { generateAvatar, fileToDataUrl } from '../../utils/replicate'
+import { loadPlayer, savePlayer, clearPlayer } from '../../utils/playerStorage'
 
 type AvatarMode = 'none' | 'upload' | 'describe'
 
@@ -21,10 +22,30 @@ export function AvatarSelect() {
 
   const humanPlayers = players.filter(p => p.type === 'human')
 
-  const [setups, setSetups] = useState<PlayerSetup[]>([
-    { name: players[0].name, mode: 'none', description: '', uploadedImage: null, generating: false, error: null },
-    { name: players[1].name, mode: 'none', description: '', uploadedImage: null, generating: false, error: null },
-  ])
+  const [setups, setSetups] = useState<PlayerSetup[]>(() => {
+    return [1 as const, 2 as const].map((id) => {
+      const saved = loadPlayer(id)
+      if (saved) {
+        if (saved.name) setPlayerName(id, saved.name)
+        if (saved.color) setPlayerColor(id, saved.color)
+        if (saved.avatarUrl) setPlayerAvatar(id, saved.avatarUrl)
+        return {
+          name: saved.name || `Player ${id}`,
+          mode: 'none' as AvatarMode,
+          description: saved.description || '',
+          uploadedImage: null,
+          generating: false,
+          error: null,
+        }
+      }
+      return { name: players[id - 1].name, mode: 'none' as AvatarMode, description: '', uploadedImage: null, generating: false, error: null }
+    })
+  })
+
+  const [welcomeBack, setWelcomeBack] = useState<Record<number, boolean>>({
+    1: !!loadPlayer(1),
+    2: !!loadPlayer(2),
+  })
 
   const updateSetup = (idx: number, patch: Partial<PlayerSetup>) => {
     setSetups(prev => prev.map((s, i) => i === idx ? { ...s, ...patch } : s))
@@ -66,9 +87,24 @@ export function AvatarSelect() {
     }
   }
 
+  const handleClearPlayer = (id: 1 | 2) => {
+    clearPlayer(id)
+    setWelcomeBack(prev => ({ ...prev, [id]: false }))
+    setPlayerAvatar(id, '')
+    updateSetup(id - 1, { name: `Player ${id}`, description: '', uploadedImage: null })
+    setPlayerName(id, `Player ${id}`)
+  }
+
   const handleContinue = () => {
-    humanPlayers.forEach((p, i) => {
-      setPlayerName(p.id, setups[p.id - 1]?.name || `Player ${p.id}`)
+    humanPlayers.forEach((p) => {
+      const setup = setups[p.id - 1]
+      setPlayerName(p.id, setup.name || `Player ${p.id}`)
+      savePlayer(p.id, {
+        name: setup.name || `Player ${p.id}`,
+        color: p.color,
+        avatarUrl: p.avatarUrl,
+        description: setup.description,
+      })
     })
     setPhase('event-select')
   }
@@ -102,6 +138,19 @@ export function AvatarSelect() {
                   </div>
                 )}
               </div>
+
+              {/* Welcome back */}
+              {welcomeBack[player.id] && (
+                <div className="flex items-center gap-2">
+                  <span className="text-green-300 text-sm font-bold">Welcome back, {setup.name}!</span>
+                  <button
+                    onClick={() => handleClearPlayer(player.id as 1 | 2)}
+                    className="text-white/40 hover:text-red-300 text-xs underline transition-colors"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
 
               {/* Name input */}
               <input
