@@ -83,14 +83,17 @@ export function TugOfWar() {
   const handleP2Answer = useCallback((i: number) => handleAnswer(2, i), [handleAnswer])
 
   useKeyboardInput({
-    onP1Answer: handleP1Answer,
-    onP2Answer: players[1].type === 'cpu' ? () => {} : handleP2Answer,
+    onAnswer: (playerId, choiceIndex) => {
+      if (playerId === 1) handleP1Answer(choiceIndex)
+      else if (playerId === 2 && players[1]?.type === 'human') handleP2Answer(choiceIndex)
+    },
     enabled: true,
+    playerCount: 2,
   })
 
   useGamepad({
     onP1Answer: handleP1Answer,
-    onP2Answer: players[1].type === 'cpu' ? () => {} : handleP2Answer,
+    onP2Answer: players[1]?.type === 'cpu' ? () => {} : handleP2Answer,
     enabled: true,
     onControllerChange: setControllerType,
   })
@@ -98,9 +101,9 @@ export function TugOfWar() {
   useCPU({
     character: cpuCharacter,
     currentProblem,
-    enabled: players[1].type === 'cpu' && !usedShot[2],
+    enabled: players[1]?.type === 'cpu' && !usedShot[2],
     onAnswer: handleP2Answer,
-    streak: players[1].streak,
+    streak: players[1]?.streak ?? 0,
   })
 
   const handleTimeUp = useCallback(() => {

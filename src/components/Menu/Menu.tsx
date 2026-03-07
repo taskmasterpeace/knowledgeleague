@@ -5,7 +5,7 @@ import { ControllerHint } from '../shared/ControllerButtons'
 import { Settings } from '../Settings/Settings'
 
 export function Menu() {
-  const { setPhase, startSinglePlayer, controllerType, setControllerType } = useGameState()
+  const { setPhase, startSinglePlayer, setPlayerCount, controllerType, setControllerType } = useGameState()
   const [showSettings, setShowSettings] = useState(false)
 
   useGamepad({
@@ -46,16 +46,28 @@ export function Menu() {
           1 PLAYER
         </button>
         <button
-          onClick={() => setPhase('avatar-select')}
+          onClick={() => { setPlayerCount(2); setPhase('avatar-select') }}
           className="w-full py-6 bg-green-400 hover:bg-green-300 text-gray-900 text-3xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg"
         >
           2 PLAYERS
+        </button>
+        <button
+          onClick={() => { setPlayerCount(3); setPhase('avatar-select') }}
+          className="w-full py-6 bg-cyan-400 hover:bg-cyan-300 text-gray-900 text-3xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg"
+        >
+          3 PLAYERS
+        </button>
+        <button
+          onClick={() => { setPlayerCount(4); setPhase('avatar-select') }}
+          className="w-full py-6 bg-orange-400 hover:bg-orange-300 text-gray-900 text-3xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg"
+        >
+          4 PLAYERS
         </button>
       </div>
 
       <div className="flex flex-col items-center gap-2">
         <div className="text-white/40 text-sm">
-          P1: Number Row 1-2-3-4 &nbsp;&nbsp; P2: Numpad 1-2-3-4
+          P1: 1-2-3-4 &nbsp; P2: Numpad &nbsp; P3: Q-W-E-R &nbsp; P4: U-I-O-P
         </div>
         <ControllerHint controllerType={controllerType} />
       </div>

@@ -1,3 +1,5 @@
+import type { PlayerId } from '../types'
+
 interface SavedPlayer {
   name: string
   color: string
@@ -7,11 +9,11 @@ interface SavedPlayer {
 
 const KEY_PREFIX = 'mathMuscle:player'
 
-export function savePlayer(id: 1 | 2, data: SavedPlayer): void {
+export function savePlayer(id: PlayerId, data: SavedPlayer): void {
   localStorage.setItem(`${KEY_PREFIX}${id}`, JSON.stringify(data))
 }
 
-export function loadPlayer(id: 1 | 2): SavedPlayer | null {
+export function loadPlayer(id: PlayerId): SavedPlayer | null {
   try {
     const stored = localStorage.getItem(`${KEY_PREFIX}${id}`)
     if (stored) return JSON.parse(stored)
@@ -19,6 +21,6 @@ export function loadPlayer(id: 1 | 2): SavedPlayer | null {
   return null
 }
 
-export function clearPlayer(id: 1 | 2): void {
+export function clearPlayer(id: PlayerId): void {
   localStorage.removeItem(`${KEY_PREFIX}${id}`)
 }

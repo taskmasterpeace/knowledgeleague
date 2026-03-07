@@ -15,17 +15,23 @@ import {
   MARATHON_NO_ANSWER,
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
+import type { PlayerId } from '../../types'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
+interface PlayerRoundResult {
+  answer: RoundAnswer
+  spaces: number
+}
+
 interface RoundResult {
-  p1: RoundAnswer
-  p2: RoundAnswer
-  p1Spaces: number
-  p2Spaces: number
+  playerResults: Map<PlayerId, PlayerRoundResult>
   correctAnswer: number
   question: string
 }
+
+// Scoring tiers: 1st correct = 3, 2nd = 2, 3rd+ / wrong = 1, no answer = 0
+const CORRECT_TIERS = [MARATHON_FIRST_CORRECT, MARATHON_SECOND_CORRECT, MARATHON_WRONG_ANSWER]
 
 export function MathMarathon() {
   const {
@@ -41,59 +47,65 @@ export function MathMarathon() {
   const [showingResult, setShowingResult] = useState(false)
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null)
 
-  const answersRef = useRef<{ p1: RoundAnswer; p2: RoundAnswer }>({ p1: null, p2: null })
+  const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
 
   const resolveRound = useCallback(() => {
     if (roundResolvedRef.current) return
     roundResolvedRef.current = true
 
-    const { p1, p2 } = answersRef.current
+    const answers = answersRef.current
+    const playerResults = new Map<PlayerId, PlayerRoundResult>()
 
-    let p1Spaces = MARATHON_NO_ANSWER
-    let p2Spaces = MARATHON_NO_ANSWER
-
-    const p1Correct = p1?.correct ?? false
-    const p2Correct = p2?.correct ?? false
-
-    if (p1Correct && p2Correct) {
-      if ((p1!.timestamp) <= (p2!.timestamp)) {
-        p1Spaces = MARATHON_FIRST_CORRECT
-        p2Spaces = MARATHON_SECOND_CORRECT
-      } else {
-        p1Spaces = MARATHON_SECOND_CORRECT
-        p2Spaces = MARATHON_FIRST_CORRECT
+    // Collect correct answers sorted by timestamp
+    const correctAnswers: { id: PlayerId; timestamp: number }[] = []
+    for (const player of players) {
+      const answer = answers.get(player.id as PlayerId) ?? null
+      if (answer?.correct) {
+        correctAnswers.push({ id: player.id as PlayerId, timestamp: answer.timestamp })
       }
-    } else if (p1Correct) {
-      p1Spaces = MARATHON_FIRST_CORRECT
-      p2Spaces = p2 ? MARATHON_WRONG_ANSWER : MARATHON_NO_ANSWER
-    } else if (p2Correct) {
-      p2Spaces = MARATHON_FIRST_CORRECT
-      p1Spaces = p1 ? MARATHON_WRONG_ANSWER : MARATHON_NO_ANSWER
-    } else {
-      p1Spaces = p1 ? MARATHON_WRONG_ANSWER : MARATHON_NO_ANSWER
-      p2Spaces = p2 ? MARATHON_WRONG_ANSWER : MARATHON_NO_ANSWER
+    }
+    correctAnswers.sort((a, b) => a.timestamp - b.timestamp)
+
+    // Assign spaces
+    for (const player of players) {
+      const pid = player.id as PlayerId
+      const answer = answers.get(pid) ?? null
+      let spaces = MARATHON_NO_ANSWER
+
+      if (answer?.correct) {
+        const rank = correctAnswers.findIndex(c => c.id === pid)
+        spaces = CORRECT_TIERS[Math.min(rank, CORRECT_TIERS.length - 1)]
+      } else if (answer) {
+        spaces = MARATHON_WRONG_ANSWER
+      }
+
+      playerResults.set(pid, { answer, spaces })
+
+      if (spaces > 0) updatePosition(pid, spaces)
+      if (answer?.correct) { incrementStreak(pid); incrementScore(pid) } else { resetStreak(pid) }
     }
 
-    if (p1Spaces > 0) updatePosition(1, p1Spaces)
-    if (p2Spaces > 0) updatePosition(2, p2Spaces)
-
-    if (p1Correct) { incrementStreak(1); incrementScore(1) } else { resetStreak(1) }
-    if (p2Correct) { incrementStreak(2); incrementScore(2) } else { resetStreak(2) }
-
-    const p1NewPos = players[0].position + p1Spaces
-    const p2NewPos = players[1].position + p2Spaces
-    if (p1NewPos >= trackLength || p2NewPos >= trackLength) {
-      if (p1NewPos >= trackLength && p2NewPos >= trackLength) {
-        setWinner(p1NewPos >= p2NewPos ? 1 : 2)
-      } else {
-        setWinner(p1NewPos >= trackLength ? 1 : 2)
+    // Check for winner
+    let winnerId: PlayerId | null = null
+    let winnerPos = 0
+    for (const player of players) {
+      const pid = player.id as PlayerId
+      const result = playerResults.get(pid)!
+      const newPos = player.position + result.spaces
+      if (newPos >= trackLength && newPos > winnerPos) {
+        winnerId = pid
+        winnerPos = newPos
       }
+    }
+
+    if (winnerId) {
+      setWinner(winnerId)
       return
     }
 
     setRoundResult({
-      p1, p2, p1Spaces, p2Spaces,
+      playerResults,
       correctAnswer: currentProblem.correctAnswer,
       question: currentProblem.question,
     })
@@ -102,61 +114,70 @@ export function MathMarathon() {
     setTimeout(() => {
       setShowingResult(false)
       setRoundResult(null)
-      answersRef.current = { p1: null, p2: null }
+      answersRef.current = new Map()
       roundResolvedRef.current = false
       nextProblem()
       setTimerKey(k => k + 1)
     }, 2000)
-  }, [players, currentProblem, updatePosition, incrementStreak, resetStreak, incrementScore, setWinner, nextProblem])
+  }, [players, currentProblem, trackLength, updatePosition, incrementStreak, resetStreak, incrementScore, setWinner, nextProblem])
 
-  const handleAnswer = useCallback((playerId: 1 | 2, choiceIndex: number) => {
+  const handleAnswer = useCallback((playerId: PlayerId, choiceIndex: number) => {
     if (showingResult) return
-    const key = playerId === 1 ? 'p1' : 'p2'
-    if (answersRef.current[key] !== null) return
+    if (answersRef.current.has(playerId)) return
 
     const isCorrect = currentProblem.choices[choiceIndex] === currentProblem.correctAnswer
+    answersRef.current.set(playerId, { choiceIndex, correct: isCorrect, timestamp: Date.now() })
 
-    answersRef.current[key] = { choiceIndex, correct: isCorrect, timestamp: Date.now() }
-
-    if (answersRef.current.p1 !== null && answersRef.current.p2 !== null) {
+    // If all players have answered, resolve immediately
+    if (answersRef.current.size >= players.length) {
       resolveRound()
     }
-  }, [currentProblem, showingResult, resolveRound])
+  }, [currentProblem, showingResult, resolveRound, players.length])
 
-  const handleP1Answer = useCallback((i: number) => handleAnswer(1, i), [handleAnswer])
-  const handleP2Answer = useCallback((i: number) => handleAnswer(2, i), [handleAnswer])
+  const humanCount = players.filter(p => p.type === 'human').length
 
   useKeyboardInput({
-    onP1Answer: handleP1Answer,
-    onP2Answer: players[1].type === 'cpu' ? () => {} : handleP2Answer,
+    onAnswer: (playerId, choiceIndex) => {
+      const player = players.find(p => p.id === playerId)
+      if (player?.type === 'human') handleAnswer(playerId, choiceIndex)
+    },
     enabled: !showingResult,
+    playerCount: humanCount,
   })
 
   useGamepad({
-    onP1Answer: handleP1Answer,
-    onP2Answer: players[1].type === 'cpu' ? () => {} : handleP2Answer,
+    onP1Answer: (i) => handleAnswer(1, i),
+    onP2Answer: (i) => {
+      if (players[1]?.type === 'human') handleAnswer(2, i)
+    },
     enabled: !showingResult,
     onControllerChange: setControllerType,
   })
 
+  // CPU player (always player 2 in single-player mode)
+  const cpuPlayer = players.find(p => p.type === 'cpu')
   useCPU({
     character: cpuCharacter,
     currentProblem,
-    enabled: players[1].type === 'cpu' && !showingResult,
-    onAnswer: handleP2Answer,
-    streak: players[1].streak,
+    enabled: !!cpuPlayer && !showingResult,
+    onAnswer: (i) => { if (cpuPlayer) handleAnswer(cpuPlayer.id as PlayerId, i) },
+    streak: cpuPlayer?.streak ?? 0,
   })
 
   const handleTimeUp = useCallback(() => {
     resolveRound()
   }, [resolveRound])
 
+  // Track vertical spacing per player
+  const trackSpacing = (i: number) => `${(i / Math.max(players.length - 1, 1)) * 70 + 10}%`
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-400 to-blue-600 flex flex-col p-6 gap-6">
       {/* Progress bars */}
       <div className="flex flex-col gap-2">
-        <ScoreBar position={players[0].position} trackLength={trackLength} color={players[0].color} label={players[0].name} />
-        <ScoreBar position={players[1].position} trackLength={trackLength} color={players[1].color} label={players[1].name} />
+        {players.map(player => (
+          <ScoreBar key={player.id} position={player.position} trackLength={trackLength} color={player.color} label={player.name} />
+        ))}
       </div>
 
       {/* Track visualization */}
@@ -168,7 +189,7 @@ export function MathMarathon() {
             className="absolute transition-all duration-300"
             style={{
               left: `${Math.min(95, (player.position / trackLength) * 100)}%`,
-              top: i === 0 ? '10%' : '50%',
+              top: trackSpacing(i),
             }}
           >
             <PlayerAvatar
@@ -187,31 +208,31 @@ export function MathMarathon() {
       {/* Problem or Results */}
       <div className="flex-1 flex items-center justify-center">
         {showingResult && roundResult ? (
-          <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur rounded-2xl p-8 border-2 border-white/20 w-full max-w-2xl">
+          <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur rounded-2xl p-8 border-2 border-white/20 w-full max-w-3xl">
             <div className="text-3xl font-bold text-white">
               {roundResult.question} = <span className="text-green-300">{roundResult.correctAnswer}</span>
             </div>
-            <div className="flex gap-12">
-              {[
-                { player: players[0], answer: roundResult.p1, spaces: roundResult.p1Spaces },
-                { player: players[1], answer: roundResult.p2, spaces: roundResult.p2Spaces },
-              ].map(({ player, answer, spaces }) => (
-                <div key={player.id} className="flex flex-col items-center gap-2">
-                  <PlayerAvatar name={player.name} color={player.color} size={50} avatarUrl={player.avatarUrl} />
-                  <div className={`text-2xl font-bold ${answer?.correct ? 'text-green-300' : answer ? 'text-red-300' : 'text-white/40'}`}>
-                    {answer?.correct ? 'Correct!' : answer ? 'Wrong' : 'No answer'}
+            <div className="flex gap-8 flex-wrap justify-center">
+              {players.map(player => {
+                const result = roundResult.playerResults.get(player.id as PlayerId)
+                return (
+                  <div key={player.id} className="flex flex-col items-center gap-2">
+                    <PlayerAvatar name={player.name} color={player.color} size={50} avatarUrl={player.avatarUrl} />
+                    <div className={`text-2xl font-bold ${result?.answer?.correct ? 'text-green-300' : result?.answer ? 'text-red-300' : 'text-white/40'}`}>
+                      {result?.answer?.correct ? 'Correct!' : result?.answer ? 'Wrong' : 'No answer'}
+                    </div>
+                    <div className="text-yellow-300 text-xl font-bold">+{result?.spaces ?? 0} spaces</div>
                   </div>
-                  <div className="text-yellow-300 text-xl font-bold">+{spaces} spaces</div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         ) : (
           <MathProblem
             problem={currentProblem}
             onAnswer={() => {}}
-            lockedP1={answersRef.current.p1 !== null}
-            lockedP2={answersRef.current.p2 !== null}
+            lockedP1={answersRef.current.has(1)}
+            lockedP2={answersRef.current.has(2)}
             p1Keys={['1', '2', '3', '4']}
             p2Keys={['1', '2', '3', '4']}
             controllerType={controllerType}

@@ -10,8 +10,10 @@ export type GameEvent = 'marathon' | 'tug-of-war'
 
 export type PlayerType = 'human' | 'cpu'
 
+export type PlayerId = 1 | 2 | 3 | 4
+
 export interface Player {
-  id: 1 | 2
+  id: PlayerId
   name: string
   color: string
   type: PlayerType

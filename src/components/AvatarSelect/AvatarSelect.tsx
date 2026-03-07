@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, createRef } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { PLAYER_COLORS } from '../../utils/constants'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { generateAvatar, fileToDataUrl } from '../../utils/replicate'
 import { loadPlayer, savePlayer, clearPlayer } from '../../utils/playerStorage'
+import type { PlayerId } from '../../types'
 
 type AvatarMode = 'none' | 'upload' | 'describe'
 
@@ -18,12 +19,13 @@ interface PlayerSetup {
 
 export function AvatarSelect() {
   const { players, setPlayerName, setPlayerColor, setPlayerAvatar, setPhase } = useGameState()
-  const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
 
   const humanPlayers = players.filter(p => p.type === 'human')
+  const fileInputRefs = useRef(humanPlayers.map(() => createRef<HTMLInputElement>()))
 
   const [setups, setSetups] = useState<PlayerSetup[]>(() => {
-    return [1 as const, 2 as const].map((id) => {
+    return humanPlayers.map((p) => {
+      const id = p.id as PlayerId
       const saved = loadPlayer(id)
       if (saved) {
         if (saved.name) setPlayerName(id, saved.name)
@@ -38,30 +40,31 @@ export function AvatarSelect() {
           error: null,
         }
       }
-      return { name: players[id - 1].name, mode: 'none' as AvatarMode, description: '', uploadedImage: null, generating: false, error: null }
+      return { name: p.name, mode: 'none' as AvatarMode, description: '', uploadedImage: null, generating: false, error: null }
     })
   })
 
-  const [welcomeBack, setWelcomeBack] = useState<Record<number, boolean>>({
-    1: !!loadPlayer(1),
-    2: !!loadPlayer(2),
+  const [welcomeBack, setWelcomeBack] = useState<Record<number, boolean>>(() => {
+    const wb: Record<number, boolean> = {}
+    humanPlayers.forEach(p => { wb[p.id] = !!loadPlayer(p.id as PlayerId) })
+    return wb
   })
 
   const updateSetup = (idx: number, patch: Partial<PlayerSetup>) => {
     setSetups(prev => prev.map((s, i) => i === idx ? { ...s, ...patch } : s))
   }
 
-  const handleFileUpload = async (playerIdx: number, file: File) => {
+  const handleFileUpload = async (idx: number, file: File) => {
     const dataUrl = await fileToDataUrl(file)
-    updateSetup(playerIdx, { uploadedImage: dataUrl, mode: 'upload' })
+    updateSetup(idx, { uploadedImage: dataUrl, mode: 'upload' })
   }
 
-  const handleGenerate = async (playerIdx: number) => {
-    const setup = setups[playerIdx]
-    const playerId = humanPlayers[playerIdx]?.id
+  const handleGenerate = async (idx: number) => {
+    const setup = setups[idx]
+    const playerId = humanPlayers[idx]?.id as PlayerId
     if (!playerId) return
 
-    updateSetup(playerIdx, { generating: true, error: null })
+    updateSetup(idx, { generating: true, error: null })
 
     try {
       let prompt = ''
@@ -78,29 +81,30 @@ export function AvatarSelect() {
 
       const url = await generateAvatar({ prompt, inputImage })
       setPlayerAvatar(playerId, url)
-      updateSetup(playerIdx, { generating: false })
+      updateSetup(idx, { generating: false })
     } catch (err) {
-      updateSetup(playerIdx, {
+      updateSetup(idx, {
         generating: false,
         error: err instanceof Error ? err.message : 'Generation failed',
       })
     }
   }
 
-  const handleClearPlayer = (id: 1 | 2) => {
+  const handleClearPlayer = (idx: number, id: PlayerId) => {
     clearPlayer(id)
     setWelcomeBack(prev => ({ ...prev, [id]: false }))
     setPlayerAvatar(id, '')
-    updateSetup(id - 1, { name: `Player ${id}`, description: '', uploadedImage: null })
+    updateSetup(idx, { name: `Player ${id}`, description: '', uploadedImage: null })
     setPlayerName(id, `Player ${id}`)
   }
 
   const handleContinue = () => {
-    humanPlayers.forEach((p) => {
-      const setup = setups[p.id - 1]
-      setPlayerName(p.id, setup.name || `Player ${p.id}`)
-      savePlayer(p.id, {
-        name: setup.name || `Player ${p.id}`,
+    humanPlayers.forEach((p, idx) => {
+      const pid = p.id as PlayerId
+      const setup = setups[idx]
+      setPlayerName(pid, setup.name || `Player ${pid}`)
+      savePlayer(pid, {
+        name: setup.name || `Player ${pid}`,
         color: p.color,
         avatarUrl: p.avatarUrl,
         description: setup.description,
@@ -113,13 +117,15 @@ export function AvatarSelect() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-500 to-blue-700 flex flex-col items-center justify-center gap-6 p-8">
-      <h2 className="text-5xl font-black text-white tracking-tight">CREATE YOUR PLAYER</h2>
+      <h2 className="text-5xl font-black text-white tracking-tight">CREATE YOUR PLAYER{humanPlayers.length > 1 ? 'S' : ''}</h2>
 
-      <div className="flex gap-8">
+      <div className="flex gap-6 flex-wrap justify-center">
         {humanPlayers.map((player, idx) => {
-          const setup = setups[player.id - 1]
+          const setup = setups[idx]
+          if (!setup) return null
+          const pid = player.id as PlayerId
           return (
-            <div key={player.id} className="flex flex-col items-center gap-3 bg-white/10 backdrop-blur rounded-2xl p-6 border-2 border-white/20 w-80">
+            <div key={player.id} className="flex flex-col items-center gap-3 bg-white/10 backdrop-blur rounded-2xl p-6 border-2 border-white/20 w-72">
               {/* Avatar preview */}
               <div className="relative">
                 {player.avatarUrl ? (
@@ -144,7 +150,7 @@ export function AvatarSelect() {
                 <div className="flex items-center gap-2">
                   <span className="text-green-300 text-sm font-bold">Welcome back, {setup.name}!</span>
                   <button
-                    onClick={() => handleClearPlayer(player.id as 1 | 2)}
+                    onClick={() => handleClearPlayer(idx, pid)}
                     className="text-white/40 hover:text-red-300 text-xs underline transition-colors"
                   >
                     Clear
@@ -156,7 +162,7 @@ export function AvatarSelect() {
               <input
                 type="text"
                 value={setup.name}
-                onChange={(e) => updateSetup(player.id - 1, { name: e.target.value })}
+                onChange={(e) => updateSetup(idx, { name: e.target.value })}
                 placeholder={`Player ${player.id} name`}
                 maxLength={10}
                 className="text-center text-xl font-bold bg-white/20 text-white placeholder-white/40 border-2 border-white/30 rounded-xl px-3 py-2 w-full focus:outline-none focus:border-white/60"
@@ -167,7 +173,7 @@ export function AvatarSelect() {
                 {PLAYER_COLORS.map((color) => (
                   <button
                     key={color}
-                    onClick={() => setPlayerColor(player.id, color)}
+                    onClick={() => setPlayerColor(pid, color)}
                     className={`w-8 h-8 rounded-full border-2 transition-all ${player.color === color ? 'border-white scale-125' : 'border-transparent hover:scale-110'}`}
                     style={{ backgroundColor: color }}
                   />
@@ -177,13 +183,13 @@ export function AvatarSelect() {
               {/* Avatar mode selector */}
               <div className="flex gap-2 w-full">
                 <button
-                  onClick={() => updateSetup(player.id - 1, { mode: 'upload' })}
+                  onClick={() => updateSetup(idx, { mode: 'upload' })}
                   className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold transition-all ${setup.mode === 'upload' ? 'bg-white/30 text-white' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
                 >
                   Upload Photo
                 </button>
                 <button
-                  onClick={() => updateSetup(player.id - 1, { mode: 'describe' })}
+                  onClick={() => updateSetup(idx, { mode: 'describe' })}
                   className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold transition-all ${setup.mode === 'describe' ? 'bg-white/30 text-white' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
                 >
                   Describe Me
@@ -194,17 +200,17 @@ export function AvatarSelect() {
               {setup.mode === 'upload' && (
                 <div className="w-full flex flex-col gap-2">
                   <input
-                    ref={fileInputRefs[idx]}
+                    ref={fileInputRefs.current[idx]}
                     type="file"
                     accept="image/*"
                     className="hidden"
                     onChange={(e) => {
                       const file = e.target.files?.[0]
-                      if (file) handleFileUpload(player.id - 1, file)
+                      if (file) handleFileUpload(idx, file)
                     }}
                   />
                   <button
-                    onClick={() => fileInputRefs[idx].current?.click()}
+                    onClick={() => fileInputRefs.current[idx]?.current?.click()}
                     className="w-full py-2 bg-white/15 hover:bg-white/25 text-white rounded-lg text-sm font-medium transition-all border border-dashed border-white/30"
                   >
                     {setup.uploadedImage ? 'Change Photo' : 'Choose Photo'}
@@ -219,7 +225,7 @@ export function AvatarSelect() {
               {setup.mode === 'describe' && (
                 <textarea
                   value={setup.description}
-                  onChange={(e) => updateSetup(player.id - 1, { description: e.target.value })}
+                  onChange={(e) => updateSetup(idx, { description: e.target.value })}
                   placeholder="Describe how you look... e.g. 'A girl with curly brown hair and glasses wearing a blue hoodie'"
                   maxLength={200}
                   rows={3}

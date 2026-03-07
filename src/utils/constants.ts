@@ -29,3 +29,5 @@ export const PLAYER_COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#a855
 // P1 uses number row (Digit1-Digit4), P2 uses numpad (Numpad1-Numpad4)
 export const P1_CODES: Record<string, number> = { 'Digit1': 0, 'Digit2': 1, 'Digit3': 2, 'Digit4': 3 }
 export const P2_CODES: Record<string, number> = { 'Numpad1': 0, 'Numpad2': 1, 'Numpad3': 2, 'Numpad4': 3 }
+export const P3_CODES: Record<string, number> = { 'KeyQ': 0, 'KeyW': 1, 'KeyE': 2, 'KeyR': 3 }
+export const P4_CODES: Record<string, number> = { 'KeyU': 0, 'KeyI': 1, 'KeyO': 2, 'KeyP': 3 }

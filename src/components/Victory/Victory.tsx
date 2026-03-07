@@ -5,8 +5,10 @@ export function Victory() {
   const { players, winner, resetGame, rematch } = useGameState()
 
   if (!winner) return null
-  const winnerPlayer = players[winner - 1]
-  const loserPlayer = players[winner === 1 ? 1 : 0]
+  const winnerPlayer = players.find(p => p.id === winner)!
+
+  // Rank all players by position (descending), then by score
+  const ranked = [...players].sort((a, b) => b.position - a.position || b.score - a.score)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-400 to-orange-600 flex flex-col items-center justify-center gap-8 p-8">
@@ -14,16 +16,30 @@ export function Victory() {
         {winnerPlayer.name.toUpperCase()} WINS!
       </h2>
 
-      <div className="flex gap-12 items-end">
-        <div className="flex flex-col items-center opacity-50">
-          <PlayerAvatar name={loserPlayer.name} color={loserPlayer.color} size={80} isLosing avatarUrl={loserPlayer.avatarUrl} />
-          <span className="text-white text-xl mt-2">Score: {loserPlayer.score}</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="text-8xl mb-4">🏆</div>
-          <PlayerAvatar name={winnerPlayer.name} color={winnerPlayer.color} size={100} isWinning avatarUrl={winnerPlayer.avatarUrl} />
-          <span className="text-white text-2xl font-bold mt-2">Score: {winnerPlayer.score}</span>
-        </div>
+      <div className="flex gap-8 items-end flex-wrap justify-center">
+        {ranked.map((player, i) => {
+          const isWinner = player.id === winner
+          return (
+            <div key={player.id} className={`flex flex-col items-center ${isWinner ? '' : 'opacity-60'}`}>
+              {isWinner && <div className="text-6xl mb-2">🏆</div>}
+              {i === 1 && <div className="text-3xl mb-2">🥈</div>}
+              {i === 2 && <div className="text-3xl mb-2">🥉</div>}
+              {i >= 3 && <div className="h-10" />}
+              <PlayerAvatar
+                name={player.name}
+                color={player.color}
+                size={isWinner ? 100 : 70}
+                isWinning={isWinner}
+                isLosing={!isWinner}
+                avatarUrl={player.avatarUrl}
+              />
+              <span className={`text-white mt-2 font-bold ${isWinner ? 'text-2xl' : 'text-lg'}`}>
+                {player.name}
+              </span>
+              <span className="text-white/80 text-sm">Score: {player.score}</span>
+            </div>
+          )
+        })}
       </div>
 
       <div className="flex gap-4 mt-8">
