@@ -142,7 +142,7 @@ export function MathMarathon() {
           lockedP1={Date.now() < players[0].lockedUntil}
           lockedP2={Date.now() < players[1].lockedUntil}
           p1Keys={['1', '2', '3', '4']}
-          p2Keys={['7', '8', '9', '0']}
+          p2Keys={['1', '2', '3', '4']}
           controllerType={controllerType}
         />
       </div>

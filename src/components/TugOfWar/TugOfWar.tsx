@@ -167,7 +167,7 @@ export function TugOfWar() {
           lockedP1={usedShot[1]}
           lockedP2={usedShot[2]}
           p1Keys={['1', '2', '3', '4']}
-          p2Keys={['7', '8', '9', '0']}
+          p2Keys={['1', '2', '3', '4']}
           controllerType={controllerType}
         />
       </div>

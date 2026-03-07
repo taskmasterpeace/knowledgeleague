@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react'
-import { P1_KEYS, P2_KEYS } from '../utils/constants'
+import { P1_CODES, P2_CODES } from '../utils/constants'
 
 interface UseKeyboardInputProps {
   onP1Answer: (choiceIndex: number) => void
@@ -10,13 +10,13 @@ interface UseKeyboardInputProps {
 export function useKeyboardInput({ onP1Answer, onP2Answer, enabled }: UseKeyboardInputProps) {
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!enabled) return
-    const key = e.key
-    if (key in P1_KEYS) {
+    const code = e.code
+    if (code in P1_CODES) {
       e.preventDefault()
-      onP1Answer(P1_KEYS[key])
-    } else if (key in P2_KEYS) {
+      onP1Answer(P1_CODES[code])
+    } else if (code in P2_CODES) {
       e.preventDefault()
-      onP2Answer(P2_KEYS[key])
+      onP2Answer(P2_CODES[code])
     }
   }, [onP1Answer, onP2Answer, enabled])
 

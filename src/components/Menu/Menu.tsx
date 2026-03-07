@@ -42,7 +42,7 @@ export function Menu() {
 
       <div className="flex flex-col items-center gap-2">
         <div className="text-white/40 text-sm">
-          P1: Keys 1-2-3-4 &nbsp;&nbsp; P2: Keys 7-8-9-0
+          P1: Number Row 1-2-3-4 &nbsp;&nbsp; P2: Numpad 1-2-3-4
         </div>
         <ControllerHint controllerType={controllerType} />
       </div>

@@ -32,6 +32,7 @@ export const CPU_CHARACTERS: CPUCharacter[] = [
 // Player colors
 export const PLAYER_COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#a855f7', '#ec4899']
 
-// Keyboard mapping
-export const P1_KEYS: Record<string, number> = { '1': 0, '2': 1, '3': 2, '4': 3 }
-export const P2_KEYS: Record<string, number> = { '7': 0, '8': 1, '9': 2, '0': 3 }
+// Keyboard mapping — both players press 1-2-3-4
+// P1 uses number row (Digit1-Digit4), P2 uses numpad (Numpad1-Numpad4)
+export const P1_CODES: Record<string, number> = { 'Digit1': 0, 'Digit2': 1, 'Digit3': 2, 'Digit4': 3 }
+export const P2_CODES: Record<string, number> = { 'Numpad1': 0, 'Numpad2': 1, 'Numpad3': 2, 'Numpad4': 3 }
