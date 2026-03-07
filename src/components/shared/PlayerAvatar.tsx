@@ -5,10 +5,33 @@ interface Props {
   isWinning?: boolean
   isLosing?: boolean
   isLocked?: boolean
+  avatarUrl?: string | null
 }
 
-export function PlayerAvatar({ name, color, size = 80, isWinning, isLosing, isLocked }: Props) {
+export function PlayerAvatar({ name, color, size = 80, isWinning, isLosing, isLocked, avatarUrl }: Props) {
   const initials = name.slice(0, 2).toUpperCase()
+
+  if (avatarUrl) {
+    return (
+      <div className="flex flex-col items-center gap-1">
+        <img
+          src={avatarUrl}
+          alt={name}
+          width={size}
+          height={size}
+          className="rounded-lg border-2 transition-all"
+          style={{
+            imageRendering: 'pixelated',
+            borderColor: color,
+            opacity: isLocked ? 0.4 : 1,
+            filter: isLocked ? 'grayscale(0.5)' : 'none',
+          }}
+        />
+        <span className="text-white font-bold text-sm">{name}</span>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col items-center gap-1">
       <svg width={size} height={size * 1.5} viewBox="0 0 80 120">

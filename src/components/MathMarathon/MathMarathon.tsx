@@ -2,11 +2,13 @@ import { useCallback, useState, useRef } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useMathEngine } from '../../hooks/useMathEngine'
 import { useKeyboardInput } from '../../hooks/useKeyboardInput'
+import { useGamepad } from '../../hooks/useGamepad'
 import { useCPU } from '../../hooks/useCPU'
 import { MathProblem } from '../shared/MathProblem'
 import { Timer } from '../shared/Timer'
 import { ScoreBar } from '../shared/ScoreBar'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
+import { ControllerHint } from '../shared/ControllerButtons'
 import {
   MARATHON_CORRECT_BASE, MARATHON_CORRECT_MAX, MARATHON_WRONG_PENALTY,
   MARATHON_WIN_THRESHOLD, LOCKOUT_DURATION, MASH_LOCKOUT_DURATION,
@@ -17,6 +19,7 @@ export function MathMarathon() {
   const {
     players, updatePosition, incrementStreak, resetStreak,
     lockPlayer, incrementScore, setWinner, cpuCharacter,
+    controllerType, setControllerType,
   } = useGameState()
   const { currentProblem, nextProblem, problemCount } = useMathEngine()
   const [timerKey, setTimerKey] = useState(0)
@@ -35,7 +38,6 @@ export function MathMarathon() {
     const now = Date.now()
     const player = players[playerId - 1]
 
-    // Check lockout
     if (now < player.lockedUntil) return
 
     const isCorrect = currentProblem.choices[choiceIndex] === currentProblem.correctAnswer
@@ -44,7 +46,6 @@ export function MathMarathon() {
       const elapsed = now - problemStartRef.current
       const timeBonus = Math.max(0, 1 - elapsed / PROBLEM_TIME_LIMIT)
       const distance = MARATHON_CORRECT_BASE + timeBonus * (MARATHON_CORRECT_MAX - MARATHON_CORRECT_BASE)
-      // Confidence bonus
       const waited = elapsed >= CONFIDENCE_BONUS_THRESHOLD
       const finalDistance = waited ? distance * 1.3 : distance
 
@@ -53,15 +54,12 @@ export function MathMarathon() {
       incrementScore(playerId)
       setFeedback(f => ({ ...f, [playerId]: 'correct' }))
 
-      // Check win
       if (player.position + finalDistance >= MARATHON_WIN_THRESHOLD) {
         setWinner(playerId)
         return
       }
-      // Move to next problem after brief delay
       setTimeout(advanceProblem, 600)
     } else {
-      // Check for mashing
       const timeSinceLastWrong = now - (lastWrongRef.current[playerId] || 0)
       const lockDuration = timeSinceLastWrong < MASH_WINDOW ? MASH_LOCKOUT_DURATION : LOCKOUT_DURATION
       lastWrongRef.current[playerId] = now
@@ -83,11 +81,18 @@ export function MathMarathon() {
     enabled: true,
   })
 
+  useGamepad({
+    onP1Answer: handleP1Answer,
+    onP2Answer: players[1].type === 'cpu' ? () => {} : handleP2Answer,
+    enabled: true,
+    onControllerChange: setControllerType,
+  })
+
   useCPU({
     character: cpuCharacter,
     currentProblem,
     enabled: players[1].type === 'cpu',
-    onAnswer: (i) => handleAnswer(2, i),
+    onAnswer: handleP2Answer,
     streak: players[1].streak,
   })
 
@@ -120,6 +125,7 @@ export function MathMarathon() {
               color={player.color}
               size={40}
               isLocked={Date.now() < player.lockedUntil}
+              avatarUrl={player.avatarUrl}
             />
           </div>
         ))}
@@ -137,6 +143,7 @@ export function MathMarathon() {
           lockedP2={Date.now() < players[1].lockedUntil}
           p1Keys={['1', '2', '3', '4']}
           p2Keys={['7', '8', '9', '0']}
+          controllerType={controllerType}
         />
       </div>
 
@@ -146,8 +153,11 @@ export function MathMarathon() {
       {feedback[2] === 'correct' && <div className="fixed top-4 right-4 text-6xl animate-bounce">✓</div>}
       {feedback[2] === 'wrong' && <div className="fixed top-4 right-4 text-6xl text-red-500 animate-pulse">✗</div>}
 
-      {/* Problem counter */}
-      <div className="text-center text-white/40 text-sm">Problem #{problemCount}</div>
+      {/* Footer */}
+      <div className="flex justify-between items-center">
+        <div className="text-white/40 text-sm">Problem #{problemCount}</div>
+        <ControllerHint controllerType={controllerType} />
+      </div>
     </div>
   )
 }

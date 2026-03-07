@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { GamePhase, GameEvent, Player, CPUCharacter } from '../types'
+import type { ControllerType } from './useGamepad'
 
 interface GameState {
   phase: GamePhase
@@ -7,12 +8,14 @@ interface GameState {
   players: [Player, Player]
   cpuCharacter: CPUCharacter | null
   winner: 1 | 2 | null
+  controllerType: ControllerType
 
   setPhase: (phase: GamePhase) => void
   setEvent: (event: GameEvent) => void
   setCPUCharacter: (cpu: CPUCharacter) => void
   setPlayerName: (id: 1 | 2, name: string) => void
   setPlayerColor: (id: 1 | 2, color: string) => void
+  setPlayerAvatar: (id: 1 | 2, url: string) => void
   updatePosition: (id: 1 | 2, delta: number) => void
   setPosition: (id: 1 | 2, position: number) => void
   incrementStreak: (id: 1 | 2) => void
@@ -20,13 +23,15 @@ interface GameState {
   lockPlayer: (id: 1 | 2, until: number) => void
   incrementScore: (id: 1 | 2) => void
   setWinner: (id: 1 | 2) => void
+  setControllerType: (type: ControllerType) => void
   resetGame: () => void
+  rematch: () => void
   startSinglePlayer: () => void
 }
 
 const defaultPlayers: [Player, Player] = [
-  { id: 1, name: 'Player 1', color: '#3b82f6', type: 'human', position: 0, streak: 0, lockedUntil: 0, score: 0 },
-  { id: 2, name: 'Player 2', color: '#ef4444', type: 'human', position: 0, streak: 0, lockedUntil: 0, score: 0 },
+  { id: 1, name: 'Player 1', color: '#3b82f6', type: 'human', position: 0, streak: 0, lockedUntil: 0, score: 0, avatarUrl: null },
+  { id: 2, name: 'Player 2', color: '#ef4444', type: 'human', position: 0, streak: 0, lockedUntil: 0, score: 0, avatarUrl: null },
 ]
 
 export const useGameState = create<GameState>((set) => ({
@@ -35,6 +40,7 @@ export const useGameState = create<GameState>((set) => ({
   players: structuredClone(defaultPlayers),
   cpuCharacter: null,
   winner: null,
+  controllerType: null,
 
   setPhase: (phase) => set({ phase }),
   setEvent: (event) => set({ event }),
@@ -47,6 +53,9 @@ export const useGameState = create<GameState>((set) => ({
   })),
   setPlayerColor: (id, color) => set((s) => ({
     players: s.players.map(p => p.id === id ? { ...p, color } : p) as [Player, Player],
+  })),
+  setPlayerAvatar: (id, url) => set((s) => ({
+    players: s.players.map(p => p.id === id ? { ...p, avatarUrl: url } : p) as [Player, Player],
   })),
   updatePosition: (id, delta) => set((s) => ({
     players: s.players.map(p => p.id === id ? { ...p, position: p.position + delta } : p) as [Player, Player],
@@ -67,6 +76,7 @@ export const useGameState = create<GameState>((set) => ({
     players: s.players.map(p => p.id === id ? { ...p, score: p.score + 1 } : p) as [Player, Player],
   })),
   setWinner: (id) => set({ winner: id, phase: 'victory' }),
+  setControllerType: (controllerType) => set({ controllerType }),
   resetGame: () => set({
     phase: 'menu',
     event: null,
@@ -74,6 +84,11 @@ export const useGameState = create<GameState>((set) => ({
     cpuCharacter: null,
     winner: null,
   }),
+  rematch: () => set((s) => ({
+    phase: 'event-select',
+    winner: null,
+    players: s.players.map(p => ({ ...p, position: 0, streak: 0, lockedUntil: 0, score: 0 })) as [Player, Player],
+  })),
   startSinglePlayer: () => set((s) => ({
     players: [s.players[0], { ...s.players[1], type: 'cpu' }] as [Player, Player],
   })),

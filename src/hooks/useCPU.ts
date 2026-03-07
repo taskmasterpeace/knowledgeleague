@@ -11,9 +11,18 @@ interface UseCPUProps {
 
 export function useCPU({ character, currentProblem, enabled, onAnswer, streak }: UseCPUProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onAnswerRef = useRef(onAnswer)
+  const answeredRef = useRef<string | null>(null)
+
+  // Keep callback ref fresh without triggering effect
+  onAnswerRef.current = onAnswer
 
   useEffect(() => {
     if (!enabled || !character || !currentProblem) return
+
+    // Use the question as a key to avoid re-answering the same problem
+    const problemKey = currentProblem.question
+    if (answeredRef.current === problemKey) return
 
     // Clear any existing timer
     if (timerRef.current) clearTimeout(timerRef.current)
@@ -29,28 +38,27 @@ export function useCPU({ character, currentProblem, enabled, onAnswer, streak }:
 
     timerRef.current = setTimeout(() => {
       if (!currentProblem) return
+      // Mark this problem as answered
+      answeredRef.current = problemKey
 
       const isCorrect = Math.random() < effectiveAccuracy
       if (isCorrect) {
-        // Pick the correct answer
         const correctIndex = currentProblem.choices.indexOf(currentProblem.correctAnswer)
-        onAnswer(correctIndex)
+        onAnswerRef.current(correctIndex)
       } else {
-        // Pick a wrong answer — prefer the closest distractor
         const wrongIndices = currentProblem.choices
           .map((c, i) => ({ val: c, idx: i }))
           .filter(c => c.val !== currentProblem.correctAnswer)
           .sort((a, b) =>
             Math.abs(a.val - currentProblem.correctAnswer) - Math.abs(b.val - currentProblem.correctAnswer)
           )
-        // Pick the closest wrong answer most of the time
         const pick = Math.random() < 0.7 ? wrongIndices[0] : wrongIndices[Math.floor(Math.random() * wrongIndices.length)]
-        onAnswer(pick.idx)
+        onAnswerRef.current(pick.idx)
       }
     }, delay)
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [character, currentProblem, enabled, onAnswer, streak])
+  }, [character, currentProblem, enabled, streak])
 }

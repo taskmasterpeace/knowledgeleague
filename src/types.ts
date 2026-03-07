@@ -19,6 +19,7 @@ export interface Player {
   streak: number          // consecutive correct answers
   lockedUntil: number     // timestamp when lockout ends
   score: number           // problems answered correctly
+  avatarUrl: string | null // AI-generated avatar GIF URL
 }
 
 export interface CPUCharacter {

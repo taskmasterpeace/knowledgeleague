@@ -1,7 +1,17 @@
 import { useGameState } from '../../hooks/useGameState'
+import { useGamepad } from '../../hooks/useGamepad'
+import { ControllerHint } from '../shared/ControllerButtons'
 
 export function Menu() {
-  const { setPhase, startSinglePlayer } = useGameState()
+  const { setPhase, startSinglePlayer, controllerType, setControllerType } = useGameState()
+
+  // Listen for controller connections on menu
+  useGamepad({
+    onP1Answer: () => {},
+    onP2Answer: () => {},
+    enabled: false,
+    onControllerChange: setControllerType,
+  })
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-600 to-purple-800 flex flex-col items-center justify-center gap-12 p-8">
@@ -30,8 +40,11 @@ export function Menu() {
         </button>
       </div>
 
-      <div className="text-white/40 text-sm mt-8">
-        P1: Keys 1-2-3-4 &nbsp;&nbsp; P2: Keys 7-8-9-0
+      <div className="flex flex-col items-center gap-2">
+        <div className="text-white/40 text-sm">
+          P1: Keys 1-2-3-4 &nbsp;&nbsp; P2: Keys 7-8-9-0
+        </div>
+        <ControllerHint controllerType={controllerType} />
       </div>
     </div>
   )

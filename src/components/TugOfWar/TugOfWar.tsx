@@ -1,87 +1,79 @@
-import { useCallback, useState, useRef } from 'react'
+import { useCallback, useState } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useMathEngine } from '../../hooks/useMathEngine'
 import { useKeyboardInput } from '../../hooks/useKeyboardInput'
+import { useGamepad } from '../../hooks/useGamepad'
 import { useCPU } from '../../hooks/useCPU'
 import { MathProblem } from '../shared/MathProblem'
 import { Timer } from '../shared/Timer'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
+import { ControllerHint } from '../shared/ControllerButtons'
 import {
   TUG_CORRECT_PULL, TUG_SUPER_PULL, TUG_WRONG_PULL,
   TUG_STREAK_THRESHOLD, TUG_WIN_THRESHOLD,
-  LOCKOUT_DURATION, MASH_LOCKOUT_DURATION, MASH_WINDOW,
-  CONFIDENCE_BONUS_THRESHOLD, PROBLEM_TIME_LIMIT,
 } from '../../utils/constants'
 
 export function TugOfWar() {
   const {
     players, setPosition, incrementStreak, resetStreak,
-    lockPlayer, incrementScore, setWinner, cpuCharacter,
+    incrementScore, setWinner, cpuCharacter,
+    controllerType, setControllerType,
   } = useGameState()
   const { currentProblem, nextProblem, problemCount } = useMathEngine()
   const [timerKey, setTimerKey] = useState(0)
-  const problemStartRef = useRef(Date.now())
-  const lastWrongRef = useRef<Record<number, number>>({ 1: 0, 2: 0 })
   const [feedback, setFeedback] = useState<Record<number, 'correct' | 'wrong' | null>>({ 1: null, 2: null })
+  const [usedShot, setUsedShot] = useState<Record<number, boolean>>({ 1: false, 2: false })
 
-  // Rope position: 0 = center, negative = P1 winning, positive = P2 winning
-  // We use players[0].position to track rope: -100 to +100
   const ropePos = players[0].position
 
   const advanceProblem = useCallback(() => {
     nextProblem()
     setTimerKey(k => k + 1)
-    problemStartRef.current = Date.now()
     setFeedback({ 1: null, 2: null })
+    setUsedShot({ 1: false, 2: false })
   }, [nextProblem])
 
   const handleAnswer = useCallback((playerId: 1 | 2, choiceIndex: number) => {
-    const now = Date.now()
-    const player = players[playerId - 1]
-
-    if (now < player.lockedUntil) return
+    if (usedShot[playerId]) return
 
     const isCorrect = currentProblem.choices[choiceIndex] === currentProblem.correctAnswer
-    const direction = playerId === 1 ? -1 : 1 // P1 pulls left (negative), P2 pulls right (positive)
+    const direction = playerId === 1 ? -1 : 1
+
+    setUsedShot(prev => ({ ...prev, [playerId]: true }))
 
     if (isCorrect) {
-      const streak = player.streak + 1
+      const streak = players[playerId - 1].streak + 1
       const pull = streak >= TUG_STREAK_THRESHOLD ? TUG_SUPER_PULL : TUG_CORRECT_PULL
-      const elapsed = now - problemStartRef.current
-      const waited = elapsed >= CONFIDENCE_BONUS_THRESHOLD
-      const finalPull = waited ? pull * 1.3 : pull
 
-      const newPos = ropePos + direction * finalPull
+      const newPos = ropePos + direction * pull
       setPosition(1, newPos)
       incrementStreak(playerId)
       incrementScore(playerId)
       setFeedback(f => ({ ...f, [playerId]: 'correct' }))
 
-      // Check win
       if (Math.abs(newPos) >= TUG_WIN_THRESHOLD) {
         setWinner(newPos < 0 ? 1 : 2)
         return
       }
       setTimeout(advanceProblem, 600)
     } else {
-      const timeSinceLastWrong = now - (lastWrongRef.current[playerId] || 0)
-      const lockDuration = timeSinceLastWrong < MASH_WINDOW ? MASH_LOCKOUT_DURATION : LOCKOUT_DURATION
-      lastWrongRef.current[playerId] = now
-
-      // Opponent auto-pulls
       const opponentDirection = playerId === 1 ? 1 : -1
       const newPos = ropePos + opponentDirection * TUG_WRONG_PULL
       setPosition(1, newPos)
       resetStreak(playerId)
-      lockPlayer(playerId, now + lockDuration)
       setFeedback(f => ({ ...f, [playerId]: 'wrong' }))
-      setTimeout(() => setFeedback(f => ({ ...f, [playerId]: null })), lockDuration)
 
       if (Math.abs(newPos) >= TUG_WIN_THRESHOLD) {
         setWinner(newPos < 0 ? 1 : 2)
+        return
+      }
+
+      const opponentId = playerId === 1 ? 2 : 1
+      if (usedShot[opponentId]) {
+        setTimeout(advanceProblem, 800)
       }
     }
-  }, [players, currentProblem, ropePos, setPosition, incrementStreak, resetStreak, lockPlayer, incrementScore, setWinner, advanceProblem])
+  }, [players, currentProblem, ropePos, usedShot, setPosition, incrementStreak, resetStreak, incrementScore, setWinner, advanceProblem])
 
   const handleP1Answer = useCallback((i: number) => handleAnswer(1, i), [handleAnswer])
   const handleP2Answer = useCallback((i: number) => handleAnswer(2, i), [handleAnswer])
@@ -92,11 +84,18 @@ export function TugOfWar() {
     enabled: true,
   })
 
+  useGamepad({
+    onP1Answer: handleP1Answer,
+    onP2Answer: players[1].type === 'cpu' ? () => {} : handleP2Answer,
+    enabled: true,
+    onControllerChange: setControllerType,
+  })
+
   useCPU({
     character: cpuCharacter,
     currentProblem,
-    enabled: players[1].type === 'cpu',
-    onAnswer: (i) => handleAnswer(2, i),
+    enabled: players[1].type === 'cpu' && !usedShot[2],
+    onAnswer: handleP2Answer,
     streak: players[1].streak,
   })
 
@@ -104,7 +103,6 @@ export function TugOfWar() {
     advanceProblem()
   }, [advanceProblem])
 
-  // Rope visualization: map ropePos (-100 to 100) to flag position (0% to 100%)
   const flagPct = 50 + (ropePos / 2)
 
   return (
@@ -118,11 +116,13 @@ export function TugOfWar() {
             size={60}
             isWinning={ropePos < -20}
             isLosing={ropePos > 20}
-            isLocked={Date.now() < players[0].lockedUntil}
+            isLocked={usedShot[1]}
+            avatarUrl={players[0].avatarUrl}
           />
           <div className="text-yellow-300 text-sm font-bold mt-1">
             {players[0].streak >= TUG_STREAK_THRESHOLD ? 'SUPER PULL!' : `Streak: ${players[0].streak}`}
           </div>
+          {usedShot[1] && !feedback[1] && <div className="text-white/50 text-xs">Waiting...</div>}
         </div>
         <div className="text-white text-xl font-bold">VS</div>
         <div className="flex flex-col items-center">
@@ -132,22 +132,21 @@ export function TugOfWar() {
             size={60}
             isWinning={ropePos > 20}
             isLosing={ropePos < -20}
-            isLocked={Date.now() < players[1].lockedUntil}
+            isLocked={usedShot[2]}
+            avatarUrl={players[1].avatarUrl}
           />
           <div className="text-yellow-300 text-sm font-bold mt-1">
             {players[1].streak >= TUG_STREAK_THRESHOLD ? 'SUPER PULL!' : `Streak: ${players[1].streak}`}
           </div>
+          {usedShot[2] && !feedback[2] && <div className="text-white/50 text-xs">Waiting...</div>}
         </div>
       </div>
 
       {/* Rope */}
       <div className="relative h-16 bg-gradient-to-r from-blue-500/30 via-amber-800/40 to-red-500/30 rounded-2xl border-2 border-white/20 overflow-hidden">
-        {/* Win zones */}
         <div className="absolute left-0 top-0 bottom-0 w-[10%] bg-blue-500/20 border-r-2 border-blue-400/40" />
         <div className="absolute right-0 top-0 bottom-0 w-[10%] bg-red-500/20 border-l-2 border-red-400/40" />
-        {/* Rope line */}
         <div className="absolute top-1/2 left-[5%] right-[5%] h-2 bg-amber-700 rounded -translate-y-1/2" />
-        {/* Flag */}
         <div
           className="absolute top-1 transition-all duration-300"
           style={{ left: `${flagPct}%`, transform: 'translateX(-50%)' }}
@@ -165,10 +164,11 @@ export function TugOfWar() {
         <MathProblem
           problem={currentProblem}
           onAnswer={() => {}}
-          lockedP1={Date.now() < players[0].lockedUntil}
-          lockedP2={Date.now() < players[1].lockedUntil}
+          lockedP1={usedShot[1]}
+          lockedP2={usedShot[2]}
           p1Keys={['1', '2', '3', '4']}
           p2Keys={['7', '8', '9', '0']}
+          controllerType={controllerType}
         />
       </div>
 
@@ -178,7 +178,10 @@ export function TugOfWar() {
       {feedback[2] === 'correct' && <div className="fixed top-4 right-4 text-6xl animate-bounce">✓</div>}
       {feedback[2] === 'wrong' && <div className="fixed top-4 right-4 text-6xl text-red-500 animate-pulse">✗</div>}
 
-      <div className="text-center text-white/40 text-sm">Problem #{problemCount}</div>
+      <div className="flex justify-between items-center">
+        <div className="text-white/40 text-sm">Problem #{problemCount}</div>
+        <ControllerHint controllerType={controllerType} />
+      </div>
     </div>
   )
 }
