@@ -28,6 +28,7 @@ export interface CPUCharacter {
   accuracy: number              // 0-1 probability of correct answer
   tagline: string
   color: string
+  avatarUrl?: string | null
 }
 
 export type Difficulty = 'easy' | 'medium' | 'hard'
