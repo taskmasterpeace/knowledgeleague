@@ -1,18 +1,15 @@
 import type { CPUCharacter } from '../types'
 
-// Timing
+// Timing (used by Timer until settings replace these)
 export const PROBLEM_TIME_LIMIT = 10_000       // 10 seconds per problem
-export const LOCKOUT_DURATION = 2_000           // 2s lockout on wrong answer
-export const MASH_LOCKOUT_DURATION = 4_000      // 4s lockout for button mashing
-export const MASH_WINDOW = 500                  // 0.5s window to detect mashing
-export const CONFIDENCE_BONUS_THRESHOLD = 3_000 // 3s wait = confidence bonus
 export const URGENT_THRESHOLD = 3_000           // 3s remaining = urgent mode
 
-// Marathon distances
-export const MARATHON_CORRECT_BASE = 5          // base % gain on correct
-export const MARATHON_CORRECT_MAX = 30          // max % gain (fast answer)
-export const MARATHON_WRONG_PENALTY = 3         // % slide back on wrong
-export const MARATHON_WIN_THRESHOLD = 100       // % to win
+// Marathon — spaces-based scoring
+export const MARATHON_TRACK_LENGTH = 20           // spaces to win
+export const MARATHON_FIRST_CORRECT = 3           // spaces for first correct answer
+export const MARATHON_SECOND_CORRECT = 2          // spaces for second correct (but not first)
+export const MARATHON_WRONG_ANSWER = 1            // spaces for wrong answer (encouragement)
+export const MARATHON_NO_ANSWER = 0               // spaces for not answering
 
 // Tug-of-War
 export const TUG_CORRECT_PULL = 15              // % pull on correct
