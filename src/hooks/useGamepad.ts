@@ -11,7 +11,9 @@ interface GamepadState {
 
 function detectControllerType(gamepad: Gamepad): ControllerType {
   const id = gamepad.id.toLowerCase()
-  if (id.includes('dualsense') || id.includes('dualshock') || id.includes('054c') || id.includes('playstation') || id.includes('sony')) {
+  if (id.includes('dualsense') || id.includes('dualshock') || id.includes('054c') ||
+      id.includes('playstation') || id.includes('sony') ||
+      id.includes('054c:0ce6') || id.includes('054c:09cc')) {
     return 'playstation'
   }
   if (id.includes('xbox') || id.includes('xinput') || id.includes('045e') || id.includes('microsoft')) {
@@ -42,18 +44,22 @@ interface UseGamepadProps {
   onP2Answer: (choiceIndex: number) => void
   enabled: boolean
   onControllerChange?: (type: ControllerType) => void
+  onPause?: () => void
+  vibrationEnabled?: boolean
 }
 
-export function useGamepad({ onP1Answer, onP2Answer, enabled, onControllerChange }: UseGamepadProps) {
+export function useGamepad({ onP1Answer, onP2Answer, enabled, onControllerChange, onPause }: UseGamepadProps) {
   const prevButtonsRef = useRef<Map<number, boolean[]>>(new Map())
   const onP1Ref = useRef(onP1Answer)
   const onP2Ref = useRef(onP2Answer)
   const onControllerRef = useRef(onControllerChange)
+  const onPauseRef = useRef(onPause)
   const rafRef = useRef<number>(0)
 
   onP1Ref.current = onP1Answer
   onP2Ref.current = onP2Answer
   onControllerRef.current = onControllerChange
+  onPauseRef.current = onPause
 
   const poll = useCallback(() => {
     if (!enabled) {
@@ -89,6 +95,11 @@ export function useGamepad({ onP1Answer, onP2Answer, enabled, onControllerChange
         }
       }
 
+      // Start/Options button (index 9) → pause
+      if (gp.buttons[9]?.pressed && !(prev[9] || false)) {
+        if (onPauseRef.current) onPauseRef.current()
+      }
+
       // Save current state
       prevButtonsRef.current.set(gp.index, gp.buttons.map(b => b.pressed))
     }
@@ -100,6 +111,18 @@ export function useGamepad({ onP1Answer, onP2Answer, enabled, onControllerChange
     rafRef.current = requestAnimationFrame(poll)
     return () => cancelAnimationFrame(rafRef.current)
   }, [poll])
+}
+
+export function vibrateController(durationMs = 200, intensity = 0.5) {
+  const gamepads = navigator.getGamepads()
+  for (const gp of gamepads) {
+    if (!gp?.vibrationActuator) continue
+    gp.vibrationActuator.playEffect('dual-rumble', {
+      duration: durationMs,
+      strongMagnitude: intensity,
+      weakMagnitude: intensity * 0.5,
+    }).catch(() => {})
+  }
 }
 
 // Button label configs for different controller types
