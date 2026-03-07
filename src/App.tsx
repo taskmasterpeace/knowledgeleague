@@ -1,9 +1,31 @@
+import { useGameState } from './hooks/useGameState'
+import { Menu } from './components/Menu/Menu'
+import { CPUSelect } from './components/CPUSelect/CPUSelect'
+import { AvatarSelect } from './components/AvatarSelect/AvatarSelect'
+import { EventSelect } from './components/EventSelect/EventSelect'
+import { MathMarathon } from './components/MathMarathon/MathMarathon'
+import { TugOfWar } from './components/TugOfWar/TugOfWar'
+import { Victory } from './components/Victory/Victory'
+
 function App() {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 flex items-center justify-center">
-      <h1 className="text-6xl font-bold text-white">Math Muscle</h1>
-    </div>
-  )
+  const { phase, event } = useGameState()
+
+  switch (phase) {
+    case 'menu':
+      return <Menu />
+    case 'cpu-select':
+      return <CPUSelect />
+    case 'avatar-select':
+      return <AvatarSelect />
+    case 'event-select':
+      return <EventSelect />
+    case 'playing':
+      return event === 'marathon' ? <MathMarathon /> : <TugOfWar />
+    case 'victory':
+      return <Victory />
+    default:
+      return <Menu />
+  }
 }
 
 export default App
