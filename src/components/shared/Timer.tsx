@@ -1,24 +1,24 @@
 import { useEffect, useState, useRef } from 'react'
-import { PROBLEM_TIME_LIMIT, URGENT_THRESHOLD } from '../../utils/constants'
 
 interface Props {
   onTimeUp: () => void
   resetKey: number
+  timeLimit: number
 }
 
-export function Timer({ onTimeUp, resetKey }: Props) {
-  const [remaining, setRemaining] = useState(PROBLEM_TIME_LIMIT)
+export function Timer({ onTimeUp, resetKey, timeLimit }: Props) {
+  const [remaining, setRemaining] = useState(timeLimit)
   const startRef = useRef(Date.now())
 
   useEffect(() => {
     startRef.current = Date.now()
-    setRemaining(PROBLEM_TIME_LIMIT)
-  }, [resetKey])
+    setRemaining(timeLimit)
+  }, [resetKey, timeLimit])
 
   useEffect(() => {
     const interval = setInterval(() => {
       const elapsed = Date.now() - startRef.current
-      const left = Math.max(0, PROBLEM_TIME_LIMIT - elapsed)
+      const left = Math.max(0, timeLimit - elapsed)
       setRemaining(left)
       if (left <= 0) {
         clearInterval(interval)
@@ -26,10 +26,10 @@ export function Timer({ onTimeUp, resetKey }: Props) {
       }
     }, 50)
     return () => clearInterval(interval)
-  }, [onTimeUp, resetKey])
+  }, [onTimeUp, resetKey, timeLimit])
 
-  const pct = (remaining / PROBLEM_TIME_LIMIT) * 100
-  const urgent = remaining <= URGENT_THRESHOLD
+  const pct = (remaining / timeLimit) * 100
+  const urgent = remaining <= 3000
 
   return (
     <div className="w-full max-w-2xl mx-auto">

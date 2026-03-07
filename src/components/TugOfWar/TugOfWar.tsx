@@ -12,6 +12,7 @@ import {
   TUG_CORRECT_PULL, TUG_SUPER_PULL, TUG_WRONG_PULL,
   TUG_STREAK_THRESHOLD, TUG_WIN_THRESHOLD,
 } from '../../utils/constants'
+import { useSettings } from '../../hooks/useSettings'
 
 export function TugOfWar() {
   const {
@@ -19,7 +20,10 @@ export function TugOfWar() {
     incrementScore, setWinner, cpuCharacter,
     controllerType, setControllerType,
   } = useGameState()
-  const { currentProblem, nextProblem, problemCount } = useMathEngine()
+  const { timePerQuestion, difficulty } = useSettings()
+  const { currentProblem, nextProblem, problemCount } = useMathEngine(
+    difficulty === 'adaptive' ? undefined : difficulty
+  )
   const [timerKey, setTimerKey] = useState(0)
   const [feedback, setFeedback] = useState<Record<number, 'correct' | 'wrong' | null>>({ 1: null, 2: null })
   const [usedShot, setUsedShot] = useState<Record<number, boolean>>({ 1: false, 2: false })
@@ -157,7 +161,7 @@ export function TugOfWar() {
       </div>
 
       {/* Timer */}
-      <Timer onTimeUp={handleTimeUp} resetKey={timerKey} />
+      <Timer onTimeUp={handleTimeUp} resetKey={timerKey} timeLimit={timePerQuestion} />
 
       {/* Problem */}
       <div className="flex-1 flex items-center justify-center">

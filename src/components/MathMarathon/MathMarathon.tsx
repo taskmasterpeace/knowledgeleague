@@ -10,10 +10,11 @@ import { ScoreBar } from '../shared/ScoreBar'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { ControllerHint } from '../shared/ControllerButtons'
 import {
-  MARATHON_TRACK_LENGTH, MARATHON_FIRST_CORRECT,
+  MARATHON_FIRST_CORRECT,
   MARATHON_SECOND_CORRECT, MARATHON_WRONG_ANSWER,
   MARATHON_NO_ANSWER,
 } from '../../utils/constants'
+import { useSettings } from '../../hooks/useSettings'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
@@ -32,7 +33,10 @@ export function MathMarathon() {
     incrementScore, setWinner, cpuCharacter,
     controllerType, setControllerType,
   } = useGameState()
-  const { currentProblem, nextProblem, problemCount } = useMathEngine()
+  const { timePerQuestion, trackLength, difficulty } = useSettings()
+  const { currentProblem, nextProblem, problemCount } = useMathEngine(
+    difficulty === 'adaptive' ? undefined : difficulty
+  )
   const [timerKey, setTimerKey] = useState(0)
   const [showingResult, setShowingResult] = useState(false)
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null)
@@ -79,11 +83,11 @@ export function MathMarathon() {
 
     const p1NewPos = players[0].position + p1Spaces
     const p2NewPos = players[1].position + p2Spaces
-    if (p1NewPos >= MARATHON_TRACK_LENGTH || p2NewPos >= MARATHON_TRACK_LENGTH) {
-      if (p1NewPos >= MARATHON_TRACK_LENGTH && p2NewPos >= MARATHON_TRACK_LENGTH) {
+    if (p1NewPos >= trackLength || p2NewPos >= trackLength) {
+      if (p1NewPos >= trackLength && p2NewPos >= trackLength) {
         setWinner(p1NewPos >= p2NewPos ? 1 : 2)
       } else {
-        setWinner(p1NewPos >= MARATHON_TRACK_LENGTH ? 1 : 2)
+        setWinner(p1NewPos >= trackLength ? 1 : 2)
       }
       return
     }
@@ -151,8 +155,8 @@ export function MathMarathon() {
     <div className="min-h-screen bg-gradient-to-b from-sky-400 to-blue-600 flex flex-col p-6 gap-6">
       {/* Progress bars */}
       <div className="flex flex-col gap-2">
-        <ScoreBar position={players[0].position} trackLength={MARATHON_TRACK_LENGTH} color={players[0].color} label={players[0].name} />
-        <ScoreBar position={players[1].position} trackLength={MARATHON_TRACK_LENGTH} color={players[1].color} label={players[1].name} />
+        <ScoreBar position={players[0].position} trackLength={trackLength} color={players[0].color} label={players[0].name} />
+        <ScoreBar position={players[1].position} trackLength={trackLength} color={players[1].color} label={players[1].name} />
       </div>
 
       {/* Track visualization */}
@@ -163,7 +167,7 @@ export function MathMarathon() {
             key={player.id}
             className="absolute transition-all duration-300"
             style={{
-              left: `${Math.min(95, (player.position / MARATHON_TRACK_LENGTH) * 100)}%`,
+              left: `${Math.min(95, (player.position / trackLength) * 100)}%`,
               top: i === 0 ? '10%' : '50%',
             }}
           >
@@ -178,7 +182,7 @@ export function MathMarathon() {
       </div>
 
       {/* Timer */}
-      {!showingResult && <Timer onTimeUp={handleTimeUp} resetKey={timerKey} />}
+      {!showingResult && <Timer onTimeUp={handleTimeUp} resetKey={timerKey} timeLimit={timePerQuestion} />}
 
       {/* Problem or Results */}
       <div className="flex-1 flex items-center justify-center">

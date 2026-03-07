@@ -1,9 +1,5 @@
 import type { CPUCharacter } from '../types'
 
-// Timing (used by Timer until settings replace these)
-export const PROBLEM_TIME_LIMIT = 10_000       // 10 seconds per problem
-export const URGENT_THRESHOLD = 3_000           // 3s remaining = urgent mode
-
 // Marathon — spaces-based scoring
 export const MARATHON_TRACK_LENGTH = 20           // spaces to win
 export const MARATHON_FIRST_CORRECT = 3           // spaces for first correct answer

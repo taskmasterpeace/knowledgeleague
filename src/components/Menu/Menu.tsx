@@ -1,11 +1,13 @@
+import { useState } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useGamepad } from '../../hooks/useGamepad'
 import { ControllerHint } from '../shared/ControllerButtons'
+import { Settings } from '../Settings/Settings'
 
 export function Menu() {
   const { setPhase, startSinglePlayer, controllerType, setControllerType } = useGameState()
+  const [showSettings, setShowSettings] = useState(false)
 
-  // Listen for controller connections on menu
   useGamepad({
     onP1Answer: () => {},
     onP2Answer: () => {},
@@ -14,7 +16,18 @@ export function Menu() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-600 to-purple-800 flex flex-col items-center justify-center gap-12 p-8">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-600 to-purple-800 flex flex-col items-center justify-center gap-12 p-8 relative">
+      {/* Settings gear */}
+      <button
+        onClick={() => setShowSettings(true)}
+        className="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+        </svg>
+      </button>
+
       <div className="text-center">
         <h1 className="text-8xl font-black text-white tracking-tighter drop-shadow-lg">
           MATH MUSCLE
@@ -46,6 +59,8 @@ export function Menu() {
         </div>
         <ControllerHint controllerType={controllerType} />
       </div>
+
+      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
     </div>
   )
 }
