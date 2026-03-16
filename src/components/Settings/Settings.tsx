@@ -1,8 +1,17 @@
 import { useSettings } from '../../hooks/useSettings'
+import type { ProblemType } from '../../types'
 
 interface Props {
   onClose: () => void
 }
+
+const CATEGORY_OPTIONS: { key: ProblemType; label: string }[] = [
+  { key: 'addition', label: 'Addition' },
+  { key: 'subtraction', label: 'Subtraction' },
+  { key: 'missing', label: 'Missing Number' },
+  { key: 'comparison', label: 'Comparison' },
+  { key: 'skip-counting', label: 'Skip Counting' },
+]
 
 const TIME_OPTIONS = [
   { label: '10s', value: 10_000 },
@@ -44,6 +53,35 @@ export function Settings({ onClose }: Props) {
                   {d}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Problem Types */}
+          <div>
+            <label className="text-white/70 text-sm font-bold uppercase tracking-wide">Problem Types</label>
+            <div className="grid grid-cols-3 gap-2 mt-1">
+              {CATEGORY_OPTIONS.map(({ key, label }) => {
+                const enabled = settings.enabledCategories.includes(key)
+                return (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      if (enabled && settings.enabledCategories.length === 1) return
+                      const next = enabled
+                        ? settings.enabledCategories.filter((c) => c !== key)
+                        : [...settings.enabledCategories, key]
+                      settings.update({ enabledCategories: next })
+                    }}
+                    className={`py-2 px-1 rounded-lg text-xs font-bold transition-all ${
+                      enabled
+                        ? 'bg-yellow-400 text-gray-900'
+                        : 'bg-white/10 text-white/60 hover:bg-white/20'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
             </div>
           </div>
 

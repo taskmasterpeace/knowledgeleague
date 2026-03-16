@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { ProblemType } from '../types'
 
 export interface Settings {
   difficulty: 'easy' | 'medium' | 'hard' | 'adaptive'
@@ -7,9 +8,11 @@ export interface Settings {
   soundEnabled: boolean
   musicEnabled: boolean
   vibrationEnabled: boolean
+  enabledCategories: ProblemType[]
 }
 
-const STORAGE_KEY = 'mathMuscle:settings'
+const STORAGE_KEY = 'brainGames:settings'
+const LEGACY_KEY = 'mathMuscle:settings'
 
 const defaults: Settings = {
   difficulty: 'adaptive',
@@ -18,11 +21,12 @@ const defaults: Settings = {
   soundEnabled: true,
   musicEnabled: true,
   vibrationEnabled: true,
+  enabledCategories: ['addition', 'subtraction', 'missing', 'comparison', 'skip-counting'],
 }
 
 function loadSettings(): Settings {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_KEY)
     if (stored) return { ...defaults, ...JSON.parse(stored) }
   } catch {}
   return defaults

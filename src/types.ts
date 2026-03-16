@@ -5,6 +5,7 @@ export type GamePhase =
   | 'event-select'
   | 'playing'
   | 'victory'
+  | 'trophies'
 
 export type GameEvent = 'marathon' | 'tug-of-war'
 
@@ -37,6 +38,12 @@ export interface CPUCharacter {
 export type Difficulty = 'easy' | 'medium' | 'hard'
 
 export type ProblemType = 'addition' | 'subtraction' | 'missing' | 'comparison' | 'skip-counting'
+
+export interface Badge {
+  category: ProblemType
+  tier: 'bronze' | 'silver' | 'gold' | 'master'
+  earnedAt: string
+}
 
 export interface MathProblem {
   question: string
