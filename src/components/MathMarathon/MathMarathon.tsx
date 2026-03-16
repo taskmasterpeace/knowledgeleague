@@ -53,6 +53,7 @@ export function MathMarathon() {
   const [shaking, setShaking] = useState(false)
   const [showBurst, setShowBurst] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
+  const [hoppingPlayers, setHoppingPlayers] = useState<Set<PlayerId>>(new Set())
 
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
@@ -125,8 +126,16 @@ export function MathMarathon() {
     if (anyHumanCorrect) {
       setFlashType('correct')
       setShowBurst(true)
+      // Trigger avatar hop for players who got it correct
+      const hoppers = new Set<PlayerId>()
+      for (const player of players) {
+        const pid = player.id as PlayerId
+        if (playerResults.get(pid)?.answer?.correct) hoppers.add(pid)
+      }
+      setHoppingPlayers(hoppers)
       setTimeout(() => setFlashType(null), 150)
       setTimeout(() => setShowBurst(false), 600)
+      setTimeout(() => setHoppingPlayers(new Set()), 400)
     } else {
       setFlashType('wrong')
       setShaking(true)
@@ -253,6 +262,7 @@ export function MathMarathon() {
               color={player.color}
               size={40}
               avatarUrl={player.avatarUrl}
+              isHopping={hoppingPlayers.has(player.id as PlayerId)}
             />
           </div>
         ))}
