@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react'
+import { useCallback, useState, useRef, useEffect } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useMathEngine } from '../../hooks/useMathEngine'
 import { useKeyboardInput } from '../../hooks/useKeyboardInput'
@@ -17,6 +17,7 @@ import {
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
 import type { PlayerId } from '../../types'
+import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
@@ -53,6 +54,17 @@ export function MathMarathon() {
 
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
+  const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
+  const timerStartRef = useRef(Date.now())
+
+  useEffect(() => {
+    for (const player of players) {
+      if (player.type === 'human' && !profilesRef.current.has(player.id)) {
+        const profile = getOrCreateProfile(player.name)
+        profilesRef.current.set(player.id, profile.id)
+      }
+    }
+  }, [players])
 
   const resolveRound = useCallback(() => {
     if (roundResolvedRef.current) return
@@ -88,6 +100,18 @@ export function MathMarathon() {
 
       if (spaces > 0) updatePosition(pid, spaces)
       if (answer?.correct) { incrementStreak(pid); incrementScore(pid) } else { resetStreak(pid) }
+    }
+
+    // Record answers for human players
+    for (const player of players) {
+      if (player.type !== 'human') continue
+      const pid = player.id as PlayerId
+      const result = playerResults.get(pid)
+      if (!result) continue
+      const profileId = profilesRef.current.get(player.id)
+      if (!profileId) continue
+      const responseTime = result.answer ? result.answer.timestamp - timerStartRef.current : timePerQuestion
+      recordAnswer(profileId, currentProblem.type, result.answer?.correct ?? false, responseTime)
     }
 
     // Trigger effects based on whether any human got it correct
@@ -138,9 +162,10 @@ export function MathMarathon() {
       answersRef.current = new Map()
       roundResolvedRef.current = false
       nextProblem()
+      timerStartRef.current = Date.now()
       setTimerKey(k => k + 1)
     }, 2000)
-  }, [players, currentProblem, trackLength, updatePosition, incrementStreak, resetStreak, incrementScore, setWinner, nextProblem])
+  }, [players, currentProblem, trackLength, timePerQuestion, updatePosition, incrementStreak, resetStreak, incrementScore, setWinner, nextProblem])
 
   const handleAnswer = useCallback((playerId: PlayerId, choiceIndex: number) => {
     if (showingResult) return

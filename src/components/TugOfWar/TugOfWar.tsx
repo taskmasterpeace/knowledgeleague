@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useRef, useEffect } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useMathEngine } from '../../hooks/useMathEngine'
 import { useKeyboardInput } from '../../hooks/useKeyboardInput'
@@ -14,6 +14,7 @@ import {
   TUG_STREAK_THRESHOLD, TUG_WIN_THRESHOLD,
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
+import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 
 export function TugOfWar() {
   const {
@@ -32,10 +33,23 @@ export function TugOfWar() {
   const [shaking, setShaking] = useState(false)
   const [showBurst, setShowBurst] = useState(false)
 
+  const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
+  const timerStartRef = useRef(Date.now())
+
+  useEffect(() => {
+    for (const player of players) {
+      if (player.type === 'human' && !profilesRef.current.has(player.id)) {
+        const profile = getOrCreateProfile(player.name)
+        profilesRef.current.set(player.id, profile.id)
+      }
+    }
+  }, [players])
+
   const ropePos = players[0].position
 
   const advanceProblem = useCallback(() => {
     nextProblem()
+    timerStartRef.current = Date.now()
     setTimerKey(k => k + 1)
     setFeedback({ 1: null, 2: null })
     setUsedShot({ 1: false, 2: false })
@@ -48,6 +62,12 @@ export function TugOfWar() {
     const direction = playerId === 1 ? -1 : 1
 
     setUsedShot(prev => ({ ...prev, [playerId]: true }))
+
+    const profileId = profilesRef.current.get(playerId)
+    if (profileId && players[playerId - 1].type === 'human') {
+      const responseTime = Date.now() - timerStartRef.current
+      recordAnswer(profileId, currentProblem.type, isCorrect, responseTime)
+    }
 
     if (isCorrect) {
       const streak = players[playerId - 1].streak + 1
