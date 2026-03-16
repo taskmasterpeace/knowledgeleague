@@ -1,0 +1,191 @@
+import React, { useEffect, useRef, useMemo } from 'react'
+
+// ===== PARTICLE BURST =====
+
+interface ParticleBurstProps {
+  active: boolean
+  color?: string
+  count?: number
+}
+
+export function ParticleBurst({ active, color = '#facc15', count = 10 }: ParticleBurstProps) {
+  if (!active) return null
+
+  const particles = Array.from({ length: count }, (_, i) => {
+    const angle = (i / count) * 360
+    const dist = 30 + Math.random() * 50
+    const rad = (angle * Math.PI) / 180
+    const tx = Math.cos(rad) * dist
+    const ty = Math.sin(rad) * dist
+    const delay = Math.random() * 100
+
+    return (
+      <div
+        key={i}
+        style={{
+          position: 'absolute',
+          width: 6,
+          height: 6,
+          backgroundColor: color,
+          borderRadius: 1,
+          top: '50%',
+          left: '50%',
+          marginTop: -3,
+          marginLeft: -3,
+          animation: `particle-burst 0.6s ease-out forwards`,
+          animationDelay: `${delay}ms`,
+          transform: `translate(${tx}px, ${ty}px)`,
+          transformOrigin: 'center',
+        }}
+      />
+    )
+  })
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-block', pointerEvents: 'none' }}>
+      {particles}
+    </div>
+  )
+}
+
+// ===== SCREEN SHAKE =====
+
+interface ScreenShakeProps {
+  trigger: boolean
+  children: React.ReactNode
+}
+
+export function ScreenShake({ trigger, children }: ScreenShakeProps) {
+  const divRef = useRef<HTMLDivElement>(null)
+  const prevTrigger = useRef(false)
+
+  useEffect(() => {
+    if (trigger && !prevTrigger.current && divRef.current) {
+      divRef.current.classList.add('screen-shake')
+      const timer = setTimeout(() => {
+        divRef.current?.classList.remove('screen-shake')
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+    prevTrigger.current = trigger
+  }, [trigger])
+
+  return <div ref={divRef}>{children}</div>
+}
+
+// ===== STREAK FLAME =====
+
+interface StreakFlameProps {
+  streak: number
+}
+
+export function StreakFlame({ streak }: StreakFlameProps) {
+  if (streak < 2) return null
+
+  const size = streak >= 5 ? 28 : streak >= 3 ? 20 : 16
+  const color = streak >= 5 ? '#3b82f6' : streak >= 3 ? '#ea580c' : '#f97316'
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={color}
+      style={{
+        display: 'inline-block',
+        animation: 'flame-flicker 0.6s ease-in-out infinite',
+        transformOrigin: 'bottom center',
+        verticalAlign: 'middle',
+      }}
+      aria-label={`${streak} streak`}
+    >
+      <path d="M12 2C12 2 7 8 7 13a5 5 0 0010 0c0-3-2-6-2-6s-1 2-2 2c-1 0-1-2-1-7z" />
+      <path
+        d="M12 14c0 1.1-.9 2-2 2s-2-.9-2-2c0-1.5 2-4 2-4s2 2.5 2 4z"
+        fill={streak >= 5 ? '#93c5fd' : '#fed7aa'}
+        opacity={0.8}
+      />
+    </svg>
+  )
+}
+
+// ===== FLASH OVERLAY =====
+
+interface FlashOverlayProps {
+  type: 'correct' | 'wrong' | null
+}
+
+export function FlashOverlay({ type }: FlashOverlayProps) {
+  if (!type) return null
+
+  const isCorrect = type === 'correct'
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: isCorrect ? '#4ade80' : '#ef4444',
+        pointerEvents: 'none',
+        zIndex: 9999,
+        animation: isCorrect
+          ? 'flash-green 0.4s ease-out forwards'
+          : 'flash-red 0.4s ease-out forwards',
+      }}
+    />
+  )
+}
+
+// ===== FIREWORKS =====
+
+interface FireworksProps {
+  active: boolean
+}
+
+const FIREWORK_COLORS = ['#facc15', '#f97316', '#a855f7', '#3b82f6', '#10b981', '#ec4899']
+
+export function Fireworks({ active }: FireworksProps) {
+  const bursts = useMemo(() => {
+    return Array.from({ length: 4 }, (_, i) => ({
+      id: i,
+      top: `${15 + Math.random() * 60}%`,
+      left: `${10 + Math.random() * 80}%`,
+      color: FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)],
+      size: 40 + Math.floor(Math.random() * 40),
+      delay: i * 300,
+    }))
+  }, [])
+
+  if (!active) return null
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 9998,
+      }}
+    >
+      {bursts.map((burst) => (
+        <svg
+          key={burst.id}
+          width={burst.size}
+          height={burst.size}
+          viewBox="0 0 40 40"
+          style={{
+            position: 'absolute',
+            top: burst.top,
+            left: burst.left,
+            transform: 'translate(-50%, -50%)',
+            animation: 'firework-burst 0.8s ease-out forwards',
+            animationDelay: `${burst.delay}ms`,
+            opacity: 0,
+          }}
+        >
+          <circle cx="20" cy="20" r="18" fill={burst.color} />
+        </svg>
+      ))}
+    </div>
+  )
+}
