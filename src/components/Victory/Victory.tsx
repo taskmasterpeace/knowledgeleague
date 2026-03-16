@@ -1,5 +1,6 @@
 import { useGameState } from '../../hooks/useGameState'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
+import { Fireworks } from '../shared/Effects'
 
 export function Victory() {
   const { players, winner, resetGame, rematch } = useGameState()
@@ -12,6 +13,7 @@ export function Victory() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-400 to-orange-600 flex flex-col items-center justify-center gap-8 p-8">
+      <Fireworks active={true} />
       <h2 className="text-6xl font-black text-white tracking-tight animate-bounce">
         {winnerPlayer.name.toUpperCase()} WINS!
       </h2>

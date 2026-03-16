@@ -8,6 +8,7 @@ import { MathProblem } from '../shared/MathProblem'
 import { Timer } from '../shared/Timer'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { ControllerHint } from '../shared/ControllerButtons'
+import { ScreenShake, FlashOverlay, StreakFlame, ParticleBurst } from '../shared/Effects'
 import {
   TUG_CORRECT_PULL, TUG_SUPER_PULL, TUG_WRONG_PULL,
   TUG_STREAK_THRESHOLD, TUG_WIN_THRESHOLD,
@@ -27,6 +28,9 @@ export function TugOfWar() {
   const [timerKey, setTimerKey] = useState(0)
   const [feedback, setFeedback] = useState<Record<number, 'correct' | 'wrong' | null>>({ 1: null, 2: null })
   const [usedShot, setUsedShot] = useState<Record<number, boolean>>({ 1: false, 2: false })
+  const [flashType, setFlashType] = useState<'correct' | 'wrong' | null>(null)
+  const [shaking, setShaking] = useState(false)
+  const [showBurst, setShowBurst] = useState(false)
 
   const ropePos = players[0].position
 
@@ -54,6 +58,10 @@ export function TugOfWar() {
       incrementStreak(playerId)
       incrementScore(playerId)
       setFeedback(f => ({ ...f, [playerId]: 'correct' }))
+      setFlashType('correct')
+      setShowBurst(true)
+      setTimeout(() => setFlashType(null), 150)
+      setTimeout(() => setShowBurst(false), 600)
 
       if (Math.abs(newPos) >= TUG_WIN_THRESHOLD) {
         setWinner(newPos < 0 ? 1 : 2)
@@ -66,6 +74,10 @@ export function TugOfWar() {
       setPosition(1, newPos)
       resetStreak(playerId)
       setFeedback(f => ({ ...f, [playerId]: 'wrong' }))
+      setFlashType('wrong')
+      setShaking(true)
+      setTimeout(() => setFlashType(null), 150)
+      setTimeout(() => setShaking(false), 250)
 
       if (Math.abs(newPos) >= TUG_WIN_THRESHOLD) {
         setWinner(newPos < 0 ? 1 : 2)
@@ -113,7 +125,9 @@ export function TugOfWar() {
   const flagPct = 50 + (ropePos / 2)
 
   return (
+    <ScreenShake trigger={shaking}>
     <div className="min-h-screen bg-gradient-to-b from-green-500 to-emerald-800 flex flex-col p-6 gap-6">
+      <FlashOverlay type={flashType} />
       {/* Player info */}
       <div className="flex justify-between items-start">
         <div className="flex flex-col items-center">
@@ -126,7 +140,8 @@ export function TugOfWar() {
             isLocked={usedShot[1]}
             avatarUrl={players[0].avatarUrl}
           />
-          <div className="text-yellow-300 text-sm font-bold mt-1">
+          <div className="text-yellow-300 text-sm font-bold mt-1 flex items-center gap-1">
+            <StreakFlame streak={players[0].streak} />
             {players[0].streak >= TUG_STREAK_THRESHOLD ? 'SUPER PULL!' : `Streak: ${players[0].streak}`}
           </div>
           {usedShot[1] && !feedback[1] && <div className="text-white/50 text-xs">Waiting...</div>}
@@ -142,7 +157,8 @@ export function TugOfWar() {
             isLocked={usedShot[2]}
             avatarUrl={players[1].avatarUrl}
           />
-          <div className="text-yellow-300 text-sm font-bold mt-1">
+          <div className="text-yellow-300 text-sm font-bold mt-1 flex items-center gap-1">
+            <StreakFlame streak={players[1].streak} />
             {players[1].streak >= TUG_STREAK_THRESHOLD ? 'SUPER PULL!' : `Streak: ${players[1].streak}`}
           </div>
           {usedShot[2] && !feedback[2] && <div className="text-white/50 text-xs">Waiting...</div>}
@@ -168,6 +184,7 @@ export function TugOfWar() {
 
       {/* Problem */}
       <div className="flex-1 flex items-center justify-center">
+        <ParticleBurst active={showBurst} color="#4ade80" />
         <MathProblem
           problem={currentProblem}
           onAnswer={() => {}}
@@ -190,5 +207,6 @@ export function TugOfWar() {
         <ControllerHint controllerType={controllerType} />
       </div>
     </div>
+    </ScreenShake>
   )
 }

@@ -9,6 +9,7 @@ import { Timer } from '../shared/Timer'
 import { ScoreBar } from '../shared/ScoreBar'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { ControllerHint } from '../shared/ControllerButtons'
+import { ScreenShake, FlashOverlay, StreakFlame, ParticleBurst } from '../shared/Effects'
 import {
   MARATHON_FIRST_CORRECT,
   MARATHON_SECOND_CORRECT, MARATHON_WRONG_ANSWER,
@@ -46,6 +47,9 @@ export function MathMarathon() {
   const [timerKey, setTimerKey] = useState(0)
   const [showingResult, setShowingResult] = useState(false)
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null)
+  const [flashType, setFlashType] = useState<'correct' | 'wrong' | null>(null)
+  const [shaking, setShaking] = useState(false)
+  const [showBurst, setShowBurst] = useState(false)
 
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
@@ -84,6 +88,23 @@ export function MathMarathon() {
 
       if (spaces > 0) updatePosition(pid, spaces)
       if (answer?.correct) { incrementStreak(pid); incrementScore(pid) } else { resetStreak(pid) }
+    }
+
+    // Trigger effects based on whether any human got it correct
+    const anyHumanCorrect = players.some(p => {
+      if (p.type !== 'human') return false
+      return playerResults.get(p.id as PlayerId)?.answer?.correct === true
+    })
+    if (anyHumanCorrect) {
+      setFlashType('correct')
+      setShowBurst(true)
+      setTimeout(() => setFlashType(null), 150)
+      setTimeout(() => setShowBurst(false), 600)
+    } else {
+      setFlashType('wrong')
+      setShaking(true)
+      setTimeout(() => setFlashType(null), 150)
+      setTimeout(() => setShaking(false), 250)
     }
 
     // Check for winner
@@ -172,11 +193,16 @@ export function MathMarathon() {
   const trackSpacing = (i: number) => `${(i / Math.max(players.length - 1, 1)) * 70 + 10}%`
 
   return (
+    <ScreenShake trigger={shaking}>
     <div className="min-h-screen bg-gradient-to-b from-sky-400 to-blue-600 flex flex-col p-6 gap-6">
+      <FlashOverlay type={flashType} />
       {/* Progress bars */}
       <div className="flex flex-col gap-2">
         {players.map(player => (
-          <ScoreBar key={player.id} position={player.position} trackLength={trackLength} color={player.color} label={player.name} />
+          <div key={player.id} className="flex items-center gap-2">
+            <ScoreBar position={player.position} trackLength={trackLength} color={player.color} label={player.name} />
+            <StreakFlame streak={player.streak} />
+          </div>
         ))}
       </div>
 
@@ -207,6 +233,7 @@ export function MathMarathon() {
 
       {/* Problem or Results */}
       <div className="flex-1 flex items-center justify-center">
+        <ParticleBurst active={showBurst} color="#4ade80" />
         {showingResult && roundResult ? (
           <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur rounded-2xl p-8 border-2 border-white/20 w-full max-w-3xl">
             <div className="text-3xl font-bold text-white">
@@ -246,5 +273,6 @@ export function MathMarathon() {
         <ControllerHint controllerType={controllerType} />
       </div>
     </div>
+    </ScreenShake>
   )
 }
