@@ -16,10 +16,14 @@ export const TUG_WIN_THRESHOLD = 80             // % past center to win
 
 // CPU Characters
 export const CPU_CHARACTERS: CPUCharacter[] = [
-  { name: 'Kevin', speedRange: [1, 3], accuracy: 0.85, tagline: 'Fast but sloppy!', color: '#ef4444' },
-  { name: 'Sally', speedRange: [4, 7], accuracy: 0.90, tagline: 'Slow and steady', color: '#a855f7' },
-  { name: 'Benny', speedRange: [2, 5], accuracy: 0.60, tagline: 'Still learning', color: '#22c55e' },
-  { name: 'Mia',   speedRange: [1, 6], accuracy: 0.75, tagline: 'Wildcard!',       color: '#f59e0b' },
+  { name: 'Kevin', speedRange: [0, 3], accuracy: 0.85, tagline: 'Fast but sloppy!', color: '#ef4444',
+    avatarUrl: '/avatars/cpu/kevin-portrait.png', animatedUrl: '/avatars/cpu/kevin-walk.gif' },
+  { name: 'Sally', speedRange: [4, 8], accuracy: 0.90, tagline: 'Slow and steady', color: '#a855f7',
+    avatarUrl: '/avatars/cpu/sally-portrait.png', animatedUrl: '/avatars/cpu/sally-walk.gif' },
+  { name: 'Benny', speedRange: [2, 6], accuracy: 0.60, tagline: 'Still learning', color: '#22c55e',
+    avatarUrl: '/avatars/cpu/benny-portrait.png', animatedUrl: '/avatars/cpu/benny-walk.gif' },
+  { name: 'Mia',   speedRange: [0, 6], accuracy: 0.75, tagline: 'Wildcard!',       color: '#f59e0b',
+    avatarUrl: '/avatars/cpu/mia-portrait.png', animatedUrl: '/avatars/cpu/mia-walk.gif' },
 ]
 
 // Player colors
