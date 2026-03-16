@@ -16,8 +16,9 @@ import {
   MARATHON_NO_ANSWER,
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
-import type { PlayerId } from '../../types'
+import type { PlayerId, Badge } from '../../types'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
+import { BadgeToast } from '../shared/BadgeToast'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
@@ -51,6 +52,7 @@ export function MathMarathon() {
   const [flashType, setFlashType] = useState<'correct' | 'wrong' | null>(null)
   const [shaking, setShaking] = useState(false)
   const [showBurst, setShowBurst] = useState(false)
+  const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
 
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
@@ -111,7 +113,8 @@ export function MathMarathon() {
       const profileId = profilesRef.current.get(player.id)
       if (!profileId) continue
       const responseTime = result.answer ? result.answer.timestamp - timerStartRef.current : timePerQuestion
-      recordAnswer(profileId, currentProblem.type, result.answer?.correct ?? false, responseTime)
+      const badge = recordAnswer(profileId, currentProblem.type, result.answer?.correct ?? false, responseTime)
+      if (badge) setEarnedBadge(badge)
     }
 
     // Trigger effects based on whether any human got it correct
@@ -161,6 +164,7 @@ export function MathMarathon() {
       setRoundResult(null)
       answersRef.current = new Map()
       roundResolvedRef.current = false
+      setEarnedBadge(null)
       nextProblem()
       timerStartRef.current = Date.now()
       setTimerKey(k => k + 1)
@@ -220,6 +224,7 @@ export function MathMarathon() {
   return (
     <ScreenShake trigger={shaking}>
     <div className="min-h-screen bg-gradient-to-b from-sky-400 to-blue-600 flex flex-col p-6 gap-6">
+      <BadgeToast badge={earnedBadge} />
       <FlashOverlay type={flashType} />
       {/* Progress bars */}
       <div className="flex flex-col gap-2">

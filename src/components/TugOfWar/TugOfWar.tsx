@@ -15,6 +15,8 @@ import {
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
+import type { Badge } from '../../types'
+import { BadgeToast } from '../shared/BadgeToast'
 
 export function TugOfWar() {
   const {
@@ -32,6 +34,7 @@ export function TugOfWar() {
   const [flashType, setFlashType] = useState<'correct' | 'wrong' | null>(null)
   const [shaking, setShaking] = useState(false)
   const [showBurst, setShowBurst] = useState(false)
+  const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
 
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
   const timerStartRef = useRef(Date.now())
@@ -53,6 +56,7 @@ export function TugOfWar() {
     setTimerKey(k => k + 1)
     setFeedback({ 1: null, 2: null })
     setUsedShot({ 1: false, 2: false })
+    setEarnedBadge(null)
   }, [nextProblem])
 
   const handleAnswer = useCallback((playerId: 1 | 2, choiceIndex: number) => {
@@ -66,7 +70,8 @@ export function TugOfWar() {
     const profileId = profilesRef.current.get(playerId)
     if (profileId && players[playerId - 1].type === 'human') {
       const responseTime = Date.now() - timerStartRef.current
-      recordAnswer(profileId, currentProblem.type, isCorrect, responseTime)
+      const badge = recordAnswer(profileId, currentProblem.type, isCorrect, responseTime)
+      if (badge) setEarnedBadge(badge)
     }
 
     if (isCorrect) {
@@ -147,6 +152,7 @@ export function TugOfWar() {
   return (
     <ScreenShake trigger={shaking}>
     <div className="min-h-screen bg-gradient-to-b from-green-500 to-emerald-800 flex flex-col p-6 gap-6">
+      <BadgeToast badge={earnedBadge} />
       <FlashOverlay type={flashType} />
       {/* Player info */}
       <div className="flex justify-between items-start">

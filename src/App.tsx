@@ -6,6 +6,7 @@ import { EventSelect } from './components/EventSelect/EventSelect'
 import { MathMarathon } from './components/MathMarathon/MathMarathon'
 import { TugOfWar } from './components/TugOfWar/TugOfWar'
 import { Victory } from './components/Victory/Victory'
+import { TrophyShelf } from './components/TrophyShelf/TrophyShelf'
 
 function App() {
   const { phase, event } = useGameState()
@@ -23,6 +24,8 @@ function App() {
       return event === 'marathon' ? <MathMarathon /> : <TugOfWar />
     case 'victory':
       return <Victory />
+    case 'trophies':
+      return <TrophyShelf />
     default:
       return <Menu />
   }

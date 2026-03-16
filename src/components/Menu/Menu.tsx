@@ -63,6 +63,12 @@ export function Menu() {
         >
           4 PLAYERS
         </button>
+        <button
+          onClick={() => setPhase('trophies')}
+          className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-gray-900 text-2xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg mt-4"
+        >
+          🏆 TROPHIES
+        </button>
       </div>
 
       <div className="flex flex-col items-center gap-2">
