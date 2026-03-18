@@ -227,68 +227,117 @@ export function MathMarathon() {
     resolveRound()
   }, [resolveRound])
 
-  // Track vertical spacing per player
-  const trackSpacing = (i: number) => `${(i / Math.max(players.length - 1, 1)) * 70 + 10}%`
-
   return (
     <ScreenShake trigger={shaking}>
-    <div className="min-h-screen bg-gradient-to-b from-sky-400 to-blue-600 flex flex-col p-6 gap-6">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col p-4 gap-4">
       <BadgeToast badge={earnedBadge} />
       <FlashOverlay type={flashType} />
-      {/* Progress bars */}
-      <div className="flex flex-col gap-2">
-        {players.map(player => (
-          <div key={player.id} className="flex items-center gap-2">
-            <ScoreBar position={player.position} trackLength={trackLength} color={player.color} label={player.name} />
-            <StreakFlame streak={player.streak} />
-          </div>
-        ))}
+
+      {/* HUD Panel - Score Bars */}
+      <div className="pixel-card rounded-lg p-3">
+        <div className="flex flex-col gap-1.5">
+          {players.map(player => (
+            <div key={player.id} className="flex items-center gap-2">
+              <ScoreBar position={player.position} trackLength={trackLength} color={player.color} label={player.name} />
+              <StreakFlame streak={player.streak} />
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Track visualization */}
-      <div className="relative h-32 bg-white/10 rounded-2xl border-2 border-white/20 overflow-hidden">
-        <div className="absolute top-0 bottom-0 right-4 w-1 bg-yellow-400/50" />
-        {players.map((player, i) => (
-          <div
-            key={player.id}
-            className="absolute transition-all duration-300"
-            style={{
-              left: `${Math.min(95, (player.position / trackLength) * 100)}%`,
-              top: trackSpacing(i),
-            }}
-          >
-            <PlayerAvatar
-              name={player.name}
-              color={player.color}
-              size={40}
-              avatarUrl={player.avatarUrl}
-              isHopping={hoppingPlayers.has(player.id as PlayerId)}
-            />
-          </div>
-        ))}
+      {/* Race Track */}
+      <div className="pixel-card rounded-lg p-2 relative overflow-hidden" style={{ minHeight: `${Math.max(120, players.length * 50 + 40)}px` }}>
+        {/* Grass border top */}
+        <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-b from-green-800 to-green-900 rounded-t-md" />
+        {/* Grass border bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-t from-green-800 to-green-900 rounded-b-md" />
+
+        {/* Track surface */}
+        <div className="absolute inset-x-0 top-3 bottom-3 bg-gradient-to-b from-amber-900/40 via-amber-800/30 to-amber-900/40" />
+
+        {/* Lane dividers */}
+        {players.length > 1 && players.slice(1).map((_, i) => {
+          const y = ((i + 1) / players.length) * 100
+          return (
+            <div key={i} className="absolute left-8 right-8 h-px" style={{ top: `${y}%` }}>
+              <div className="w-full h-full"
+                style={{ backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 8px, transparent 8px, transparent 16px)' }}
+              />
+            </div>
+          )
+        })}
+
+        {/* Start label */}
+        <div className="absolute left-1 top-1/2 -translate-y-1/2 font-pixel text-[7px] text-green-400/50"
+          style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>
+          START
+        </div>
+
+        {/* Checkered finish line */}
+        <div className="absolute right-0 top-3 bottom-3 w-6"
+          style={{
+            backgroundImage: `repeating-conic-gradient(rgba(255,255,255,0.8) 0% 25%, rgba(40,40,40,0.8) 0% 50%)`,
+            backgroundSize: '8px 8px',
+          }}
+        />
+        <div className="absolute right-7 top-1/2 -translate-y-1/2 font-pixel text-[6px] text-yellow-400/60"
+          style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>
+          FINISH
+        </div>
+
+        {/* Player avatars on track */}
+        {players.map((player, i) => {
+          const laneY = ((i + 0.5) / players.length) * 100
+          return (
+            <div
+              key={player.id}
+              className="absolute transition-all duration-500 -translate-y-1/2 z-10"
+              style={{
+                left: `${Math.min(88, Math.max(3, (player.position / trackLength) * 85 + 3))}%`,
+                top: `${laneY}%`,
+              }}
+            >
+              <PlayerAvatar
+                name={player.name}
+                color={player.color}
+                size={36}
+                avatarUrl={player.avatarUrl}
+                isHopping={hoppingPlayers.has(player.id as PlayerId)}
+              />
+            </div>
+          )
+        })}
       </div>
 
       {/* Timer */}
       {!showingResult && <Timer onTimeUp={handleTimeUp} resetKey={timerKey} timeLimit={timePerQuestion} />}
 
       {/* Problem or Results */}
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center relative">
         <ParticleBurst active={showBurst} color="#4ade80" />
         {showingResult && roundResult ? (
-          <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur rounded-2xl p-8 border-2 border-white/20 w-full max-w-3xl">
-            <div className="text-3xl font-bold text-white">
-              {roundResult.question} = <span className="text-green-300">{roundResult.correctAnswer}</span>
+          <div className="pixel-card rounded-lg p-6 w-full max-w-3xl screen-enter">
+            <div className="text-center mb-4">
+              <span className="font-pixel text-lg text-white">{roundResult.question} = </span>
+              <span className="font-pixel text-lg text-green-400 text-glow">{roundResult.correctAnswer}</span>
             </div>
-            <div className="flex gap-8 flex-wrap justify-center">
+            <div className="flex gap-6 flex-wrap justify-center">
               {players.map(player => {
                 const result = roundResult.playerResults.get(player.id as PlayerId)
+                const isCorrect = result?.answer?.correct
                 return (
                   <div key={player.id} className="flex flex-col items-center gap-2">
                     <PlayerAvatar name={player.name} color={player.color} size={50} avatarUrl={player.avatarUrl} />
-                    <div className={`text-2xl font-bold ${result?.answer?.correct ? 'text-green-300' : result?.answer ? 'text-red-300' : 'text-white/40'}`}>
-                      {result?.answer?.correct ? 'Correct!' : result?.answer ? 'Wrong' : 'No answer'}
+                    <div className={`font-pixel text-[10px] font-bold px-3 py-1.5 rounded ${
+                      isCorrect
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                        : result?.answer
+                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                    }`}>
+                      {isCorrect ? 'CORRECT!' : result?.answer ? 'WRONG' : 'NO ANSWER'}
                     </div>
-                    <div className="text-yellow-300 text-xl font-bold">+{result?.spaces ?? 0} spaces</div>
+                    <div className="font-pixel text-[9px] text-yellow-300">+{result?.spaces ?? 0} spaces</div>
                   </div>
                 )
               })}
@@ -309,7 +358,7 @@ export function MathMarathon() {
 
       {/* Footer */}
       <div className="flex justify-between items-center">
-        <div className="text-white/40 text-sm">Problem #{problemCount}</div>
+        <div className="font-pixel text-[8px] text-white/30">PROBLEM #{problemCount}</div>
         <ControllerHint controllerType={controllerType} />
       </div>
     </div>

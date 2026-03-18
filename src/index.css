@@ -1,5 +1,108 @@
 @import "tailwindcss";
 
+/* ===== PIXEL ART GAME STYLING SYSTEM ===== */
+
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Pixel-style button with 3D press effect */
+.pixel-btn {
+  image-rendering: pixelated;
+  box-shadow:
+    inset -3px -3px 0px rgba(0,0,0,0.3),
+    inset 3px 3px 0px rgba(255,255,255,0.2),
+    0 4px 0 rgba(0,0,0,0.4);
+  transition: all 0.1s;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+}
+.pixel-btn:active {
+  box-shadow:
+    inset 3px 3px 0px rgba(0,0,0,0.3),
+    inset -3px -3px 0px rgba(255,255,255,0.2),
+    0 1px 0 rgba(0,0,0,0.4);
+  transform: translateY(3px);
+}
+
+/* Pixel card panel */
+.pixel-card {
+  background: linear-gradient(180deg, rgba(30,30,60,0.95) 0%, rgba(20,20,50,0.98) 100%);
+  border: 3px solid rgba(100,100,180,0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.1),
+    0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* Animated starfield background */
+.stars-bg {
+  background:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.8) 50%, transparent 50%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.6) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,255,255,0.9) 50%, transparent 50%),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.5) 50%, transparent 50%),
+    radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.7) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 20% 90%, rgba(255,255,255,0.4) 50%, transparent 50%),
+    radial-gradient(1px 1px at 80% 50%, rgba(255,255,255,0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 40% 40%, rgba(255,255,255,0.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 60% 70%, rgba(255,255,255,0.8) 50%, transparent 50%),
+    radial-gradient(1px 1px at 15% 45%, rgba(255,255,255,0.3) 50%, transparent 50%),
+    radial-gradient(1px 1px at 85% 15%, rgba(255,255,255,0.7) 50%, transparent 50%),
+    radial-gradient(1px 1px at 55% 85%, rgba(255,255,255,0.4) 50%, transparent 50%);
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  from { background-position: 0 0; }
+  to { background-position: 3px 2px; }
+}
+
+/* Text glow effects */
+.text-glow {
+  text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(100,149,237,0.3);
+}
+.text-glow-gold {
+  text-shadow: 0 0 10px rgba(255,215,0,0.6), 0 0 20px rgba(255,165,0,0.3);
+}
+
+/* Screen enter animation */
+@keyframes screen-enter {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.screen-enter {
+  animation: screen-enter 0.3s ease-out;
+}
+
+/* Glowing pulse */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255,215,0,0.3); }
+  50% { box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,165,0,0.2); }
+}
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Rainbow shimmer for master badge */
+@keyframes rainbow-shimmer {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+.rainbow-shimmer {
+  animation: rainbow-shimmer 3s linear infinite;
+}
+
+/* Correct answer pulse */
+@keyframes choice-correct-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(74,222,128,0.4); }
+  50% { box-shadow: 0 0 25px rgba(74,222,128,0.8), 0 0 50px rgba(74,222,128,0.3); }
+}
+
+/* Timer urgent flash */
+@keyframes timer-urgent-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
 /* ===== PARTICLE BURST ===== */
 @keyframes particle-burst {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
