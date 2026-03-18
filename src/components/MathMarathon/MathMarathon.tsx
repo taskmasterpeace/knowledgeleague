@@ -16,6 +16,7 @@ import {
   MARATHON_NO_ANSWER,
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
+import { sounds } from '../../utils/sounds'
 import type { PlayerId, Badge } from '../../types'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import { BadgeToast } from '../shared/BadgeToast'
@@ -42,7 +43,7 @@ export function MathMarathon() {
     incrementScore, setWinner, cpuCharacter,
     controllerType, setControllerType,
   } = useGameState()
-  const { timePerQuestion, trackLength, difficulty } = useSettings()
+  const { timePerQuestion, trackLength, difficulty, soundEnabled } = useSettings()
   const { currentProblem, nextProblem, problemCount } = useMathEngine(
     difficulty === 'adaptive' ? undefined : difficulty
   )
@@ -115,7 +116,23 @@ export function MathMarathon() {
       if (!profileId) continue
       const responseTime = result.answer ? result.answer.timestamp - timerStartRef.current : timePerQuestion
       const badge = recordAnswer(profileId, currentProblem.type, result.answer?.correct ?? false, responseTime)
-      if (badge) setEarnedBadge(badge)
+      if (badge) {
+        setEarnedBadge(badge)
+        if (soundEnabled) sounds.badge()
+      }
+    }
+
+    // Play streak sound if any human hit a streak milestone
+    for (const player of players) {
+      if (player.type !== 'human') continue
+      const pid = player.id as PlayerId
+      const result = playerResults.get(pid)
+      if (result?.answer?.correct) {
+        const newStreak = player.streak + 1
+        if (newStreak === 3 || newStreak === 5) {
+          if (soundEnabled) sounds.streak()
+        }
+      }
     }
 
     // Trigger effects based on whether any human got it correct
@@ -124,6 +141,7 @@ export function MathMarathon() {
       return playerResults.get(p.id as PlayerId)?.answer?.correct === true
     })
     if (anyHumanCorrect) {
+      if (soundEnabled) sounds.correct()
       setFlashType('correct')
       setShowBurst(true)
       // Trigger avatar hop for players who got it correct
@@ -137,6 +155,7 @@ export function MathMarathon() {
       setTimeout(() => setShowBurst(false), 600)
       setTimeout(() => setHoppingPlayers(new Set()), 400)
     } else {
+      if (soundEnabled) sounds.wrong()
       setFlashType('wrong')
       setShaking(true)
       setTimeout(() => setFlashType(null), 150)

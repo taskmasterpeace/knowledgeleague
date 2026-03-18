@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { Badge } from '../../types'
 import { BadgeIcon } from './BadgeIcon'
+import { useSettings } from '../../hooks/useSettings'
+import { sounds } from '../../utils/sounds'
 
 interface BadgeToastProps {
   badge: Badge | null
@@ -24,12 +26,14 @@ const TIER_LABELS: Record<string, string> = {
 export function BadgeToast({ badge }: BadgeToastProps) {
   const [visible, setVisible] = useState(false)
   const [slidingOut, setSlidingOut] = useState(false)
+  const { soundEnabled } = useSettings()
 
   useEffect(() => {
     if (!badge) return
 
     setVisible(true)
     setSlidingOut(false)
+    if (soundEnabled) sounds.badge()
 
     const slideOutTimer = setTimeout(() => {
       setSlidingOut(true)

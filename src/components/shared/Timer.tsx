@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
+import { useSettings } from '../../hooks/useSettings'
+import { sounds } from '../../utils/sounds'
 
 interface Props {
   onTimeUp: () => void
@@ -9,10 +11,13 @@ interface Props {
 export function Timer({ onTimeUp, resetKey, timeLimit }: Props) {
   const [remaining, setRemaining] = useState(timeLimit)
   const startRef = useRef(Date.now())
+  const lastBeepSecRef = useRef(-1)
+  const { soundEnabled } = useSettings()
 
   useEffect(() => {
     startRef.current = Date.now()
     setRemaining(timeLimit)
+    lastBeepSecRef.current = -1
   }, [resetKey, timeLimit])
 
   useEffect(() => {
@@ -20,13 +25,29 @@ export function Timer({ onTimeUp, resetKey, timeLimit }: Props) {
       const elapsed = Date.now() - startRef.current
       const left = Math.max(0, timeLimit - elapsed)
       setRemaining(left)
+
+      // Timer countdown beeps for last 3 seconds
+      if (left <= 3000 && left > 0) {
+        const sec = Math.ceil(left / 1000)
+        if (sec !== lastBeepSecRef.current) {
+          lastBeepSecRef.current = sec
+          if (soundEnabled) {
+            if (sec === 1) {
+              sounds.timerFinal()
+            } else {
+              sounds.timerWarn()
+            }
+          }
+        }
+      }
+
       if (left <= 0) {
         clearInterval(interval)
         onTimeUp()
       }
     }, 50)
     return () => clearInterval(interval)
-  }, [onTimeUp, resetKey, timeLimit])
+  }, [onTimeUp, resetKey, timeLimit, soundEnabled])
 
   const pct = (remaining / timeLimit) * 100
   const seconds = Math.ceil(remaining / 1000)
