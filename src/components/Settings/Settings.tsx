@@ -8,9 +8,9 @@ interface Props {
 const CATEGORY_OPTIONS: { key: ProblemType; label: string }[] = [
   { key: 'addition', label: 'Addition' },
   { key: 'subtraction', label: 'Subtraction' },
-  { key: 'missing', label: 'Missing Number' },
-  { key: 'comparison', label: 'Comparison' },
-  { key: 'skip-counting', label: 'Skip Counting' },
+  { key: 'missing', label: 'Missing #' },
+  { key: 'comparison', label: 'Compare' },
+  { key: 'skip-counting', label: 'Skip Count' },
 ]
 
 const TIME_OPTIONS = [
@@ -28,26 +28,26 @@ export function Settings({ onClose }: Props) {
   const settings = useSettings()
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" onClick={onClose}>
       <div
-        className="bg-gradient-to-b from-indigo-700 to-purple-900 rounded-2xl p-8 border-2 border-white/20 w-full max-w-md shadow-2xl"
+        className="pixel-card rounded-lg p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-3xl font-black text-white mb-6 text-center">SETTINGS</h2>
+        <h2 className="font-pixel text-lg text-white text-glow mb-6 text-center">SETTINGS</h2>
 
         <div className="flex flex-col gap-5">
           {/* Difficulty */}
           <div>
-            <label className="text-white/70 text-sm font-bold uppercase tracking-wide">Difficulty</label>
-            <div className="flex gap-2 mt-1">
+            <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">Difficulty</label>
+            <div className="flex gap-2">
               {DIFFICULTY_OPTIONS.map((d) => (
                 <button
                   key={d}
                   onClick={() => settings.update({ difficulty: d })}
-                  className={`flex-1 py-2 rounded-lg text-sm font-bold capitalize transition-all ${
+                  className={`flex-1 py-2 rounded-lg font-pixel text-[7px] capitalize transition-all pixel-btn ${
                     settings.difficulty === d
-                      ? 'bg-yellow-400 text-gray-900'
-                      : 'bg-white/10 text-white/60 hover:bg-white/20'
+                      ? 'bg-yellow-500 text-gray-900'
+                      : 'bg-white/10 text-white/50 hover:bg-white/20'
                   }`}
                 >
                   {d}
@@ -58,8 +58,8 @@ export function Settings({ onClose }: Props) {
 
           {/* Problem Types */}
           <div>
-            <label className="text-white/70 text-sm font-bold uppercase tracking-wide">Problem Types</label>
-            <div className="grid grid-cols-3 gap-2 mt-1">
+            <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">Problem Types</label>
+            <div className="grid grid-cols-3 gap-2">
               {CATEGORY_OPTIONS.map(({ key, label }) => {
                 const enabled = settings.enabledCategories.includes(key)
                 return (
@@ -72,10 +72,10 @@ export function Settings({ onClose }: Props) {
                         : [...settings.enabledCategories, key]
                       settings.update({ enabledCategories: next })
                     }}
-                    className={`py-2 px-1 rounded-lg text-xs font-bold transition-all ${
+                    className={`py-2 px-1 rounded-lg font-pixel text-[6px] transition-all pixel-btn ${
                       enabled
-                        ? 'bg-yellow-400 text-gray-900'
-                        : 'bg-white/10 text-white/60 hover:bg-white/20'
+                        ? 'bg-yellow-500 text-gray-900'
+                        : 'bg-white/10 text-white/50 hover:bg-white/20'
                     }`}
                   >
                     {label}
@@ -87,16 +87,16 @@ export function Settings({ onClose }: Props) {
 
           {/* Time per question */}
           <div>
-            <label className="text-white/70 text-sm font-bold uppercase tracking-wide">Time per Question</label>
-            <div className="flex gap-2 mt-1">
+            <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">Time per Question</label>
+            <div className="flex gap-2">
               {TIME_OPTIONS.map((t) => (
                 <button
                   key={t.value}
                   onClick={() => settings.update({ timePerQuestion: t.value })}
-                  className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${
+                  className={`flex-1 py-2 rounded-lg font-pixel text-[8px] transition-all pixel-btn ${
                     settings.timePerQuestion === t.value
-                      ? 'bg-yellow-400 text-gray-900'
-                      : 'bg-white/10 text-white/60 hover:bg-white/20'
+                      ? 'bg-yellow-500 text-gray-900'
+                      : 'bg-white/10 text-white/50 hover:bg-white/20'
                   }`}
                 >
                   {t.label}
@@ -107,16 +107,16 @@ export function Settings({ onClose }: Props) {
 
           {/* Track length */}
           <div>
-            <label className="text-white/70 text-sm font-bold uppercase tracking-wide">Track Length</label>
-            <div className="flex gap-2 mt-1">
+            <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">Track Length</label>
+            <div className="flex gap-2">
               {TRACK_OPTIONS.map((n) => (
                 <button
                   key={n}
                   onClick={() => settings.update({ trackLength: n })}
-                  className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${
+                  className={`flex-1 py-2 rounded-lg font-pixel text-[8px] transition-all pixel-btn ${
                     settings.trackLength === n
-                      ? 'bg-yellow-400 text-gray-900'
-                      : 'bg-white/10 text-white/60 hover:bg-white/20'
+                      ? 'bg-yellow-500 text-gray-900'
+                      : 'bg-white/10 text-white/50 hover:bg-white/20'
                   }`}
                 >
                   {n}
@@ -131,12 +131,12 @@ export function Settings({ onClose }: Props) {
             { key: 'musicEnabled' as const, label: 'Music' },
             { key: 'vibrationEnabled' as const, label: 'Controller Vibration' },
           ].map(({ key, label }) => (
-            <div key={key} className="flex items-center justify-between">
-              <span className="text-white/70 text-sm font-bold uppercase tracking-wide">{label}</span>
+            <div key={key} className="pixel-card rounded-lg px-4 py-3 flex items-center justify-between">
+              <span className="font-pixel text-[8px] text-white/60 uppercase">{label}</span>
               <button
                 onClick={() => settings.update({ [key]: !settings[key] })}
                 className={`w-14 h-7 rounded-full transition-all relative ${
-                  settings[key] ? 'bg-green-400' : 'bg-white/20'
+                  settings[key] ? 'bg-green-500' : 'bg-white/20'
                 }`}
               >
                 <div
@@ -151,7 +151,7 @@ export function Settings({ onClose }: Props) {
 
         <button
           onClick={onClose}
-          className="w-full mt-6 py-3 bg-white/20 hover:bg-white/30 text-white text-xl font-bold rounded-xl transition-all"
+          className="pixel-btn font-pixel w-full mt-6 py-3 bg-indigo-700 hover:bg-indigo-600 text-white text-[10px] rounded-lg transition-colors"
         >
           DONE
         </button>

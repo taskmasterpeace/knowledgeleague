@@ -59,11 +59,11 @@ export function TrophyShelf() {
   const profile = profiles[selectedIndex] ?? null
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-900 to-purple-950 flex flex-col items-center p-6 gap-6">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col items-center p-6 gap-5">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-6xl font-black text-white tracking-tighter drop-shadow-lg">
-          🏆 TROPHIES
+      <div className="text-center mt-2">
+        <h1 className="font-pixel text-3xl text-yellow-300 text-glow-gold leading-relaxed">
+          TROPHIES
         </h1>
       </div>
 
@@ -72,10 +72,11 @@ export function TrophyShelf() {
         <select
           value={selectedIndex}
           onChange={e => setSelectedIndex(Number(e.target.value))}
-          className="px-4 py-2 rounded-xl bg-white/10 text-white border border-white/20 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400"
+          className="pixel-card rounded-lg px-4 py-2 text-white font-pixel text-[9px] focus:outline-none border-0 cursor-pointer"
+          style={{ background: 'linear-gradient(180deg, rgba(30,30,60,0.95) 0%, rgba(20,20,50,0.98) 100%)' }}
         >
           {profiles.map((p, i) => (
-            <option key={p.id} value={i} style={{ color: '#000' }}>
+            <option key={p.id} value={i} style={{ color: '#000', background: '#fff' }}>
               {p.name}
             </option>
           ))}
@@ -85,21 +86,23 @@ export function TrophyShelf() {
       {/* No profiles */}
       {profiles.length === 0 && (
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-white/50 text-2xl font-semibold text-center">
-            No profiles yet — play a game first!
+          <div className="pixel-card rounded-lg p-8 text-center">
+            <div className="font-pixel text-[10px] text-white/50 leading-loose">
+              No profiles yet —<br />play a game first!
+            </div>
           </div>
         </div>
       )}
 
       {/* Badge grid */}
       {profile && (
-        <div className="w-full max-w-2xl flex flex-col gap-4">
+        <div className="w-full max-w-2xl flex flex-col gap-3">
           {CATEGORIES.map(cat => (
             <div
               key={cat.key}
-              className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-5 py-4"
+              className="pixel-card rounded-lg flex items-center gap-4 px-4 py-3"
             >
-              <div className="text-white font-bold text-lg w-40 shrink-0">
+              <div className="font-pixel text-[8px] text-white/80 w-32 shrink-0 leading-relaxed">
                 {cat.label}
               </div>
               <div className="flex gap-4 flex-1 justify-center">
@@ -115,7 +118,7 @@ export function TrophyShelf() {
                     >
                       <BadgeIcon tier={tier} size={36} earned={earned} />
                       <span
-                        className="text-xs font-semibold"
+                        className="font-pixel text-[6px]"
                         style={{ color: earned ? '#fbbf24' : 'rgba(255,255,255,0.2)' }}
                       >
                         {TIER_LABELS[tier]}
@@ -131,22 +134,22 @@ export function TrophyShelf() {
 
       {/* Stats footer */}
       {profile && (
-        <div className="w-full max-w-2xl bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex flex-wrap gap-6 justify-around text-center">
+        <div className="pixel-card rounded-lg w-full max-w-2xl px-6 py-4 flex flex-wrap gap-6 justify-around text-center">
           <div>
-            <div className="text-white/40 text-xs uppercase tracking-widest font-semibold">Games Played</div>
-            <div className="text-white text-2xl font-black">{profile.gamesPlayed}</div>
+            <div className="font-pixel text-[7px] text-white/40 uppercase mb-1">Games Played</div>
+            <div className="font-pixel text-lg text-white text-glow">{profile.gamesPlayed}</div>
           </div>
           <div>
-            <div className="text-white/40 text-xs uppercase tracking-widest font-semibold">Total Correct</div>
-            <div className="text-white text-2xl font-black">{profile.totalCorrect}</div>
+            <div className="font-pixel text-[7px] text-white/40 uppercase mb-1">Total Correct</div>
+            <div className="font-pixel text-lg text-green-400">{profile.totalCorrect}</div>
           </div>
           <div>
-            <div className="text-white/40 text-xs uppercase tracking-widest font-semibold">Favorite Category</div>
-            <div className="text-white text-2xl font-black">{getFavoriteCategory(profile)}</div>
+            <div className="font-pixel text-[7px] text-white/40 uppercase mb-1">Favorite</div>
+            <div className="font-pixel text-[9px] text-cyan-300">{getFavoriteCategory(profile)}</div>
           </div>
           <div>
-            <div className="text-white/40 text-xs uppercase tracking-widest font-semibold">Avg Response</div>
-            <div className="text-white text-2xl font-black">{getAvgResponseTime(profile)}</div>
+            <div className="font-pixel text-[7px] text-white/40 uppercase mb-1">Avg Time</div>
+            <div className="font-pixel text-lg text-yellow-300 text-glow-gold">{getAvgResponseTime(profile)}</div>
           </div>
         </div>
       )}
@@ -154,9 +157,9 @@ export function TrophyShelf() {
       {/* Back button */}
       <button
         onClick={() => setPhase('menu')}
-        className="w-full max-w-sm py-4 bg-white/10 hover:bg-white/20 text-white text-2xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 border border-white/20"
+        className="pixel-btn font-pixel w-full max-w-sm py-4 bg-indigo-700 hover:bg-indigo-600 text-white text-[10px] rounded-lg transition-colors"
       >
-        ← BACK
+        BACK TO MENU
       </button>
     </div>
   )
