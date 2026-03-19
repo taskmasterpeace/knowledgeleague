@@ -80,19 +80,19 @@ export function Menu() {
           1 PLAYER
         </button>
         <button
-          onClick={() => { if (soundEnabled) sounds.select(); setPlayerCount(2); setPhase('avatar-select') }}
+          onClick={() => { preloadSounds(); if (soundEnabled) sounds.select(); setPlayerCount(2); setPhase('avatar-select') }}
           className="pixel-btn font-pixel w-full py-4 bg-green-500 hover:bg-green-400 text-gray-900 text-sm rounded-lg transition-colors"
         >
           2 PLAYERS
         </button>
         <button
-          onClick={() => { if (soundEnabled) sounds.select(); setPlayerCount(3); setPhase('avatar-select') }}
+          onClick={() => { preloadSounds(); if (soundEnabled) sounds.select(); setPlayerCount(3); setPhase('avatar-select') }}
           className="pixel-btn font-pixel w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-gray-900 text-sm rounded-lg transition-colors"
         >
           3 PLAYERS
         </button>
         <button
-          onClick={() => { if (soundEnabled) sounds.select(); setPlayerCount(4); setPhase('avatar-select') }}
+          onClick={() => { preloadSounds(); if (soundEnabled) sounds.select(); setPlayerCount(4); setPhase('avatar-select') }}
           className="pixel-btn font-pixel w-full py-4 bg-orange-500 hover:bg-orange-400 text-gray-900 text-sm rounded-lg transition-colors"
         >
           4 PLAYERS
@@ -109,7 +109,7 @@ export function Menu() {
           PHONE PLAY
         </button>
         <button
-          onClick={() => { if (soundEnabled) sounds.select(); setPhase('trophies') }}
+          onClick={() => { preloadSounds(); if (soundEnabled) sounds.select(); setPhase('trophies') }}
           className="pixel-btn font-pixel w-full py-3 bg-amber-600 hover:bg-amber-500 text-white text-xs rounded-lg transition-colors mt-2"
         >
           TROPHIES
