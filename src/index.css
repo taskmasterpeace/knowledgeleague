@@ -167,6 +167,16 @@
   to { transform: translateY(-100%); opacity: 0; }
 }
 
+/* ===== RUNNING BOB ===== */
+@keyframes running-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.animate-running {
+  animation: running-bob 0.35s ease-in-out infinite;
+}
+
 /* ===== CONFETTI FALL ===== */
 @keyframes confetti-fall {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
