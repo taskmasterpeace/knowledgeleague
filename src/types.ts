@@ -3,6 +3,7 @@ export type GamePhase =
   | 'cpu-select'
   | 'avatar-select'
   | 'event-select'
+  | 'phone-lobby'
   | 'playing'
   | 'victory'
   | 'trophies'

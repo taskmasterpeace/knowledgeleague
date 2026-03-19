@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useGamepad } from '../../hooks/useGamepad'
+import { usePeerContext } from '../../hooks/usePeerContext'
 import { ControllerHint } from '../shared/ControllerButtons'
 import { Settings } from '../Settings/Settings'
 import { useSettings } from '../../hooks/useSettings'
@@ -8,6 +9,7 @@ import { sounds, preloadSounds } from '../../utils/sounds'
 
 export function Menu() {
   const { setPhase, startSinglePlayer, setPlayerCount, controllerType, setControllerType } = useGameState()
+  const { setEnabled: setPeerEnabled } = usePeerContext()
   const [showSettings, setShowSettings] = useState(false)
   const { soundEnabled } = useSettings()
 
@@ -36,7 +38,7 @@ export function Menu() {
         <h1 className="font-pixel text-5xl text-white text-glow leading-tight">
           BRAIN<br />GAMES
         </h1>
-        <p className="font-pixel text-xs text-cyan-300/60">Kids Math Challenge</p>
+        <p className="font-pixel text-xs text-cyan-300/60">Math · Science · Reading</p>
 
         {/* Pixel brain SVG decoration */}
         <svg width="80" height="80" viewBox="0 0 80 80" className="mt-2 opacity-70">
@@ -94,6 +96,17 @@ export function Menu() {
           className="pixel-btn font-pixel w-full py-4 bg-orange-500 hover:bg-orange-400 text-gray-900 text-sm rounded-lg transition-colors"
         >
           4 PLAYERS
+        </button>
+        <button
+          onClick={() => {
+            preloadSounds()
+            if (soundEnabled) sounds.select()
+            setPeerEnabled(true)
+            setPhase('phone-lobby')
+          }}
+          className="pixel-btn font-pixel w-full py-4 bg-purple-500 hover:bg-purple-400 text-white text-sm rounded-lg transition-colors mt-1"
+        >
+          PHONE PLAY
         </button>
         <button
           onClick={() => { if (soundEnabled) sounds.select(); setPhase('trophies') }}
