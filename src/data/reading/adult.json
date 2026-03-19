@@ -1,0 +1,422 @@
+[
+  {
+    "question": "What does the word ubiquitous mean?",
+    "choices": ["Extremely rare", "Found everywhere", "Highly dangerous", "Utterly confusing"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word ephemeral mean?",
+    "choices": ["Lasting forever", "Short-lived", "Extremely heavy", "Brightly colored"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word sycophant mean?",
+    "choices": ["A large animal", "A type of instrument", "A person who flatters for gain", "A rare disease"],
+    "correctIndex": 2,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word perfunctory mean?",
+    "choices": ["Done with great care", "Carried out with minimal effort", "Extremely thorough", "Perfectly executed"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word obsequious mean?",
+    "choices": ["Rebellious", "Excessively compliant or submissive", "Dangerously aggressive", "Extremely intelligent"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word loquacious mean?",
+    "choices": ["Very quiet", "Extremely talkative", "Physically strong", "Deeply sad"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word pernicious mean?",
+    "choices": ["Highly beneficial", "Having a harmful effect", "Extremely beautiful", "Pleasantly surprising"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word recalcitrant mean?",
+    "choices": ["Stubbornly resistant to authority", "Easily persuaded", "Deeply thoughtful", "Quickly forgotten"],
+    "correctIndex": 0,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word querulous mean?",
+    "choices": ["Full of curiosity", "Whiny and complaining", "Deeply philosophical", "Extremely quiet"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word sesquipedalian mean?",
+    "choices": ["Related to horses", "Having many sides", "Characterized by long words", "Pertaining to the sea"],
+    "correctIndex": 2,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word pulchritudinous mean?",
+    "choices": ["Disgusting", "Physically beautiful", "Extremely loud", "Deeply philosophical"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word verisimilitude mean?",
+    "choices": ["Absolute truth", "The appearance of being true or real", "A type of virtue", "Complete falsehood"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Choose the correct word: The new policy will ___ everyone in the company.",
+    "choices": ["affect", "effect", "affective", "effecting"],
+    "correctIndex": 0,
+    "category": "grammar",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Choose the correct word: The medicine had a positive ___ on the patient.",
+    "choices": ["affect", "effect", "affection", "affecting"],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Choose the correct word: ___ going to the concert tonight?",
+    "choices": ["Who's", "Whose", "Whos", "Whom's"],
+    "correctIndex": 0,
+    "category": "grammar",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Choose the correct word: To ___ did you give the letter?",
+    "choices": ["who", "whom", "whose", "who's"],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Choose the correct word: Please ___ the book on the table.",
+    "choices": ["lay", "lie", "laid", "lied"],
+    "correctIndex": 0,
+    "category": "grammar",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Choose the correct word: I need to ___ down for a while.",
+    "choices": ["lay", "lie", "laid", "lain"],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Choose the correct word: There are ___ items on the shelf than yesterday.",
+    "choices": ["less", "fewer", "lesser", "least"],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Choose the correct word: She did the work ___ than her colleague.",
+    "choices": ["more quick", "most quickly", "more quickly", "quicklier"],
+    "correctIndex": 2,
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which sentence is grammatically correct?",
+    "choices": ["Between you and I, this is wrong.", "Between you and me, this is correct.", "Between you and myself, this works.", "Between I and you, this is fine."],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which sentence correctly uses the subjunctive mood?",
+    "choices": ["If I was rich, I would travel.", "If I were rich, I would travel.", "If I am rich, I would travel.", "If I be rich, I would travel."],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  {
+    "question": "The word kindergarten comes from which language?",
+    "choices": ["French", "Spanish", "German", "Dutch"],
+    "correctIndex": 2,
+    "category": "etymology",
+    "difficulty": "easy"
+  },
+  {
+    "question": "The word piano comes from which language?",
+    "choices": ["French", "Italian", "Spanish", "German"],
+    "correctIndex": 1,
+    "category": "etymology",
+    "difficulty": "easy"
+  },
+  {
+    "question": "The word tsunami comes from which language?",
+    "choices": ["Chinese", "Korean", "Japanese", "Hawaiian"],
+    "correctIndex": 2,
+    "category": "etymology",
+    "difficulty": "easy"
+  },
+  {
+    "question": "The word safari comes from which language?",
+    "choices": ["Hindi", "Swahili", "Arabic", "Turkish"],
+    "correctIndex": 2,
+    "category": "etymology",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The word avatar comes from which language?",
+    "choices": ["Sanskrit", "Arabic", "Greek", "Latin"],
+    "correctIndex": 0,
+    "category": "etymology",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The English word democracy has roots in which language?",
+    "choices": ["Latin", "Greek", "French", "Germanic"],
+    "correctIndex": 1,
+    "category": "etymology",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The word algebra comes from which language?",
+    "choices": ["Greek", "Latin", "Arabic", "Persian"],
+    "correctIndex": 2,
+    "category": "etymology",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The word ketchup is believed to originate from which language family?",
+    "choices": ["French", "Spanish", "Chinese/Malay", "Native American"],
+    "correctIndex": 2,
+    "category": "etymology",
+    "difficulty": "hard"
+  },
+  {
+    "question": "The word serendipity was coined based on a fairy tale from which country?",
+    "choices": ["India", "Persia", "Sri Lanka", "China"],
+    "correctIndex": 2,
+    "category": "etymology",
+    "difficulty": "hard"
+  },
+  {
+    "question": "The word robot comes from the Czech word robota, meaning what?",
+    "choices": ["Machine", "Metal", "Forced labor", "Servant"],
+    "correctIndex": 2,
+    "category": "etymology",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Hot is to cold as day is to ___.",
+    "choices": ["Light", "Night", "Sun", "Morning"],
+    "correctIndex": 1,
+    "category": "analogies",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Book is to read as song is to ___.",
+    "choices": ["Dance", "Write", "Sing", "Play"],
+    "correctIndex": 2,
+    "category": "analogies",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Painter is to brush as writer is to ___.",
+    "choices": ["Book", "Pen", "Paper", "Story"],
+    "correctIndex": 1,
+    "category": "analogies",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Fish is to water as bird is to ___.",
+    "choices": ["Tree", "Nest", "Air", "Feather"],
+    "correctIndex": 2,
+    "category": "analogies",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Glove is to hand as boot is to ___.",
+    "choices": ["Leg", "Foot", "Arm", "Sock"],
+    "correctIndex": 1,
+    "category": "analogies",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Prologue is to epilogue as dawn is to ___.",
+    "choices": ["Morning", "Noon", "Dusk", "Midnight"],
+    "correctIndex": 2,
+    "category": "analogies",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Thermometer is to temperature as speedometer is to ___.",
+    "choices": ["Distance", "Velocity", "Direction", "Fuel"],
+    "correctIndex": 1,
+    "category": "analogies",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Famished is to hungry as elated is to ___.",
+    "choices": ["Sad", "Happy", "Angry", "Tired"],
+    "correctIndex": 1,
+    "category": "analogies",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Archipelago is to islands as constellation is to ___.",
+    "choices": ["Planets", "Stars", "Galaxies", "Moons"],
+    "correctIndex": 1,
+    "category": "analogies",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Cacophony is to sound as labyrinth is to ___.",
+    "choices": ["Darkness", "Paths", "Height", "Water"],
+    "correctIndex": 1,
+    "category": "analogies",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Accomodate", "Acommodate", "Accommodate", "Acomodate"],
+    "correctIndex": 2,
+    "category": "spelling",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Occurence", "Occurrence", "Ocurrence", "Occurance"],
+    "correctIndex": 1,
+    "category": "spelling",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Seperate", "Separete", "Sepurate", "Separate"],
+    "correctIndex": 3,
+    "category": "spelling",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Definately", "Definetely", "Definitely", "Definitly"],
+    "correctIndex": 2,
+    "category": "spelling",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Conscientious", "Consciencious", "Conscientous", "Conscentious"],
+    "correctIndex": 0,
+    "category": "spelling",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Millenium", "Millennium", "Milenium", "Milennium"],
+    "correctIndex": 1,
+    "category": "spelling",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Supercede", "Superseed", "Supersede", "Superceed"],
+    "correctIndex": 2,
+    "category": "spelling",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Idiosyncracy", "Idiosyncrasy", "Idiosynchrasy", "Idiosyncracy"],
+    "correctIndex": 1,
+    "category": "spelling",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Sacrilegious", "Sacreligious", "Sacralegious", "Sacreligeous"],
+    "correctIndex": 0,
+    "category": "spelling",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word is spelled correctly?",
+    "choices": ["Mischievious", "Mischevous", "Mischievous", "Mischevious"],
+    "correctIndex": 2,
+    "category": "spelling",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the idiom 'the ball is in your court' mean?",
+    "choices": ["You need to play sports", "It's your decision or responsibility now", "The game is over", "You've made a mistake"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the idiom 'bite the bullet' mean?",
+    "choices": ["Eat something hard", "Face a difficult situation bravely", "Make a foolish mistake", "Speak harshly"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the idiom 'burning the midnight oil' mean?",
+    "choices": ["Wasting resources", "Working or studying late at night", "Starting a fire", "Being extremely angry"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the idiom 'a Pyrrhic victory' mean?",
+    "choices": ["A decisive win", "A victory won at too great a cost", "An ancient battle", "An impossible achievement"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the idiom 'throw the baby out with the bathwater' mean?",
+    "choices": ["Be careless with children", "Discard something valuable along with the unwanted", "Clean thoroughly", "Start completely fresh"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the idiom 'crocodile tears' mean?",
+    "choices": ["Genuine sadness", "Insincere display of emotion", "Tears of joy", "Extreme fear"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the expression 'hoist with his own petard' mean?",
+    "choices": ["Lifted to a high position", "Harmed by one's own plan to harm others", "Given an award", "Trapped in a building"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the idiom 'the sword of Damocles' refer to?",
+    "choices": ["A powerful weapon", "An impending danger or threat", "A decisive victory", "An ancient treasure"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "hard"
+  }
+]

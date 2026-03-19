@@ -1,0 +1,422 @@
+[
+  {
+    "question": "What does the word enormous mean?",
+    "choices": ["Very tiny", "Very fast", "Very large", "Very old"],
+    "correctIndex": 2,
+    "category": "vocabulary",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word furious mean?",
+    "choices": ["Very happy", "Very angry", "Very tired", "Very quiet"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word ancient mean?",
+    "choices": ["Brand new", "Very old", "Quite small", "Really loud"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word observe mean?",
+    "choices": ["To ignore", "To watch carefully", "To run quickly", "To speak loudly"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word fortunate mean?",
+    "choices": ["Unlucky", "Brave", "Lucky", "Wealthy"],
+    "correctIndex": 2,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word anxious mean?",
+    "choices": ["Bored", "Worried", "Excited", "Calm"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word courageous mean?",
+    "choices": ["Scared", "Careful", "Brave", "Curious"],
+    "correctIndex": 2,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word peculiar mean?",
+    "choices": ["Normal", "Strange", "Pretty", "Clever"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word exhausted mean?",
+    "choices": ["Very hungry", "Very excited", "Very tired", "Very cold"],
+    "correctIndex": 2,
+    "category": "vocabulary",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word abundant mean?",
+    "choices": ["Scarce", "Plentiful", "Expensive", "Hidden"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word reluctant mean?",
+    "choices": ["Eager", "Unwilling", "Polite", "Cheerful"],
+    "correctIndex": 1,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word frigid mean?",
+    "choices": ["Extremely cold", "Very dry", "Slightly warm", "Quite windy"],
+    "correctIndex": 0,
+    "category": "vocabulary",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which sentence uses the correct verb tense? Yesterday, I ___.",
+    "choices": ["walk to school", "walking to school", "walked to school", "will walk to school"],
+    "correctIndex": 2,
+    "category": "grammar",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which sentence has correct subject-verb agreement?",
+    "choices": ["The dogs runs fast.", "The dogs run fast.", "The dogs is fast.", "The dogs running fast."],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which is the correct past tense of go?",
+    "choices": ["Goed", "Goned", "Went", "Going"],
+    "correctIndex": 2,
+    "category": "grammar",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which sentence is correct?",
+    "choices": ["She don't like pizza.", "She doesn't like pizza.", "She not like pizza.", "She no like pizza."],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Choose the correct word: The team ___ playing well today.",
+    "choices": ["is", "are", "be", "am"],
+    "correctIndex": 0,
+    "category": "grammar",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which sentence uses the future tense?",
+    "choices": ["I ate breakfast.", "I eat breakfast.", "I will eat breakfast.", "I was eating breakfast."],
+    "correctIndex": 2,
+    "category": "grammar",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Choose the correct word: She sings ___ than her sister.",
+    "choices": ["good", "better", "best", "more good"],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which sentence has the correct pronoun?",
+    "choices": ["Me went to the store.", "I went to the store.", "Myself went to the store.", "Mine went to the store."],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which is correct? Tom and ___ went to the park.",
+    "choices": ["me", "I", "myself", "mine"],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Choose the correct word: Each of the students ___ a pencil.",
+    "choices": ["have", "has", "are having", "were having"],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which is correct? Neither the cat nor the dogs ___ outside.",
+    "choices": ["is", "are", "was", "be"],
+    "correctIndex": 1,
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which sentence uses the correct past tense?",
+    "choices": ["I bringed my lunch.", "I brang my lunch.", "I brought my lunch.", "I have bringed my lunch."],
+    "correctIndex": 2,
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  {
+    "question": "She was as quiet as a ___.",
+    "choices": ["Lion", "Drum", "Mouse", "Bell"],
+    "correctIndex": 2,
+    "category": "figurative-language",
+    "difficulty": "easy"
+  },
+  {
+    "question": "He was as brave as a ___.",
+    "choices": ["Rabbit", "Lion", "Turtle", "Fish"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "easy"
+  },
+  {
+    "question": "The pillow was as soft as a ___.",
+    "choices": ["Rock", "Board", "Cloud", "Brick"],
+    "correctIndex": 2,
+    "category": "figurative-language",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does 'it's raining cats and dogs' mean?",
+    "choices": ["Animals are falling from the sky", "It's raining very hard", "Pets are outside", "The weather is nice"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does 'break a leg' mean?",
+    "choices": ["Be careful", "Get hurt", "Good luck", "Run fast"],
+    "correctIndex": 2,
+    "category": "figurative-language",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Her smile was as bright as the ___.",
+    "choices": ["Moon", "Sun", "Stars", "Clouds"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does 'a piece of cake' mean?",
+    "choices": ["A dessert", "Something very easy", "A celebration", "A recipe"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does 'hold your horses' mean?",
+    "choices": ["Grab the reins", "Be patient and wait", "Ride faster", "Take care of animals"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "hard"
+  },
+  {
+    "question": "The classroom was a zoo. This means the classroom was ___.",
+    "choices": ["Full of animals", "Very noisy and wild", "Outdoors", "Colorful and bright"],
+    "correctIndex": 1,
+    "category": "figurative-language",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does 'let the cat out of the bag' mean?",
+    "choices": ["Free an animal", "Open a bag", "Reveal a secret", "Go shopping"],
+    "correctIndex": 2,
+    "category": "figurative-language",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word is a noun? The happy dog ran quickly.",
+    "choices": ["Happy", "Dog", "Ran", "Quickly"],
+    "correctIndex": 1,
+    "category": "parts-of-speech",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word is a verb? She painted a beautiful picture.",
+    "choices": ["She", "Painted", "Beautiful", "Picture"],
+    "correctIndex": 1,
+    "category": "parts-of-speech",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word is an adjective? The tall tree swayed gently.",
+    "choices": ["The", "Tall", "Tree", "Gently"],
+    "correctIndex": 1,
+    "category": "parts-of-speech",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word is an adverb? He ran quickly to the door.",
+    "choices": ["He", "Ran", "Quickly", "Door"],
+    "correctIndex": 2,
+    "category": "parts-of-speech",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word is a noun? Honesty is very important.",
+    "choices": ["Honesty", "Is", "Very", "Important"],
+    "correctIndex": 0,
+    "category": "parts-of-speech",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word is an adjective? She wore a gorgeous dress.",
+    "choices": ["She", "Wore", "Gorgeous", "Dress"],
+    "correctIndex": 2,
+    "category": "parts-of-speech",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word is a verb? The children gathered in the yard.",
+    "choices": ["Children", "Gathered", "In", "Yard"],
+    "correctIndex": 1,
+    "category": "parts-of-speech",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word is a preposition? The book is on the table.",
+    "choices": ["Book", "Is", "On", "Table"],
+    "correctIndex": 2,
+    "category": "parts-of-speech",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word is a conjunction? I like cats and dogs.",
+    "choices": ["Like", "Cats", "And", "Dogs"],
+    "correctIndex": 2,
+    "category": "parts-of-speech",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word is an adverb? She carefully opened the gift.",
+    "choices": ["She", "Carefully", "Opened", "Gift"],
+    "correctIndex": 1,
+    "category": "parts-of-speech",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which sentence is written correctly?",
+    "choices": ["him and me went to the store.", "He and I went to the store.", "Me and him went to the store.", "Him and I went to the store."],
+    "correctIndex": 1,
+    "category": "sentence-correction",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which sentence is written correctly?",
+    "choices": ["Their going to the park.", "There going to the park.", "They're going to the park.", "Theyre going to the park."],
+    "correctIndex": 2,
+    "category": "sentence-correction",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which sentence is written correctly?",
+    "choices": ["I seen the movie yesterday.", "I saw the movie yesterday.", "I have saw the movie.", "I seeing the movie yesterday."],
+    "correctIndex": 1,
+    "category": "sentence-correction",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which sentence is written correctly?",
+    "choices": ["The childrens played outside.", "The children's played outside.", "The children played outside.", "The childrens' played outside."],
+    "correctIndex": 2,
+    "category": "sentence-correction",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which sentence is written correctly?",
+    "choices": ["She runned to the bus stop.", "She ran to the bus stop.", "She has ran to the bus stop.", "She ranned to the bus stop."],
+    "correctIndex": 1,
+    "category": "sentence-correction",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which sentence is written correctly?",
+    "choices": ["Its a beautiful day outside.", "It's a beautiful day outside.", "Its' a beautiful day outside.", "Itss a beautiful day outside."],
+    "correctIndex": 1,
+    "category": "sentence-correction",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which sentence is written correctly?",
+    "choices": ["We could of gone earlier.", "We could have gone earlier.", "We could had gone earlier.", "We could has gone earlier."],
+    "correctIndex": 1,
+    "category": "sentence-correction",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which sentence is written correctly?",
+    "choices": ["She did good on the test.", "She did well on the test.", "She done good on the test.", "She done well on the test."],
+    "correctIndex": 1,
+    "category": "sentence-correction",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the opposite of ancient?",
+    "choices": ["Old", "Modern", "Dusty", "Broken"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of enormous?",
+    "choices": ["Huge", "Tiny", "Wide", "Heavy"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of brave?",
+    "choices": ["Strong", "Bold", "Cowardly", "Loud"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of generous?",
+    "choices": ["Kind", "Selfish", "Wealthy", "Honest"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of polite?",
+    "choices": ["Friendly", "Rude", "Quiet", "Shy"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of victory?",
+    "choices": ["Success", "Battle", "Defeat", "Contest"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of temporary?",
+    "choices": ["Brief", "Permanent", "Short", "Quick"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the opposite of artificial?",
+    "choices": ["Fake", "Natural", "Plastic", "Created"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "hard"
+  }
+]

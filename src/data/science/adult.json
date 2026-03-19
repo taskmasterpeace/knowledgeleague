@@ -1,0 +1,422 @@
+[
+  {
+    "question": "What is the chemical symbol for gold?",
+    "choices": ["Go", "Gd", "Au", "Ag"],
+    "correctIndex": 2,
+    "category": "chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the pH of pure water?",
+    "choices": ["0", "7", "14", "5"],
+    "correctIndex": 1,
+    "category": "chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the chemical formula for table salt?",
+    "choices": ["NaOH", "NaCl", "KCl", "HCl"],
+    "correctIndex": 1,
+    "category": "chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What element does 'O' represent on the periodic table?",
+    "choices": ["Osmium", "Oganesson", "Oxygen", "Olivine"],
+    "correctIndex": 2,
+    "category": "chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "question": "How many elements are in a water molecule (H2O)?",
+    "choices": ["1", "2", "3", "4"],
+    "correctIndex": 1,
+    "category": "chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the most abundant gas in Earth's atmosphere?",
+    "choices": ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+    "correctIndex": 2,
+    "category": "chemistry",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which element has the atomic number 1?",
+    "choices": ["Helium", "Hydrogen", "Lithium", "Carbon"],
+    "correctIndex": 1,
+    "category": "chemistry",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What type of bond involves the sharing of electrons?",
+    "choices": ["Ionic bond", "Covalent bond", "Metallic bond", "Hydrogen bond"],
+    "correctIndex": 1,
+    "category": "chemistry",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the chemical symbol for iron?",
+    "choices": ["Ir", "In", "Fe", "I"],
+    "correctIndex": 2,
+    "category": "chemistry",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does pH stand for?",
+    "choices": ["Power of helium", "Potential of hydrogen", "Parts per hundred", "Periodic hydrogen"],
+    "correctIndex": 1,
+    "category": "chemistry",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which noble gas is used in bright advertising signs?",
+    "choices": ["Helium", "Argon", "Neon", "Krypton"],
+    "correctIndex": 2,
+    "category": "chemistry",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is Avogadro's number approximately equal to?",
+    "choices": ["6.02 x 10^23", "3.14 x 10^15", "9.81 x 10^10", "1.60 x 10^-19"],
+    "correctIndex": 0,
+    "category": "chemistry",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the powerhouse of the cell?",
+    "choices": ["Nucleus", "Ribosome", "Mitochondria", "Golgi apparatus"],
+    "correctIndex": 2,
+    "category": "biology",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What molecule carries genetic information?",
+    "choices": ["RNA", "DNA", "ATP", "Protein"],
+    "correctIndex": 1,
+    "category": "biology",
+    "difficulty": "easy"
+  },
+  {
+    "question": "How many chambers does the human heart have?",
+    "choices": ["2", "3", "4", "5"],
+    "correctIndex": 2,
+    "category": "biology",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the largest organ in the human body?",
+    "choices": ["Liver", "Brain", "Skin", "Lungs"],
+    "correctIndex": 2,
+    "category": "biology",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What type of blood cells fight infection?",
+    "choices": ["Red blood cells", "White blood cells", "Platelets", "Plasma"],
+    "correctIndex": 1,
+    "category": "biology",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What structure in a cell contains the DNA?",
+    "choices": ["Cell membrane", "Cytoplasm", "Nucleus", "Ribosome"],
+    "correctIndex": 2,
+    "category": "biology",
+    "difficulty": "medium"
+  },
+  {
+    "question": "How many pairs of chromosomes do humans have?",
+    "choices": ["21", "23", "25", "46"],
+    "correctIndex": 1,
+    "category": "biology",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What organ produces insulin?",
+    "choices": ["Liver", "Kidney", "Pancreas", "Stomach"],
+    "correctIndex": 2,
+    "category": "biology",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the process by which plants make food from sunlight?",
+    "choices": ["Respiration", "Fermentation", "Photosynthesis", "Osmosis"],
+    "correctIndex": 2,
+    "category": "biology",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What are the building blocks of proteins?",
+    "choices": ["Nucleotides", "Amino acids", "Fatty acids", "Sugars"],
+    "correctIndex": 1,
+    "category": "biology",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the term for an organism's complete set of DNA?",
+    "choices": ["Proteome", "Genome", "Biome", "Chromosome"],
+    "correctIndex": 1,
+    "category": "biology",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which base pairs with adenine in DNA?",
+    "choices": ["Cytosine", "Guanine", "Thymine", "Uracil"],
+    "correctIndex": 2,
+    "category": "biology",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the SI unit of force?",
+    "choices": ["Watt", "Joule", "Newton", "Pascal"],
+    "correctIndex": 2,
+    "category": "physics",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What type of energy does a moving car have?",
+    "choices": ["Potential energy", "Kinetic energy", "Thermal energy", "Nuclear energy"],
+    "correctIndex": 1,
+    "category": "physics",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the speed of light approximately?",
+    "choices": ["300,000 km/s", "150,000 km/s", "300,000 m/s", "3,000 km/s"],
+    "correctIndex": 0,
+    "category": "physics",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does a prism do to white light?",
+    "choices": ["Absorbs it", "Reflects it", "Splits it into colors", "Blocks it"],
+    "correctIndex": 2,
+    "category": "physics",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What unit is used to measure electrical resistance?",
+    "choices": ["Volt", "Ampere", "Ohm", "Watt"],
+    "correctIndex": 2,
+    "category": "physics",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which law states that every action has an equal and opposite reaction?",
+    "choices": ["Newton's 1st law", "Newton's 2nd law", "Newton's 3rd law", "Law of gravity"],
+    "correctIndex": 2,
+    "category": "physics",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the formula for force?",
+    "choices": ["F = ma", "F = mv", "F = mg/t", "F = E/d"],
+    "correctIndex": 0,
+    "category": "physics",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What type of wave is sound?",
+    "choices": ["Transverse wave", "Longitudinal wave", "Electromagnetic wave", "Standing wave"],
+    "correctIndex": 1,
+    "category": "physics",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the unit of electrical current?",
+    "choices": ["Volt", "Ohm", "Watt", "Ampere"],
+    "correctIndex": 3,
+    "category": "physics",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What particle carries a negative charge?",
+    "choices": ["Proton", "Neutron", "Electron", "Photon"],
+    "correctIndex": 2,
+    "category": "physics",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What phenomenon causes a straw to look bent in water?",
+    "choices": ["Reflection", "Refraction", "Diffraction", "Dispersion"],
+    "correctIndex": 1,
+    "category": "physics",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the relationship E = mc² known as?",
+    "choices": ["Newton's law", "Mass-energy equivalence", "Ohm's law", "Boyle's law"],
+    "correctIndex": 1,
+    "category": "physics",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "choices": ["Venus", "Jupiter", "Mars", "Saturn"],
+    "correctIndex": 2,
+    "category": "astronomy",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the largest planet in our solar system?",
+    "choices": ["Saturn", "Jupiter", "Neptune", "Uranus"],
+    "correctIndex": 1,
+    "category": "astronomy",
+    "difficulty": "easy"
+  },
+  {
+    "question": "How many planets are in our solar system?",
+    "choices": ["7", "8", "9", "10"],
+    "correctIndex": 1,
+    "category": "astronomy",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What galaxy do we live in?",
+    "choices": ["Andromeda", "The Milky Way", "Triangulum", "Sombrero"],
+    "correctIndex": 1,
+    "category": "astronomy",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is a light-year a measure of?",
+    "choices": ["Time", "Brightness", "Distance", "Speed"],
+    "correctIndex": 2,
+    "category": "astronomy",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which planet has the most visible rings?",
+    "choices": ["Jupiter", "Uranus", "Neptune", "Saturn"],
+    "correctIndex": 3,
+    "category": "astronomy",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the closest planet to the Sun?",
+    "choices": ["Venus", "Mercury", "Mars", "Earth"],
+    "correctIndex": 1,
+    "category": "astronomy",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What type of star is our Sun?",
+    "choices": ["Red giant", "White dwarf", "Yellow dwarf", "Blue supergiant"],
+    "correctIndex": 2,
+    "category": "astronomy",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the name of the nearest star to Earth after the Sun?",
+    "choices": ["Sirius", "Proxima Centauri", "Betelgeuse", "Alpha Centauri A"],
+    "correctIndex": 1,
+    "category": "astronomy",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What happens to a massive star at the end of its life?",
+    "choices": ["It becomes a planet", "It becomes a white dwarf", "It goes supernova", "It evaporates"],
+    "correctIndex": 2,
+    "category": "astronomy",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is a neutron star?",
+    "choices": ["A star made of neutrons", "The collapsed core of a massive star", "A star with no charge", "A cold, dead star"],
+    "correctIndex": 1,
+    "category": "astronomy",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Approximately how old is the universe?",
+    "choices": ["4.5 billion years", "10 billion years", "13.8 billion years", "20 billion years"],
+    "correctIndex": 2,
+    "category": "astronomy",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What are the main layers of the Earth?",
+    "choices": ["Crust, mantle, core", "Surface, middle, bottom", "Soil, rock, lava", "Lithosphere, hydrosphere, atmosphere"],
+    "correctIndex": 0,
+    "category": "earth-science",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What causes earthquakes?",
+    "choices": ["Wind", "Rain", "Movement of tectonic plates", "Volcanic eruptions only"],
+    "correctIndex": 2,
+    "category": "earth-science",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the outer layer of the Earth called?",
+    "choices": ["Mantle", "Core", "Crust", "Lithosphere"],
+    "correctIndex": 2,
+    "category": "earth-science",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What gas makes up most of Earth's atmosphere?",
+    "choices": ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+    "correctIndex": 2,
+    "category": "earth-science",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What layer of the atmosphere protects us from UV radiation?",
+    "choices": ["Troposphere", "Stratosphere (ozone layer)", "Mesosphere", "Thermosphere"],
+    "correctIndex": 1,
+    "category": "earth-science",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What type of rock is formed from cooled lava?",
+    "choices": ["Sedimentary", "Metamorphic", "Igneous", "Limestone"],
+    "correctIndex": 2,
+    "category": "earth-science",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What scale measures earthquake magnitude?",
+    "choices": ["Beaufort scale", "Richter scale", "Mohs scale", "Kelvin scale"],
+    "correctIndex": 1,
+    "category": "earth-science",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the Ring of Fire?",
+    "choices": ["A volcano in Hawaii", "A zone of frequent earthquakes and volcanoes around the Pacific", "A solar phenomenon", "A type of rock formation"],
+    "correctIndex": 1,
+    "category": "earth-science",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the theory that continents move over time called?",
+    "choices": ["Continental drift", "Plate tectonics", "Seafloor spreading", "All of the above"],
+    "correctIndex": 3,
+    "category": "earth-science",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the Mohorovičić discontinuity?",
+    "choices": ["The boundary between crust and mantle", "The center of the Earth", "A type of earthquake", "A tectonic plate"],
+    "correctIndex": 0,
+    "category": "earth-science",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What type of rock is marble?",
+    "choices": ["Igneous", "Sedimentary", "Metamorphic", "Volcanic"],
+    "correctIndex": 2,
+    "category": "earth-science",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which layer of the Earth is liquid?",
+    "choices": ["Inner core", "Outer core", "Crust", "Upper mantle"],
+    "correctIndex": 1,
+    "category": "earth-science",
+    "difficulty": "hard"
+  }
+]

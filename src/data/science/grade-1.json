@@ -1,0 +1,422 @@
+[
+  {
+    "question": "What do plants need to grow?",
+    "choices": ["Rocks", "Sunlight", "Darkness", "Pizza"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Where do seeds come from?",
+    "choices": ["The store only", "Plants", "Clouds", "A magic hat"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What part of the plant is underground?",
+    "choices": ["Leaves", "Flowers", "Roots", "A tiny house"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do plants drink?",
+    "choices": ["Soda", "Juice", "Water", "Chocolate milk"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What color are most leaves?",
+    "choices": ["Purple", "Green", "Blue", "Polka dot"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What grows from an acorn?",
+    "choices": ["A rose", "A cactus", "An oak tree", "A sandwich"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which part of the plant makes food from sunlight?",
+    "choices": ["Roots", "Stem", "Leaves", "A tiny chef"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What happens to a plant with no water?",
+    "choices": ["It grows bigger", "It wilts", "It flies away", "It turns into a robot"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What carries seeds to new places?",
+    "choices": ["Wind", "A school bus", "Homework", "Socks"],
+    "correctIndex": 0,
+    "category": "plants",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which part of a flower makes seeds?",
+    "choices": ["The petals", "The stem", "The center", "The sparkles"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is a baby dog called?",
+    "choices": ["A kitten", "A puppy", "A cub", "A nugget"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is a baby cat called?",
+    "choices": ["A puppy", "A chick", "A kitten", "A jellybean"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do fish use to breathe?",
+    "choices": ["Lungs", "Gills", "Noses", "Tiny scuba tanks"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What covers a bird's body?",
+    "choices": ["Fur", "Scales", "Feathers", "A sweater"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Where do polar bears live?",
+    "choices": ["The desert", "The jungle", "Cold icy places", "At the mall"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do cows eat?",
+    "choices": ["Meat", "Grass", "Fish", "Tacos"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What covers a fish's body?",
+    "choices": ["Fur", "Feathers", "Scales", "Pajamas"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is a baby frog called?",
+    "choices": ["A tadpole", "A puppy", "A cub", "A frogling"],
+    "correctIndex": 0,
+    "category": "animals",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which animal has a shell on its back?",
+    "choices": ["A dog", "A turtle", "A rabbit", "A penguin"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What do all animals need to live?",
+    "choices": ["TV", "Food and water", "Toys", "Homework"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which animal is an insect?",
+    "choices": ["A dog", "A snake", "An ant", "A whale"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "medium"
+  },
+  {
+    "question": "How many legs does a spider have?",
+    "choices": ["6", "8", "4", "100"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which sense do you use to hear music?",
+    "choices": ["Sight", "Hearing", "Taste", "Your elbow"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which body part do you use to smell?",
+    "choices": ["Ears", "Eyes", "Nose", "Toes"],
+    "correctIndex": 2,
+    "category": "body-senses",
+    "difficulty": "easy"
+  },
+  {
+    "question": "How many senses do people have?",
+    "choices": ["3", "5", "10", "A million"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which sense do you use to see a rainbow?",
+    "choices": ["Hearing", "Taste", "Sight", "Telepathy"],
+    "correctIndex": 2,
+    "category": "body-senses",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What sense do you use to taste food?",
+    "choices": ["Touch", "Smell", "Taste", "X-ray vision"],
+    "correctIndex": 2,
+    "category": "body-senses",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What organ pumps blood through your body?",
+    "choices": ["Brain", "Heart", "Stomach", "Your funny bone"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What do your lungs help you do?",
+    "choices": ["See", "Breathe", "Hear", "Do a backflip"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What protects the brain inside your head?",
+    "choices": ["Hair", "The skull", "Skin", "A tiny helmet"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which body part helps you think?",
+    "choices": ["Heart", "Stomach", "Brain", "Your pinky toe"],
+    "correctIndex": 2,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What sense lets you feel if something is hot?",
+    "choices": ["Sight", "Touch", "Hearing", "Smell"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What falls from clouds when it rains?",
+    "choices": ["Snow", "Water", "Sand", "Gummy bears"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What season is the hottest?",
+    "choices": ["Winter", "Fall", "Summer", "Pancake season"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What falls from the sky in winter?",
+    "choices": ["Rain only", "Leaves", "Snow", "Confetti"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do you see in the sky during a storm?",
+    "choices": ["A rainbow", "Lightning", "Stars", "Flying cows"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which season do leaves change color?",
+    "choices": ["Spring", "Summer", "Fall", "Bedtime"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What makes a rainbow appear?",
+    "choices": ["Wind", "Sun and rain together", "Snow", "A paint spill"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What tool measures temperature?",
+    "choices": ["A ruler", "A thermometer", "A clock", "A magic wand"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What season comes after winter?",
+    "choices": ["Fall", "Summer", "Spring", "Snack time"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is wind?",
+    "choices": ["Moving water", "Moving air", "Moving dirt", "A giant sneeze"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What kind of cloud is dark and brings rain?",
+    "choices": ["Fluffy white clouds", "Storm clouds", "Fog", "Cotton candy clouds"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the closest star to Earth?",
+    "choices": ["The Moon", "The Sun", "Mars", "A disco ball"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What shines in the sky at night?",
+    "choices": ["The Sun", "Clouds", "Stars", "Flashlights"],
+    "correctIndex": 2,
+    "category": "space",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do we see in the sky at night that changes shape?",
+    "choices": ["The Sun", "The Moon", "A cloud", "A flying saucer"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Why is it dark at night?",
+    "choices": ["The Sun turns off", "Our side of Earth faces away from the Sun", "The Moon blocks the Sun", "Someone flips a switch"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What gives us light during the day?",
+    "choices": ["The Moon", "The stars", "The Sun", "A giant lamp"],
+    "correctIndex": 2,
+    "category": "space",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What planet do we live on?",
+    "choices": ["Mars", "Jupiter", "Earth", "Pluto"],
+    "correctIndex": 2,
+    "category": "space",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Is the Sun a star or a planet?",
+    "choices": ["A planet", "A star", "A moon", "A giant lightbulb"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What shape is the Earth?",
+    "choices": ["Flat like a pancake", "A cube", "A sphere (round like a ball)", "A triangle"],
+    "correctIndex": 2,
+    "category": "space",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Is a rock a solid or a liquid?",
+    "choices": ["Liquid", "Gas", "Solid", "Invisible"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Is water a solid or a liquid?",
+    "choices": ["Solid", "Liquid", "Gas", "Jelly"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which is soft?",
+    "choices": ["A rock", "A brick", "A pillow", "A diamond"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which feels rough?",
+    "choices": ["Glass", "Silk", "Sandpaper", "A bubble"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What happens to ice when it gets warm?",
+    "choices": ["It gets harder", "It melts", "It disappears", "It turns into a puppy"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which is hard?",
+    "choices": ["A feather", "A cotton ball", "A diamond", "A marshmallow"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is ice?",
+    "choices": ["Frozen juice", "Frozen water", "Frozen air", "Frozen sunshine"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which can you pour?",
+    "choices": ["A book", "A toy", "Milk", "A shoe"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What material is a window made of?",
+    "choices": ["Wood", "Glass", "Metal", "Cheese"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which material bends easily?",
+    "choices": ["A rock", "A brick", "Rubber", "A bowling ball"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "hard"
+  }
+]
