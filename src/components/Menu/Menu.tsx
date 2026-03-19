@@ -4,7 +4,7 @@ import { useGamepad } from '../../hooks/useGamepad'
 import { ControllerHint } from '../shared/ControllerButtons'
 import { Settings } from '../Settings/Settings'
 import { useSettings } from '../../hooks/useSettings'
-import { sounds } from '../../utils/sounds'
+import { sounds, preloadSounds } from '../../utils/sounds'
 
 export function Menu() {
   const { setPhase, startSinglePlayer, setPlayerCount, controllerType, setControllerType } = useGameState()
@@ -68,6 +68,7 @@ export function Menu() {
       <div className="flex flex-col gap-3 w-full max-w-sm">
         <button
           onClick={() => {
+            preloadSounds()
             if (soundEnabled) sounds.select()
             startSinglePlayer()
             setPhase('cpu-select')
