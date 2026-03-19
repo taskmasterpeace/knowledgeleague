@@ -196,7 +196,6 @@ export function Settings({ onClose }: Props) {
               </button>
             </div>
           ))}
-        </div>
 
           {/* AI Announcer */}
           <div>
