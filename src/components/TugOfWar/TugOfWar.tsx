@@ -18,6 +18,7 @@ import { sounds } from '../../utils/sounds'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import type { Badge } from '../../types'
 import { BadgeToast } from '../shared/BadgeToast'
+import { useAnnouncer } from '../../hooks/useAnnouncer'
 
 export function TugOfWar() {
   const {
@@ -36,6 +37,7 @@ export function TugOfWar() {
   const [shaking, setShaking] = useState(false)
   const [showBurst, setShowBurst] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
+  const { announceCorrect, announceWrong } = useAnnouncer()
 
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
   const timerStartRef = useRef(Date.now())
@@ -80,6 +82,7 @@ export function TugOfWar() {
 
     if (isCorrect) {
       if (soundEnabled) sounds.correct()
+      if (players[playerId - 1].type === 'human') announceCorrect(players[playerId - 1].name, players[playerId - 1].streak + 1)
       const streak = players[playerId - 1].streak + 1
       const pull = streak >= TUG_STREAK_THRESHOLD ? TUG_SUPER_PULL : TUG_CORRECT_PULL
 
@@ -100,6 +103,7 @@ export function TugOfWar() {
       setTimeout(advanceProblem, 600)
     } else {
       if (soundEnabled) sounds.wrong()
+      if (players[playerId - 1].type === 'human') announceWrong(players[playerId - 1].name, players[playerId - 1].streak > 0)
       const opponentDirection = playerId === 1 ? 1 : -1
       const newPos = ropePos + opponentDirection * TUG_WRONG_PULL
       setPosition(1, newPos)

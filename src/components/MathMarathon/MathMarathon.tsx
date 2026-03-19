@@ -20,6 +20,7 @@ import { sounds } from '../../utils/sounds'
 import type { PlayerId, Badge, QuestionCategory } from '../../types'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import { BadgeToast } from '../shared/BadgeToast'
+import { useAnnouncer } from '../../hooks/useAnnouncer'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
@@ -55,6 +56,7 @@ export function MathMarathon() {
   const [showBurst, setShowBurst] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
   const [hoppingPlayers, setHoppingPlayers] = useState<Set<PlayerId>>(new Set())
+  const { announceCorrect, announceWrong } = useAnnouncer()
 
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
@@ -160,6 +162,20 @@ export function MathMarathon() {
       setShaking(true)
       setTimeout(() => setFlashType(null), 150)
       setTimeout(() => setShaking(false), 250)
+    }
+
+    // Announcer
+    if (anyHumanCorrect) {
+      for (const player of players) {
+        const pid = player.id as PlayerId
+        if (playerResults.get(pid)?.answer?.correct && player.type === 'human') {
+          announceCorrect(player.name, player.streak + 1)
+          break
+        }
+      }
+    } else {
+      const firstHuman = players.find(p => p.type === 'human')
+      if (firstHuman) announceWrong(firstHuman.name, firstHuman.streak > 0)
     }
 
     // Check for winner
