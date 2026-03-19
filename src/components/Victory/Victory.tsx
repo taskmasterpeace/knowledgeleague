@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useGameState } from '../../hooks/useGameState'
+import { usePeerContext } from '../../hooks/usePeerContext'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { Fireworks } from '../shared/Effects'
 import { useSettings } from '../../hooks/useSettings'
@@ -7,18 +8,27 @@ import { sounds } from '../../utils/sounds'
 
 export function Victory() {
   const { players, winner, resetGame, rematch } = useGameState()
+  const { broadcastGameOver } = usePeerContext()
   const { soundEnabled } = useSettings()
+
+  // Rank all players by position (descending), then by score
+  const ranked = [...players].sort((a, b) => b.position - a.position || b.score - a.score)
 
   useEffect(() => {
     if (soundEnabled) sounds.victory()
+    // Broadcast game over to phone controllers
+    if (winner) {
+      const winnerPlayer = players.find(p => p.id === winner)
+      broadcastGameOver(
+        winnerPlayer?.name ?? 'Unknown',
+        ranked.map(p => ({ name: p.name, score: p.score, position: p.position }))
+      )
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (!winner) return null
   const winnerPlayer = players.find(p => p.id === winner)!
-
-  // Rank all players by position (descending), then by score
-  const ranked = [...players].sort((a, b) => b.position - a.position || b.score - a.score)
 
   // Podium heights: 1st tallest, 2nd/3rd shorter
   const podiumHeights = ['h-20', 'h-12', 'h-8', 'h-6']

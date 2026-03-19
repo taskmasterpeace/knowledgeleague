@@ -16,7 +16,11 @@ const ANSWER_COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444']
 export function PhoneController({ roomId }: Props) {
   const [name, setName] = useState('')
   const [joined, setJoined] = useState(false)
-  const { connected, playerId, question, choices, subject, lockedIn, correctIndex, sendAnswer, connect } = usePeerClient()
+  const {
+    connected, playerId, question, choices, subject,
+    lockedIn, correctIndex, myChoiceIndex, gameOver,
+    sendAnswer, connect,
+  } = usePeerClient()
 
   const handleJoin = () => {
     if (!name.trim()) return
@@ -61,6 +65,56 @@ export function PhoneController({ roomId }: Props) {
     )
   }
 
+  // Game Over screen
+  if (gameOver) {
+    const myRank = gameOver.rankings.findIndex(r => r.name === name) + 1
+    const isWinner = gameOver.winnerName === name
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 flex flex-col items-center justify-center gap-5 p-6">
+        {isWinner ? (
+          <>
+            <div className="text-6xl">🏆</div>
+            <h1 className="font-pixel text-2xl text-yellow-300 text-glow animate-bounce">YOU WIN!</h1>
+          </>
+        ) : (
+          <>
+            <div className="text-5xl">{myRank <= 3 ? '🎉' : '👏'}</div>
+            <h1 className="font-pixel text-xl text-white text-glow">GAME OVER</h1>
+            <p className="font-pixel text-sm text-yellow-300">{gameOver.winnerName} wins!</p>
+          </>
+        )}
+
+        {/* Leaderboard */}
+        <div className="w-full max-w-xs flex flex-col gap-2 mt-2">
+          {gameOver.rankings.map((r, i) => {
+            const isMe = r.name === name
+            const placeLabels = ['1ST', '2ND', '3RD']
+            const placeLabel = i < 3 ? placeLabels[i] : `${i + 1}TH`
+            const placeColors = ['text-yellow-300', 'text-gray-300', 'text-amber-500', 'text-white/40']
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg ${
+                  isMe ? 'bg-yellow-500/20 border border-yellow-400/40' : 'bg-white/5'
+                }`}
+              >
+                <span className={`font-pixel text-[9px] font-bold w-8 ${placeColors[i] ?? 'text-white/40'}`}>
+                  {placeLabel}
+                </span>
+                <span className={`font-pixel text-xs flex-1 ${isMe ? 'text-yellow-300' : 'text-white/80'}`}>
+                  {r.name}{isMe ? ' (you)' : ''}
+                </span>
+                <span className="font-pixel text-[8px] text-white/50">{r.score} pts</span>
+              </div>
+            )
+          })}
+        </div>
+
+        <p className="font-pixel text-[8px] text-white/30 mt-4">Waiting for host...</p>
+      </div>
+    )
+  }
+
   // Waiting for game to start
   if (choices.length === 0) {
     return (
@@ -76,6 +130,8 @@ export function PhoneController({ roomId }: Props) {
   // Determine if answers are long text (science/reading) vs short (math)
   const maxChoiceLen = Math.max(...choices.map(c => c.length))
   const isLongText = maxChoiceLen > 8
+  const showResult = correctIndex !== null
+  const wasCorrect = myChoiceIndex !== null && correctIndex === myChoiceIndex
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex flex-col p-3 gap-3">
@@ -99,33 +155,54 @@ export function PhoneController({ roomId }: Props) {
         )}
       </div>
 
+      {/* Answer feedback banner */}
+      {showResult && (
+        <div className={`text-center py-2 rounded-lg font-pixel text-sm ${
+          wasCorrect
+            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+            : myChoiceIndex !== null
+            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+            : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+        }`}>
+          {wasCorrect ? 'CORRECT!' : myChoiceIndex !== null ? 'WRONG!' : 'TIME UP!'}
+        </div>
+      )}
+
       {/* Answer grid */}
       <div className={`flex-1 grid ${isLongText ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
         {choices.map((choice, i) => {
           const isCorrectChoice = correctIndex === i
-          const showResult = correctIndex !== null
+          const isMyPick = myChoiceIndex === i
 
           return (
             <button
               key={i}
               onClick={() => sendAnswer(i)}
               disabled={lockedIn}
-              className={`rounded-xl text-white font-bold flex items-center justify-center transition-all active:scale-95 px-3 ${
+              className={`rounded-xl text-white font-bold flex items-center justify-center transition-all active:scale-95 px-3 relative ${
                 showResult
                   ? isCorrectChoice
                     ? 'bg-green-500 ring-2 ring-green-300'
+                    : isMyPick
+                    ? 'bg-red-500/60 ring-2 ring-red-400'
                     : 'bg-white/10 opacity-40'
                   : lockedIn
-                    ? 'bg-white/20 opacity-60'
+                    ? isMyPick
+                      ? 'ring-2 ring-white/60 opacity-80'
+                      : 'bg-white/20 opacity-40'
                     : 'active:brightness-110'
               }`}
               style={{
-                backgroundColor: showResult || lockedIn ? undefined : ANSWER_COLORS[i],
+                backgroundColor: showResult || (lockedIn && !isMyPick) ? undefined : ANSWER_COLORS[i],
                 fontSize: isLongText ? 'clamp(0.8rem, 4vw, 1.2rem)' : 'clamp(1.5rem, 8vw, 3rem)',
                 minHeight: isLongText ? '60px' : undefined,
               }}
             >
               {choice}
+              {/* Lock-in indicator */}
+              {lockedIn && isMyPick && !showResult && (
+                <span className="absolute top-1 right-2 font-pixel text-[7px] text-white/70">LOCKED</span>
+              )}
             </button>
           )
         })}
@@ -135,11 +212,6 @@ export function PhoneController({ roomId }: Props) {
       <div className="text-center py-2">
         {lockedIn && correctIndex === null && (
           <p className="font-pixel text-sm text-green-400 animate-pulse">LOCKED IN</p>
-        )}
-        {correctIndex !== null && (
-          <p className="font-pixel text-sm text-yellow-300">
-            Answer: {choices[correctIndex]}
-          </p>
         )}
       </div>
     </div>

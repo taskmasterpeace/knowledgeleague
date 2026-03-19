@@ -55,6 +55,12 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
     }
   }, [])
 
+  const broadcastGameOver = useCallback((winnerName: string, rankings: { name: string; score: number; position: number }[]) => {
+    for (const conn of connsRef.current.values()) {
+      conn.send({ type: 'gameOver', winnerName, rankings })
+    }
+  }, [])
+
   useEffect(() => {
     if (!enabled) return
     if (peerRef.current) return
@@ -121,5 +127,5 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
     }
   }, [enabled])
 
-  return { roomId, joinUrl, remotePlayers, broadcastProblem, broadcastResult, broadcastLockIn }
+  return { roomId, joinUrl, remotePlayers, broadcastProblem, broadcastResult, broadcastLockIn, broadcastGameOver }
 }

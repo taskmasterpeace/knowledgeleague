@@ -116,6 +116,7 @@ function HostApp({ peerEnabled, setPeerEnabled, phase, event }: {
     broadcastProblem: peer.broadcastProblem,
     broadcastResult: peer.broadcastResult,
     broadcastLockIn: peer.broadcastLockIn,
+    broadcastGameOver: peer.broadcastGameOver,
     setEnabled: setPeerEnabled,
   }
 

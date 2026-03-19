@@ -2,14 +2,21 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import Peer from 'peerjs'
 import type { DataConnection } from 'peerjs'
 
+export interface GameOverData {
+  winnerName: string
+  rankings: { name: string; score: number; position: number }[]
+}
+
 interface HostMessage {
-  type: 'problem' | 'result' | 'assigned' | 'lockedIn'
+  type: 'problem' | 'result' | 'assigned' | 'lockedIn' | 'gameOver'
   question?: string
   choices?: string[]
   subject?: string
   correctIndex?: number
   playerId?: number
   name?: string
+  winnerName?: string
+  rankings?: { name: string; score: number; position: number }[]
 }
 
 export function usePeerClient() {
@@ -20,6 +27,8 @@ export function usePeerClient() {
   const [subject, setSubject] = useState<string>('math')
   const [lockedIn, setLockedIn] = useState(false)
   const [correctIndex, setCorrectIndex] = useState<number | null>(null)
+  const [myChoiceIndex, setMyChoiceIndex] = useState<number | null>(null)
+  const [gameOver, setGameOver] = useState<GameOverData | null>(null)
   const connRef = useRef<DataConnection | null>(null)
   const peerRef = useRef<Peer | null>(null)
 
@@ -27,6 +36,7 @@ export function usePeerClient() {
     if (connRef.current && !lockedIn) {
       connRef.current.send({ type: 'answer', choiceIndex })
       setLockedIn(true)
+      setMyChoiceIndex(choiceIndex)
     }
   }, [lockedIn])
 
@@ -53,8 +63,14 @@ export function usePeerClient() {
           setSubject(data.subject ?? 'math')
           setLockedIn(false)
           setCorrectIndex(null)
+          setMyChoiceIndex(null)
         } else if (data.type === 'result' && data.correctIndex !== undefined) {
           setCorrectIndex(data.correctIndex)
+        } else if (data.type === 'gameOver') {
+          setGameOver({
+            winnerName: data.winnerName ?? 'Unknown',
+            rankings: data.rankings ?? [],
+          })
         }
       })
 
@@ -71,5 +87,9 @@ export function usePeerClient() {
     }
   }, [])
 
-  return { connected, playerId, question, choices, subject, lockedIn, correctIndex, sendAnswer, connect }
+  return {
+    connected, playerId, question, choices, subject,
+    lockedIn, correctIndex, myChoiceIndex, gameOver,
+    sendAnswer, connect,
+  }
 }

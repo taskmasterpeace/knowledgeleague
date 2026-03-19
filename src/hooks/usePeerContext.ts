@@ -9,6 +9,7 @@ export interface PeerHostContext {
   broadcastProblem: (question: string, choices: string[], subject: string) => void
   broadcastResult: (correctIndex: number) => void
   broadcastLockIn: (playerId: number) => void
+  broadcastGameOver: (winnerName: string, rankings: { name: string; score: number; position: number }[]) => void
   setEnabled: (enabled: boolean) => void
 }
 
@@ -20,6 +21,7 @@ export const PeerContext = createContext<PeerHostContext>({
   broadcastProblem: () => {},
   broadcastResult: () => {},
   broadcastLockIn: () => {},
+  broadcastGameOver: () => {},
   setEnabled: () => {},
 })
 
