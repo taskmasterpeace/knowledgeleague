@@ -37,14 +37,47 @@ export interface CPUCharacter {
 
 export type Difficulty = 'easy' | 'medium' | 'hard'
 
+export type Subject = 'math' | 'science' | 'reading'
+export type GradeLevel = 'grade-1' | 'grade-3' | 'adult'
+
 export type ProblemType = 'addition' | 'subtraction' | 'missing' | 'comparison' | 'skip-counting'
 
+// All question categories across all subjects
+export type QuestionCategory =
+  // Math (grade 1)
+  | 'addition' | 'subtraction' | 'missing' | 'comparison' | 'skip-counting'
+  // Math (grade 3+)
+  | 'multiplication' | 'division' | 'fractions' | 'rounding'
+  // Math (adult)
+  | 'percentages' | 'order-of-operations' | 'square-roots' | 'estimation'
+  // Science
+  | 'animals' | 'plants' | 'body-senses' | 'weather' | 'space'
+  | 'materials' | 'water-cycle' | 'forces' | 'food-chains' | 'fossils'
+  | 'traits' | 'magnets' | 'matter' | 'chemistry' | 'biology'
+  | 'physics' | 'astronomy' | 'earth-science'
+  // Reading
+  | 'rhyming' | 'opposites' | 'beginning-sounds' | 'fill-in-blank'
+  | 'word-meaning' | 'sight-words' | 'vocabulary' | 'grammar'
+  | 'figurative-language' | 'parts-of-speech' | 'sentence-correction'
+  | 'etymology' | 'analogies' | 'spelling'
+
 export interface Badge {
-  category: ProblemType
+  category: QuestionCategory
   tier: 'bronze' | 'silver' | 'gold' | 'master'
   earnedAt: string
 }
 
+// Universal question format used by all game modes
+export interface GameQuestion {
+  question: string
+  choices: string[]        // always 4 choices
+  correctIndex: number     // index into choices array
+  subject: Subject
+  category: QuestionCategory
+  difficulty: Difficulty
+}
+
+// Legacy math problem format (used internally by math generator)
 export interface MathProblem {
   question: string
   correctAnswer: number
