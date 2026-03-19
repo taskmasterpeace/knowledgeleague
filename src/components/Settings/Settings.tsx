@@ -1,5 +1,5 @@
 import { useSettings } from '../../hooks/useSettings'
-import type { ProblemType } from '../../types'
+import type { ProblemType, Subject } from '../../types'
 
 interface Props {
   onClose: () => void
@@ -36,6 +36,55 @@ export function Settings({ onClose }: Props) {
         <h2 className="font-pixel text-lg text-white text-glow mb-6 text-center">SETTINGS</h2>
 
         <div className="flex flex-col gap-5">
+          {/* Grade Level */}
+          <div>
+            <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">Grade Level</label>
+            <div className="flex gap-2">
+              {([['grade-1', 'Grade 1'], ['grade-3', 'Grade 3'], ['adult', 'Adult']] as const).map(([value, label]) => (
+                <button
+                  key={value}
+                  onClick={() => settings.update({ gradeLevel: value })}
+                  className={`flex-1 py-2 rounded-lg font-pixel text-[7px] transition-all pixel-btn ${
+                    settings.gradeLevel === value
+                      ? 'bg-yellow-500 text-gray-900'
+                      : 'bg-white/10 text-white/50 hover:bg-white/20'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Subjects */}
+          <div>
+            <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">Subjects</label>
+            <div className="flex gap-2">
+              {([['math', 'Math'], ['science', 'Science'], ['reading', 'Reading']] as [Subject, string][]).map(([key, label]) => {
+                const enabled = settings.enabledSubjects.includes(key)
+                return (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      if (enabled && settings.enabledSubjects.length === 1) return
+                      const next = enabled
+                        ? settings.enabledSubjects.filter(s => s !== key)
+                        : [...settings.enabledSubjects, key]
+                      settings.update({ enabledSubjects: next })
+                    }}
+                    className={`flex-1 py-2 rounded-lg font-pixel text-[7px] transition-all pixel-btn ${
+                      enabled
+                        ? 'bg-cyan-500 text-gray-900'
+                        : 'bg-white/10 text-white/50 hover:bg-white/20'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           {/* Difficulty */}
           <div>
             <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">Difficulty</label>
@@ -147,6 +196,59 @@ export function Settings({ onClose }: Props) {
               </button>
             </div>
           ))}
+        </div>
+
+          {/* AI Announcer */}
+          <div>
+            <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">AI Announcer</label>
+            <div className="pixel-card rounded-lg px-4 py-3 flex items-center justify-between mb-2">
+              <span className="font-pixel text-[8px] text-white/60 uppercase">Announcer</span>
+              <button
+                onClick={() => settings.update({ announcerEnabled: !settings.announcerEnabled })}
+                className={`w-14 h-7 rounded-full transition-all relative ${
+                  settings.announcerEnabled ? 'bg-green-500' : 'bg-white/20'
+                }`}
+              >
+                <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-all ${
+                  settings.announcerEnabled ? 'left-7' : 'left-0.5'
+                }`} />
+              </button>
+            </div>
+            {settings.announcerEnabled && (
+              <>
+                <div className="flex gap-2 mb-2">
+                  {(['alex', 'ashley', 'dennis', 'darlene'] as const).map(voice => (
+                    <button
+                      key={voice}
+                      onClick={() => settings.update({ announcerVoice: voice })}
+                      className={`flex-1 py-1.5 rounded-lg font-pixel text-[6px] capitalize transition-all pixel-btn ${
+                        settings.announcerVoice === voice
+                          ? 'bg-yellow-500 text-gray-900'
+                          : 'bg-white/10 text-white/50 hover:bg-white/20'
+                      }`}
+                    >
+                      {voice}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  {(['chatty', 'normal', 'quiet'] as const).map(freq => (
+                    <button
+                      key={freq}
+                      onClick={() => settings.update({ announcerFrequency: freq })}
+                      className={`flex-1 py-1.5 rounded-lg font-pixel text-[6px] capitalize transition-all pixel-btn ${
+                        settings.announcerFrequency === freq
+                          ? 'bg-yellow-500 text-gray-900'
+                          : 'bg-white/10 text-white/50 hover:bg-white/20'
+                      }`}
+                    >
+                      {freq}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <button
