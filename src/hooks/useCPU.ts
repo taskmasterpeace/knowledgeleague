@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
-import type { CPUCharacter, MathProblem } from '../types'
+import type { CPUCharacter, GameQuestion } from '../types'
 
 interface UseCPUProps {
   character: CPUCharacter | null
-  currentProblem: MathProblem | null
+  currentProblem: GameQuestion | null
   enabled: boolean
   onAnswer: (choiceIndex: number) => void
   streak: number
@@ -43,17 +43,14 @@ export function useCPU({ character, currentProblem, enabled, onAnswer, streak }:
 
       const isCorrect = Math.random() < effectiveAccuracy
       if (isCorrect) {
-        const correctIndex = currentProblem.choices.indexOf(currentProblem.correctAnswer)
-        onAnswerRef.current(correctIndex)
+        onAnswerRef.current(currentProblem.correctIndex)
       } else {
+        // Pick a wrong answer (prefer close-to-correct for plausibility)
         const wrongIndices = currentProblem.choices
-          .map((c, i) => ({ val: c, idx: i }))
-          .filter(c => c.val !== currentProblem.correctAnswer)
-          .sort((a, b) =>
-            Math.abs(a.val - currentProblem.correctAnswer) - Math.abs(b.val - currentProblem.correctAnswer)
-          )
-        const pick = Math.random() < 0.7 ? wrongIndices[0] : wrongIndices[Math.floor(Math.random() * wrongIndices.length)]
-        onAnswerRef.current(pick.idx)
+          .map((_, i) => i)
+          .filter(i => i !== currentProblem.correctIndex)
+        const pick = wrongIndices[Math.floor(Math.random() * wrongIndices.length)]
+        onAnswerRef.current(pick)
       }
     }, delay)
 

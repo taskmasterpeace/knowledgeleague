@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ProblemType } from '../types'
+import type { QuestionCategory, Subject, GradeLevel } from '../types'
 
 export interface Settings {
   difficulty: 'easy' | 'medium' | 'hard' | 'adaptive'
@@ -8,7 +8,12 @@ export interface Settings {
   soundEnabled: boolean
   musicEnabled: boolean
   vibrationEnabled: boolean
-  enabledCategories: ProblemType[]
+  enabledCategories: QuestionCategory[]
+  gradeLevel: GradeLevel
+  enabledSubjects: Subject[]
+  announcerEnabled: boolean
+  announcerVoice: 'alex' | 'ashley' | 'dennis' | 'darlene'
+  announcerFrequency: 'chatty' | 'normal' | 'quiet'
 }
 
 const STORAGE_KEY = 'brainGames:settings'
@@ -22,6 +27,11 @@ const defaults: Settings = {
   musicEnabled: true,
   vibrationEnabled: true,
   enabledCategories: ['addition', 'subtraction', 'missing', 'comparison', 'skip-counting'],
+  gradeLevel: 'grade-1',
+  enabledSubjects: ['math'],
+  announcerEnabled: false,
+  announcerVoice: 'alex',
+  announcerFrequency: 'normal',
 }
 
 function loadSettings(): Settings {

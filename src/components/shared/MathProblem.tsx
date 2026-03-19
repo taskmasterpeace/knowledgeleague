@@ -1,9 +1,9 @@
-import type { MathProblem as MathProblemType } from '../../types'
+import type { GameQuestion } from '../../types'
 import type { ControllerType } from '../../hooks/useGamepad'
 import { ControllerButton } from './ControllerButtons'
 
 interface Props {
-  problem: MathProblemType
+  problem: GameQuestion
   onAnswer: (choiceIndex: number) => void
   lockedP1: boolean
   lockedP2: boolean
@@ -19,16 +19,33 @@ const CARD_COLORS = [
   { bg: 'from-violet-600 to-violet-800', border: 'border-violet-400/50', glow: 'rgba(139,92,246,0.3)' },
 ]
 
+const SUBJECT_LABELS = {
+  math: 'SOLVE!',
+  science: 'SCIENCE!',
+  reading: 'READING!',
+}
+
+const SUBJECT_COLORS = {
+  math: 'bg-cyan-500',
+  science: 'bg-green-500',
+  reading: 'bg-purple-500',
+}
+
 export function MathProblem({ problem, lockedP1, lockedP2, p1Keys, p2Keys, controllerType }: Props) {
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-2xl">
       {/* Question card */}
       <div className="pixel-card rounded-lg px-8 py-5 text-center relative">
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan-500 px-3 py-0.5 rounded font-pixel text-[8px] text-white">
-          SOLVE!
+        <div className={`absolute -top-3 left-1/2 -translate-x-1/2 ${SUBJECT_COLORS[problem.subject]} px-3 py-0.5 rounded font-pixel text-[8px] text-white`}>
+          {SUBJECT_LABELS[problem.subject]}
         </div>
-        <div className="font-pixel text-3xl text-white text-glow tracking-wider">
-          {problem.question} = <span className="text-yellow-300">?</span>
+        <div className={`font-pixel text-white text-glow tracking-wider ${
+          problem.question.length > 40 ? 'text-sm' : problem.question.length > 25 ? 'text-lg' : 'text-3xl'
+        }`}>
+          {problem.subject === 'math'
+            ? <>{problem.question} = <span className="text-yellow-300">?</span></>
+            : problem.question
+          }
         </div>
       </div>
 
@@ -39,11 +56,15 @@ export function MathProblem({ problem, lockedP1, lockedP2, p1Keys, p2Keys, contr
           return (
             <div
               key={i}
-              className={`relative flex items-center justify-center bg-gradient-to-b ${colors.bg} rounded-lg border-2 ${colors.border} py-6 select-none cursor-pointer
+              className={`relative flex items-center justify-center bg-gradient-to-b ${colors.bg} rounded-lg border-2 ${colors.border} py-6 px-3 select-none cursor-pointer
                 transition-all duration-150 hover:scale-[1.03] hover:brightness-110 active:scale-95`}
               style={{ boxShadow: `0 4px 12px ${colors.glow}, inset 0 1px 0 rgba(255,255,255,0.15)` }}
             >
-              <span className="font-pixel text-2xl text-white drop-shadow-md">{choice}</span>
+              <span className={`font-pixel text-white drop-shadow-md text-center ${
+                choice.length > 15 ? 'text-[9px]' : choice.length > 8 ? 'text-xs' : 'text-2xl'
+              }`}>
+                {choice}
+              </span>
               <div className="absolute bottom-1.5 left-2 flex gap-2 items-center">
                 <span className={`font-pixel text-[7px] ${lockedP1 ? 'text-white/20 line-through' : 'text-white/40'}`}>
                   [{p1Keys[i]}]

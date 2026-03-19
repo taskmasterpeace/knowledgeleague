@@ -1,4 +1,4 @@
-import type { ProblemType, Badge } from '../types'
+import type { QuestionCategory, Badge } from '../types'
 
 export interface CategoryStats {
   attempts: number
@@ -12,7 +12,7 @@ export interface CategoryStats {
 export interface PlayerProfile {
   id: string
   name: string
-  stats: Record<ProblemType, CategoryStats>
+  stats: Record<string, CategoryStats>
   gamesPlayed: number
   totalCorrect: number
   badges: Badge[]
@@ -37,13 +37,7 @@ function createProfile(name: string): PlayerProfile {
   return {
     id: crypto.randomUUID(),
     name,
-    stats: {
-      addition: emptyStats(),
-      subtraction: emptyStats(),
-      missing: emptyStats(),
-      comparison: emptyStats(),
-      'skip-counting': emptyStats(),
-    },
+    stats: {},
     gamesPlayed: 0,
     totalCorrect: 0,
     badges: [],
@@ -92,13 +86,14 @@ export function getOrCreateProfile(name: string): PlayerProfile {
 
 export function recordAnswer(
   profileId: string,
-  category: ProblemType,
+  category: QuestionCategory,
   correct: boolean,
   responseTimeMs: number
 ): Badge | null {
   const profile = loadProfile(profileId)
   if (!profile) return null
 
+  if (!profile.stats[category]) profile.stats[category] = emptyStats()
   const stats = profile.stats[category]
   stats.attempts++
   stats.totalResponseTimeMs += responseTimeMs

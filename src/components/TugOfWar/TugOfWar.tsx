@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef, useEffect } from 'react'
 import { useGameState } from '../../hooks/useGameState'
-import { useMathEngine } from '../../hooks/useMathEngine'
+import { useQuestionEngine } from '../../hooks/useQuestionEngine'
 import { useKeyboardInput } from '../../hooks/useKeyboardInput'
 import { useGamepad } from '../../hooks/useGamepad'
 import { useCPU } from '../../hooks/useCPU'
@@ -26,7 +26,7 @@ export function TugOfWar() {
     controllerType, setControllerType,
   } = useGameState()
   const { timePerQuestion, difficulty, soundEnabled } = useSettings()
-  const { currentProblem, nextProblem, problemCount } = useMathEngine(
+  const { currentProblem, nextProblem, problemCount } = useQuestionEngine(
     difficulty === 'adaptive' ? undefined : difficulty
   )
   const [timerKey, setTimerKey] = useState(0)
@@ -63,7 +63,7 @@ export function TugOfWar() {
   const handleAnswer = useCallback((playerId: 1 | 2, choiceIndex: number) => {
     if (usedShot[playerId]) return
 
-    const isCorrect = currentProblem.choices[choiceIndex] === currentProblem.correctAnswer
+    const isCorrect = choiceIndex === currentProblem.correctIndex
     const direction = playerId === 1 ? -1 : 1
 
     setUsedShot(prev => ({ ...prev, [playerId]: true }))
@@ -71,7 +71,7 @@ export function TugOfWar() {
     const profileId = profilesRef.current.get(playerId)
     if (profileId && players[playerId - 1].type === 'human') {
       const responseTime = Date.now() - timerStartRef.current
-      const badge = recordAnswer(profileId, currentProblem.type, isCorrect, responseTime)
+      const badge = recordAnswer(profileId, currentProblem.category, isCorrect, responseTime)
       if (badge) {
         setEarnedBadge(badge)
         if (soundEnabled) sounds.badge()

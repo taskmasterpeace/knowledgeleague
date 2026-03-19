@@ -15,15 +15,16 @@ function shuffle<T>(arr: T[]): T[] {
 
 export function generateDistractors(correct: number): number[] {
   const distractors = new Set<number>()
+  const range = Math.max(5, Math.ceil(Math.abs(correct) * 0.3))
   // off-by-one
   if (correct - 1 >= 0) distractors.add(correct - 1)
-  if (correct + 1 <= 20) distractors.add(correct + 1)
+  distractors.add(correct + 1)
   // off-by-two
-  if (correct + 2 <= 20) distractors.add(correct + 2)
+  distractors.add(correct + 2)
   if (correct - 2 >= 0) distractors.add(correct - 2)
   // random close values
   while (distractors.size < 3) {
-    const d = Math.max(0, correct + randInt(-5, 5))
+    const d = Math.max(0, correct + randInt(-range, range))
     if (d !== correct) distractors.add(d)
   }
   return [...distractors].slice(0, 3)
@@ -83,14 +84,112 @@ function makeSkipCounting(): MathProblem {
   return { question: `${seq.join(', ')}, ___`, correctAnswer: answer, choices, type: 'skip-counting', difficulty: 'hard' }
 }
 
-function generateForCategory(category: ProblemType, difficulty: Difficulty): MathProblem {
+function makeMultiplication(): MathProblem {
+  const a = randInt(2, 10)
+  const b = randInt(2, 10)
+  const answer = a * b
+  const choices = shuffle([answer, ...generateDistractors(answer)])
+  return { question: `${a} × ${b}`, correctAnswer: answer, choices, type: 'addition' as ProblemType, difficulty: 'medium' }
+}
+
+function makeDivision(): MathProblem {
+  const divisor = randInt(2, 10)
+  const answer = randInt(2, 10)
+  const dividend = divisor * answer
+  const choices = shuffle([answer, ...generateDistractors(answer)])
+  return { question: `${dividend} ÷ ${divisor}`, correctAnswer: answer, choices, type: 'addition' as ProblemType, difficulty: 'medium' }
+}
+
+function makeFractions(): MathProblem {
+  const wholes = [4, 6, 8, 10, 12, 16, 20]
+  const whole = wholes[randInt(0, wholes.length - 1)]
+  const divisor = [2, 4][randInt(0, 1)]
+  const answer = whole / divisor
+  const label = divisor === 2 ? 'half' : 'quarter'
+  const choices = shuffle([answer, ...generateDistractors(answer)])
+  return { question: `What is one ${label} of ${whole}?`, correctAnswer: answer, choices, type: 'addition' as ProblemType, difficulty: 'hard' }
+}
+
+function makeRounding(): MathProblem {
+  const num = randInt(11, 99)
+  const answer = Math.round(num / 10) * 10
+  const choices = shuffle([answer, ...generateDistractors(answer)])
+  return { question: `Round ${num} to the nearest 10`, correctAnswer: answer, choices, type: 'addition' as ProblemType, difficulty: 'medium' }
+}
+
+function makePercentages(): MathProblem {
+  const percents = [10, 15, 20, 25, 50]
+  const pct = percents[randInt(0, percents.length - 1)]
+  const bases = [20, 40, 50, 60, 80, 100, 200]
+  const base = bases[randInt(0, bases.length - 1)]
+  const answer = (pct / 100) * base
+  const choices = shuffle([answer, ...generateDistractors(answer)])
+  return { question: `What is ${pct}% of ${base}?`, correctAnswer: answer, choices, type: 'addition' as ProblemType, difficulty: 'hard' }
+}
+
+function makeOrderOfOps(): MathProblem {
+  const a = randInt(2, 8)
+  const b = randInt(2, 5)
+  const c = randInt(1, 6)
+  const answer = a + b * c
+  const wrongAnswer = (a + b) * c
+  const distractors = [wrongAnswer, answer + 1, answer - 1].filter(d => d !== answer).slice(0, 3)
+  while (distractors.length < 3) distractors.push(answer + randInt(2, 10))
+  const choices = shuffle([answer, ...distractors.slice(0, 3)])
+  return { question: `${a} + ${b} × ${c}`, correctAnswer: answer, choices, type: 'addition' as ProblemType, difficulty: 'hard' }
+}
+
+function makeSquareRoots(): MathProblem {
+  const roots = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+  const root = roots[randInt(0, roots.length - 1)]
+  const answer = root
+  const square = root * root
+  const choices = shuffle([answer, ...generateDistractors(answer)])
+  return { question: `√${square}`, correctAnswer: answer, choices, type: 'addition' as ProblemType, difficulty: 'hard' }
+}
+
+function makeEstimation(): MathProblem {
+  const a = randInt(11, 25)
+  const b = randInt(3, 9)
+  const answer = a * b
+  const d1 = answer + randInt(5, 15)
+  const d2 = Math.max(1, answer - randInt(5, 15))
+  const d3 = answer + randInt(20, 30)
+  const choices = shuffle([answer, d1, d2, d3])
+  return { question: `Closest to ${a} × ${b}?`, correctAnswer: answer, choices, type: 'addition' as ProblemType, difficulty: 'medium' }
+}
+
+// Maps internal generator names to the function
+const EXTENDED_GENERATORS: Record<string, (difficulty: Difficulty) => MathProblem> = {
+  'multiplication': () => makeMultiplication(),
+  'division': () => makeDivision(),
+  'fractions': () => makeFractions(),
+  'rounding': () => makeRounding(),
+  'percentages': () => makePercentages(),
+  'order-of-operations': () => makeOrderOfOps(),
+  'square-roots': () => makeSquareRoots(),
+  'estimation': () => makeEstimation(),
+}
+
+function generateForCategory(category: ProblemType | string, difficulty: Difficulty): MathProblem {
   switch (category) {
     case 'addition': return makeAddition(difficulty)
     case 'subtraction': return makeSubtraction()
     case 'missing': return makeMissing()
     case 'comparison': return makeComparison()
     case 'skip-counting': return makeSkipCounting()
+    default: {
+      const gen = EXTENDED_GENERATORS[category]
+      if (gen) return gen(difficulty)
+      return makeAddition(difficulty)
+    }
   }
+}
+
+export const GRADE_MATH_CATEGORIES: Record<string, string[]> = {
+  'grade-1': ['addition', 'subtraction', 'missing', 'comparison', 'skip-counting'],
+  'grade-3': ['addition', 'subtraction', 'missing', 'comparison', 'skip-counting', 'multiplication', 'division', 'fractions', 'rounding'],
+  'adult': ['addition', 'subtraction', 'multiplication', 'division', 'fractions', 'percentages', 'order-of-operations', 'square-roots', 'estimation'],
 }
 
 export function generateProblem(difficulty: Difficulty, enabledCategories?: ProblemType[]): MathProblem {

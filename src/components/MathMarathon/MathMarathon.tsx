@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef, useEffect } from 'react'
 import { useGameState } from '../../hooks/useGameState'
-import { useMathEngine } from '../../hooks/useMathEngine'
+import { useQuestionEngine } from '../../hooks/useQuestionEngine'
 import { useKeyboardInput } from '../../hooks/useKeyboardInput'
 import { useGamepad } from '../../hooks/useGamepad'
 import { useCPU } from '../../hooks/useCPU'
@@ -17,7 +17,7 @@ import {
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
 import { sounds } from '../../utils/sounds'
-import type { PlayerId, Badge } from '../../types'
+import type { PlayerId, Badge, QuestionCategory } from '../../types'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import { BadgeToast } from '../shared/BadgeToast'
 
@@ -30,7 +30,7 @@ interface PlayerRoundResult {
 
 interface RoundResult {
   playerResults: Map<PlayerId, PlayerRoundResult>
-  correctAnswer: number
+  correctAnswer: string
   question: string
 }
 
@@ -44,7 +44,7 @@ export function MathMarathon() {
     controllerType, setControllerType,
   } = useGameState()
   const { timePerQuestion, trackLength, difficulty, soundEnabled } = useSettings()
-  const { currentProblem, nextProblem, problemCount } = useMathEngine(
+  const { currentProblem, nextProblem, problemCount } = useQuestionEngine(
     difficulty === 'adaptive' ? undefined : difficulty
   )
   const [timerKey, setTimerKey] = useState(0)
@@ -115,7 +115,7 @@ export function MathMarathon() {
       const profileId = profilesRef.current.get(player.id)
       if (!profileId) continue
       const responseTime = result.answer ? result.answer.timestamp - timerStartRef.current : timePerQuestion
-      const badge = recordAnswer(profileId, currentProblem.type, result.answer?.correct ?? false, responseTime)
+      const badge = recordAnswer(profileId, currentProblem.category, result.answer?.correct ?? false, responseTime)
       if (badge) {
         setEarnedBadge(badge)
         if (soundEnabled) sounds.badge()
@@ -182,7 +182,7 @@ export function MathMarathon() {
 
     setRoundResult({
       playerResults,
-      correctAnswer: currentProblem.correctAnswer,
+      correctAnswer: currentProblem.choices[currentProblem.correctIndex],
       question: currentProblem.question,
     })
     setShowingResult(true)
@@ -203,7 +203,7 @@ export function MathMarathon() {
     if (showingResult) return
     if (answersRef.current.has(playerId)) return
 
-    const isCorrect = currentProblem.choices[choiceIndex] === currentProblem.correctAnswer
+    const isCorrect = choiceIndex === currentProblem.correctIndex
     answersRef.current.set(playerId, { choiceIndex, correct: isCorrect, timestamp: Date.now() })
 
     // If all players have answered, resolve immediately
@@ -322,6 +322,7 @@ export function MathMarathon() {
                 size={36}
                 avatarUrl={player.avatarUrl}
                 isHopping={hoppingPlayers.has(player.id as PlayerId)}
+                isRunning={!showingResult}
               />
             </div>
           )
