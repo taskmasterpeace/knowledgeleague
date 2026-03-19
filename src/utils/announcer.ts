@@ -120,13 +120,20 @@ export function stopAnnouncer(): void {
 export function correctLine(playerName: string, streak: number): AnnouncerLine {
   if (streak >= 5) return { text: `${playerName} is unstoppable! ${streak} in a row!`, priority: 'high' }
   if (streak >= 3) return { text: `${playerName} is on fire!`, priority: 'normal' }
-  const lines = ['Nice one!', "That's right!", 'Brilliant!', 'Correct!']
-  return { text: lines[Math.floor(Math.random() * lines.length)], priority: 'low' }
+  // Use name ~40% of the time for normal correct answers
+  const namedLines = [`Nice one, ${playerName}!`, `Way to go, ${playerName}!`, `${playerName} gets it!`]
+  const genericLines = ['Nice one!', "That's right!", 'Brilliant!', 'Correct!']
+  const pool = Math.random() < 0.4 ? namedLines : genericLines
+  return { text: pool[Math.floor(Math.random() * pool.length)], priority: 'low' }
 }
 
 export function wrongLine(playerName: string, hadStreak: boolean): AnnouncerLine {
   if (hadStreak) return { text: `Ooh, ${playerName} breaks the streak!`, priority: 'normal' }
-  return { text: 'Not quite!', priority: 'low' }
+  // Use name ~30% of the time for wrong answers
+  const namedLines = [`Tough luck, ${playerName}!`, `Not this time, ${playerName}.`]
+  const genericLines = ['Not quite!', 'Ooh, so close!']
+  const pool = Math.random() < 0.3 ? namedLines : genericLines
+  return { text: pool[Math.floor(Math.random() * pool.length)], priority: 'low' }
 }
 
 export function leadChangeLine(playerName: string): AnnouncerLine {
@@ -144,4 +151,20 @@ export function subjectChangeLine(subject: Subject): AnnouncerLine {
 
 export function victoryLine(playerName: string): AnnouncerLine {
   return { text: `And the winner is ${playerName}! What a game!`, priority: 'high' }
+}
+
+export function playerJoinLine(playerName: string): AnnouncerLine {
+  const lines = [
+    `${playerName} has entered the game!`,
+    `Welcome, ${playerName}!`,
+    `${playerName} is here! Let's go!`,
+    `Look who showed up! It's ${playerName}!`,
+  ]
+  return { text: lines[Math.floor(Math.random() * lines.length)], priority: 'normal' }
+}
+
+export function gameStartLine(playerCount: number): AnnouncerLine {
+  if (playerCount >= 6) return { text: `${playerCount} players! This is going to be wild!`, priority: 'high' }
+  if (playerCount >= 4) return { text: `${playerCount} players ready! Let the games begin!`, priority: 'high' }
+  return { text: "Let's do this! Game on!", priority: 'high' }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useGameState } from './hooks/useGameState'
 import { usePeerHost } from './hooks/usePeerHost'
 import { PeerContext } from './hooks/usePeerContext'
@@ -15,6 +15,8 @@ import { TrophyShelf } from './components/TrophyShelf/TrophyShelf'
 import { PhoneController } from './components/PhoneController/PhoneController'
 import { PhoneLobby } from './components/PhoneLobby/PhoneLobby'
 import { PLAYER_COLORS } from './utils/constants'
+import { useSettings } from './hooks/useSettings'
+import { speak, playerJoinLine, gameStartLine } from './utils/announcer'
 
 function App() {
   const { phase, event } = useGameState()
@@ -42,6 +44,21 @@ function PhoneLobbyWrapper({ joinUrl, roomId, remotePlayers }: {
   remotePlayers: RemotePlayer[]
 }) {
   const { setPhase, setPlayerCount, setPlayerName, setPlayerColor } = useGameState()
+  const { announcerEnabled, announcerVoice, announcerFrequency } = useSettings()
+  const prevCountRef = useRef(0)
+
+  const announcerConfig = { enabled: announcerEnabled, voice: announcerVoice, frequency: announcerFrequency }
+
+  // Announce when a new player joins
+  useEffect(() => {
+    if (remotePlayers.length > prevCountRef.current) {
+      const newest = remotePlayers[remotePlayers.length - 1]
+      if (newest) {
+        speak(playerJoinLine(newest.name), announcerConfig)
+      }
+    }
+    prevCountRef.current = remotePlayers.length
+  }, [remotePlayers.length])
 
   const handleStartGame = () => {
     // Set up players: P1 is the host (keyboard), remote players get assigned slots
@@ -53,6 +70,9 @@ function PhoneLobbyWrapper({ joinUrl, roomId, remotePlayers }: {
       setPlayerName(rp.playerId as PlayerId, rp.name)
       setPlayerColor(rp.playerId as PlayerId, PLAYER_COLORS[(rp.playerId - 1) % PLAYER_COLORS.length])
     }
+
+    // Announce game start
+    speak(gameStartLine(totalPlayers), announcerConfig)
 
     setPhase('event-select')
   }

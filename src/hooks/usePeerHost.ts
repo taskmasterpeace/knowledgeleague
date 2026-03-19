@@ -90,8 +90,7 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
             if (prev.find(p => p.connId === conn.connectionId)) return prev
             const usedIds = new Set(prev.map(p => p.playerId))
             let playerId = 2
-            while (usedIds.has(playerId) && playerId <= 4) playerId++
-            if (playerId > 4) return prev
+            while (usedIds.has(playerId)) playerId++
 
             const rp: RemotePlayer = { connId: conn.connectionId, name: data.name!, playerId }
             conn.send({ type: 'assigned', playerId, name: data.name })

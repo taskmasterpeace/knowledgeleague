@@ -21,6 +21,7 @@ import type { PlayerId, Badge, QuestionCategory } from '../../types'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import { BadgeToast } from '../shared/BadgeToast'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
+import { usePeerContext } from '../../hooks/usePeerContext'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
@@ -58,6 +59,8 @@ export function MathMarathon() {
   const [hoppingPlayers, setHoppingPlayers] = useState<Set<PlayerId>>(new Set())
   const { announceCorrect, announceWrong } = useAnnouncer()
 
+  const { broadcastProblem, broadcastResult } = usePeerContext()
+
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
@@ -71,6 +74,11 @@ export function MathMarathon() {
       }
     }
   }, [players])
+
+  // Broadcast current problem to phone controllers
+  useEffect(() => {
+    broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject)
+  }, [currentProblem, broadcastProblem])
 
   const resolveRound = useCallback(() => {
     if (roundResolvedRef.current) return
@@ -196,6 +204,9 @@ export function MathMarathon() {
       return
     }
 
+    // Broadcast correct answer to phone controllers
+    broadcastResult(currentProblem.correctIndex)
+
     setRoundResult({
       playerResults,
       correctAnswer: currentProblem.choices[currentProblem.correctIndex],
@@ -213,7 +224,7 @@ export function MathMarathon() {
       timerStartRef.current = Date.now()
       setTimerKey(k => k + 1)
     }, 2000)
-  }, [players, currentProblem, trackLength, timePerQuestion, updatePosition, incrementStreak, resetStreak, incrementScore, setWinner, nextProblem])
+  }, [players, currentProblem, trackLength, timePerQuestion, updatePosition, incrementStreak, resetStreak, incrementScore, setWinner, nextProblem, broadcastResult])
 
   const handleAnswer = useCallback((playerId: PlayerId, choiceIndex: number) => {
     if (showingResult) return
@@ -227,6 +238,14 @@ export function MathMarathon() {
       resolveRound()
     }
   }, [currentProblem, showingResult, resolveRound, players.length])
+
+  // Register handler for phone controller answers via PeerJS
+  useEffect(() => {
+    (window as any).__remoteAnswerHandler = (playerId: number, choiceIndex: number) => {
+      handleAnswer(playerId as PlayerId, choiceIndex)
+    }
+    return () => { delete (window as any).__remoteAnswerHandler }
+  }, [handleAnswer])
 
   const humanCount = players.filter(p => p.type === 'human').length
 

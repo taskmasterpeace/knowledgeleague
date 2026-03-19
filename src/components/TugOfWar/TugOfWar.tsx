@@ -19,6 +19,7 @@ import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import type { Badge } from '../../types'
 import { BadgeToast } from '../shared/BadgeToast'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
+import { usePeerContext } from '../../hooks/usePeerContext'
 
 export function TugOfWar() {
   const {
@@ -39,8 +40,18 @@ export function TugOfWar() {
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
   const { announceCorrect, announceWrong } = useAnnouncer()
 
+  const { broadcastProblem, broadcastResult } = usePeerContext()
+
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
   const timerStartRef = useRef(Date.now())
+
+  // Team assignments: odd player IDs = Team 1 (left), even = Team 2 (right)
+  const team1 = players.filter((_, i) => i % 2 === 0) // P1, P3, P5...
+  const team2 = players.filter((_, i) => i % 2 === 1) // P2, P4, P6...
+  const getTeamSide = useCallback((playerId: number): 1 | 2 => {
+    const idx = players.findIndex(p => p.id === playerId)
+    return idx % 2 === 0 ? 1 : 2
+  }, [players])
 
   useEffect(() => {
     for (const player of players) {
@@ -50,6 +61,11 @@ export function TugOfWar() {
       }
     }
   }, [players])
+
+  // Broadcast current problem to phone controllers
+  useEffect(() => {
+    broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject)
+  }, [currentProblem, broadcastProblem])
 
   const ropePos = players[0].position
 
@@ -97,9 +113,11 @@ export function TugOfWar() {
       setTimeout(() => setShowBurst(false), 600)
 
       if (Math.abs(newPos) >= TUG_WIN_THRESHOLD) {
+        broadcastResult(currentProblem.correctIndex)
         setWinner(newPos < 0 ? 1 : 2)
         return
       }
+      broadcastResult(currentProblem.correctIndex)
       setTimeout(advanceProblem, 600)
     } else {
       if (soundEnabled) sounds.wrong()
@@ -115,19 +133,30 @@ export function TugOfWar() {
       setTimeout(() => setShaking(false), 250)
 
       if (Math.abs(newPos) >= TUG_WIN_THRESHOLD) {
+        broadcastResult(currentProblem.correctIndex)
         setWinner(newPos < 0 ? 1 : 2)
         return
       }
 
       const opponentId = playerId === 1 ? 2 : 1
       if (usedShot[opponentId]) {
+        broadcastResult(currentProblem.correctIndex)
         setTimeout(advanceProblem, 800)
       }
     }
-  }, [players, currentProblem, ropePos, usedShot, setPosition, incrementStreak, resetStreak, incrementScore, setWinner, advanceProblem])
+  }, [players, currentProblem, ropePos, usedShot, setPosition, incrementStreak, resetStreak, incrementScore, setWinner, advanceProblem, broadcastResult])
 
   const handleP1Answer = useCallback((i: number) => handleAnswer(1, i), [handleAnswer])
   const handleP2Answer = useCallback((i: number) => handleAnswer(2, i), [handleAnswer])
+
+  // Register handler for phone controller answers — map player to team side
+  useEffect(() => {
+    (window as any).__remoteAnswerHandler = (playerId: number, choiceIndex: number) => {
+      const teamSide = getTeamSide(playerId)
+      handleAnswer(teamSide, choiceIndex)
+    }
+    return () => { delete (window as any).__remoteAnswerHandler }
+  }, [handleAnswer, getTeamSide])
 
   useKeyboardInput({
     onAnswer: (playerId, choiceIndex) => {
@@ -165,20 +194,28 @@ export function TugOfWar() {
       <BadgeToast badge={earnedBadge} />
       <FlashOverlay type={flashType} />
 
-      {/* Player info panels */}
+      {/* Team/Player info panels */}
       <div className="flex justify-between items-start gap-3">
-        {/* Player 1 */}
+        {/* Team 1 (left side) */}
         <div className="pixel-card rounded-lg p-3 flex flex-col items-center gap-1 min-w-[120px]">
-          <PlayerAvatar
-            name={players[0].name}
-            color={players[0].color}
-            size={52}
-            isWinning={ropePos < -20}
-            isLosing={ropePos > 20}
-            isLocked={usedShot[1]}
-            avatarUrl={players[0].avatarUrl}
-          />
-          <div className="font-pixel text-[8px] text-white/80 mt-1 text-center leading-tight">{players[0].name}</div>
+          {team1.length > 1 && <div className="font-pixel text-[6px] text-blue-300/60 mb-1">TEAM 1</div>}
+          <div className="flex gap-2 flex-wrap justify-center">
+            {team1.map(p => (
+              <PlayerAvatar
+                key={p.id}
+                name={p.name}
+                color={p.color}
+                size={team1.length > 2 ? 32 : 52}
+                isWinning={ropePos < -20}
+                isLosing={ropePos > 20}
+                isLocked={usedShot[1]}
+                avatarUrl={p.avatarUrl}
+              />
+            ))}
+          </div>
+          <div className="font-pixel text-[8px] text-white/80 mt-1 text-center leading-tight">
+            {team1.map(p => p.name).join(' · ')}
+          </div>
           <div className="flex items-center gap-1">
             <StreakFlame streak={players[0].streak} />
             <span className="font-pixel text-[7px] text-yellow-300">
@@ -193,22 +230,30 @@ export function TugOfWar() {
         {/* VS */}
         <div className="font-pixel text-sm text-white/60 self-center text-glow">VS</div>
 
-        {/* Player 2 */}
+        {/* Team 2 (right side) */}
         <div className="pixel-card rounded-lg p-3 flex flex-col items-center gap-1 min-w-[120px]">
-          <PlayerAvatar
-            name={players[1].name}
-            color={players[1].color}
-            size={52}
-            isWinning={ropePos > 20}
-            isLosing={ropePos < -20}
-            isLocked={usedShot[2]}
-            avatarUrl={players[1].avatarUrl}
-          />
-          <div className="font-pixel text-[8px] text-white/80 mt-1 text-center leading-tight">{players[1].name}</div>
+          {team2.length > 1 && <div className="font-pixel text-[6px] text-red-300/60 mb-1">TEAM 2</div>}
+          <div className="flex gap-2 flex-wrap justify-center">
+            {team2.map(p => (
+              <PlayerAvatar
+                key={p.id}
+                name={p.name}
+                color={p.color}
+                size={team2.length > 2 ? 32 : 52}
+                isWinning={ropePos > 20}
+                isLosing={ropePos < -20}
+                isLocked={usedShot[2]}
+                avatarUrl={p.avatarUrl}
+              />
+            ))}
+          </div>
+          <div className="font-pixel text-[8px] text-white/80 mt-1 text-center leading-tight">
+            {team2.map(p => p.name).join(' · ')}
+          </div>
           <div className="flex items-center gap-1">
-            <StreakFlame streak={players[1].streak} />
+            <StreakFlame streak={players[1]?.streak ?? 0} />
             <span className="font-pixel text-[7px] text-yellow-300">
-              {players[1].streak >= TUG_STREAK_THRESHOLD ? 'SUPER!' : `×${players[1].streak}`}
+              {(players[1]?.streak ?? 0) >= TUG_STREAK_THRESHOLD ? 'SUPER!' : `×${players[1]?.streak ?? 0}`}
             </span>
           </div>
           {usedShot[2] && !feedback[2] && (

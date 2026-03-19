@@ -1,7 +1,7 @@
 import { useGameState } from '../../hooks/useGameState'
 
 export function EventSelect() {
-  const { setEvent, setPhase } = useGameState()
+  const { setEvent, setPhase, playerCount } = useGameState()
 
   const selectEvent = (event: 'marathon' | 'tug-of-war') => {
     setEvent(event)
@@ -104,6 +104,9 @@ export function EventSelect() {
             TUG OF<br />WAR
           </span>
           <span className="font-pixel text-[7px] text-white/50 text-center">Pull them to your side!</span>
+          {playerCount > 2 && (
+            <span className="font-pixel text-[6px] text-yellow-300/70 text-center mt-1">Teams mode!</span>
+          )}
         </button>
       </div>
     </div>

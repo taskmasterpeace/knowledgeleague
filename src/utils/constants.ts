@@ -26,8 +26,12 @@ export const CPU_CHARACTERS: CPUCharacter[] = [
     avatarUrl: '/avatars/cpu/mia-portrait.png', animatedUrl: '/avatars/cpu/mia-walk.gif' },
 ]
 
-// Player colors
-export const PLAYER_COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#a855f7', '#ec4899']
+// Player colors (supports up to 16 players, then cycles)
+export const PLAYER_COLORS = [
+  '#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#a855f7', '#ec4899',
+  '#14b8a6', '#f97316', '#6366f1', '#84cc16', '#e11d48', '#06b6d4',
+  '#8b5cf6', '#d946ef', '#0ea5e9', '#65a30d',
+]
 
 // Keyboard mapping — both players press 1-2-3-4
 // P1 uses number row (Digit1-Digit4), P2 uses numpad (Numpad1-Numpad4)
