@@ -1,0 +1,422 @@
+[
+  {
+    "question": "What happens to water when it evaporates?",
+    "choices": ["It turns to ice", "It turns into a gas", "It disappears forever", "It turns into juice"],
+    "correctIndex": 1,
+    "category": "water-cycle",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is it called when water falls from clouds?",
+    "choices": ["Evaporation", "Condensation", "Precipitation", "Hibernation"],
+    "correctIndex": 2,
+    "category": "water-cycle",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is condensation?",
+    "choices": ["Water turning into ice", "Gas turning back into liquid", "Rain falling down", "Water going underground"],
+    "correctIndex": 1,
+    "category": "water-cycle",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Where does most of Earth's water evaporate from?",
+    "choices": ["Rivers", "Puddles", "Oceans", "Swimming pools"],
+    "correctIndex": 2,
+    "category": "water-cycle",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What causes water to evaporate?",
+    "choices": ["Wind", "Heat from the Sun", "Gravity", "The Moon"],
+    "correctIndex": 1,
+    "category": "water-cycle",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What are clouds made of?",
+    "choices": ["Cotton", "Smoke", "Tiny water droplets", "Dust"],
+    "correctIndex": 2,
+    "category": "water-cycle",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What happens to water vapor when it cools down high in the sky?",
+    "choices": ["It evaporates more", "It forms clouds", "It turns into snow instantly", "It floats into space"],
+    "correctIndex": 1,
+    "category": "water-cycle",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which is NOT a form of precipitation?",
+    "choices": ["Rain", "Snow", "Hail", "Evaporation"],
+    "correctIndex": 3,
+    "category": "water-cycle",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What force pulls things down to the ground?",
+    "choices": ["Magnetism", "Friction", "Gravity", "Wind"],
+    "correctIndex": 2,
+    "category": "forces",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What slows down a ball rolling on carpet?",
+    "choices": ["Gravity", "Friction", "Magnetism", "Air"],
+    "correctIndex": 1,
+    "category": "forces",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which is an example of a push?",
+    "choices": ["Pulling a wagon", "Pressing a doorbell", "Lifting a book", "Catching a ball"],
+    "correctIndex": 1,
+    "category": "forces",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What happens when you push harder on a ball?",
+    "choices": ["It stops", "It moves faster", "It moves slower", "Nothing happens"],
+    "correctIndex": 1,
+    "category": "forces",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which surface has the MOST friction?",
+    "choices": ["Ice", "Wet tile", "Rough sandpaper", "Smooth glass"],
+    "correctIndex": 2,
+    "category": "forces",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What keeps you on the ground instead of floating?",
+    "choices": ["Air pressure", "Magnetism", "Gravity", "Your shoes"],
+    "correctIndex": 2,
+    "category": "forces",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Why does a ball thrown in the air come back down?",
+    "choices": ["Wind pushes it down", "Gravity pulls it down", "It gets tired", "The air is heavy"],
+    "correctIndex": 1,
+    "category": "forces",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which requires LESS force to move?",
+    "choices": ["A heavy box on carpet", "A light ball on ice", "A big rock on grass", "A car with no wheels"],
+    "correctIndex": 1,
+    "category": "forces",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What do we call an animal that eats only plants?",
+    "choices": ["Carnivore", "Herbivore", "Omnivore", "Decomposer"],
+    "correctIndex": 1,
+    "category": "food-chains",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is a producer in a food chain?",
+    "choices": ["An animal that hunts", "A plant that makes its own food", "An animal that eats everything", "A mushroom"],
+    "correctIndex": 1,
+    "category": "food-chains",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do we call an animal that eats other animals?",
+    "choices": ["Herbivore", "Producer", "Carnivore", "Decomposer"],
+    "correctIndex": 2,
+    "category": "food-chains",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What breaks down dead plants and animals?",
+    "choices": ["Producers", "Herbivores", "Carnivores", "Decomposers"],
+    "correctIndex": 3,
+    "category": "food-chains",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which is at the START of most food chains?",
+    "choices": ["A lion", "A mushroom", "A green plant", "A hawk"],
+    "correctIndex": 2,
+    "category": "food-chains",
+    "difficulty": "medium"
+  },
+  {
+    "question": "In the chain: grass → rabbit → fox, what is the rabbit?",
+    "choices": ["Producer", "Consumer", "Decomposer", "Predator"],
+    "correctIndex": 1,
+    "category": "food-chains",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is a food web?",
+    "choices": ["A spider's trap for food", "Many food chains connected together", "A type of plant", "A grocery list"],
+    "correctIndex": 1,
+    "category": "food-chains",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which is an omnivore?",
+    "choices": ["A cow", "A lion", "A bear", "A rabbit"],
+    "correctIndex": 2,
+    "category": "food-chains",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What can a fossil tell us about?",
+    "choices": ["The future", "Animals that lived long ago", "Tomorrow's weather", "What to eat for lunch"],
+    "correctIndex": 1,
+    "category": "fossils",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Where are fossils usually found?",
+    "choices": ["In the sky", "In rocks", "In water", "In trees"],
+    "correctIndex": 1,
+    "category": "fossils",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What type of fossil is a dinosaur footprint?",
+    "choices": ["Body fossil", "Trace fossil", "Living fossil", "Fake fossil"],
+    "correctIndex": 1,
+    "category": "fossils",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which part of an animal is MOST likely to become a fossil?",
+    "choices": ["Skin", "Fur", "Bones", "Eyes"],
+    "correctIndex": 2,
+    "category": "fossils",
+    "difficulty": "medium"
+  },
+  {
+    "question": "How old can fossils be?",
+    "choices": ["A few days", "A few years", "Millions of years", "One week"],
+    "correctIndex": 2,
+    "category": "fossils",
+    "difficulty": "hard"
+  },
+  {
+    "question": "A scientist who studies fossils is called a what?",
+    "choices": ["Biologist", "Paleontologist", "Astronaut", "Chemist"],
+    "correctIndex": 1,
+    "category": "fossils",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which trait is inherited from your parents?",
+    "choices": ["Your favorite color", "Your eye color", "Your best friend", "Your name"],
+    "correctIndex": 1,
+    "category": "traits",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which is a learned behavior?",
+    "choices": ["Eye color", "Hair color", "Riding a bike", "How tall you are"],
+    "correctIndex": 2,
+    "category": "traits",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is a life cycle?",
+    "choices": ["A type of bicycle", "The stages of an organism's life", "A circle of life jackets", "A kind of wheel"],
+    "correctIndex": 1,
+    "category": "traits",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which is inherited, NOT learned?",
+    "choices": ["Speaking English", "Playing piano", "Having freckles", "Reading books"],
+    "correctIndex": 2,
+    "category": "traits",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the correct order of a butterfly life cycle?",
+    "choices": ["Butterfly, egg, caterpillar, chrysalis", "Egg, caterpillar, chrysalis, butterfly", "Caterpillar, egg, butterfly, chrysalis", "Chrysalis, butterfly, egg, caterpillar"],
+    "correctIndex": 1,
+    "category": "traits",
+    "difficulty": "medium"
+  },
+  {
+    "question": "A tadpole grows into a what?",
+    "choices": ["Fish", "Frog", "Lizard", "Turtle"],
+    "correctIndex": 1,
+    "category": "traits",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which trait can be BOTH inherited and affected by environment?",
+    "choices": ["Eye color", "Blood type", "Height", "Number of fingers"],
+    "correctIndex": 2,
+    "category": "traits",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Baby birds learn to fly. Is flying inherited or learned?",
+    "choices": ["Fully inherited", "Fully learned", "Both inherited instinct and learned skill", "Neither"],
+    "correctIndex": 2,
+    "category": "traits",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What do magnets attract?",
+    "choices": ["Wood", "Plastic", "Iron and steel", "Paper"],
+    "correctIndex": 2,
+    "category": "magnets",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What are the two ends of a magnet called?",
+    "choices": ["Top and bottom", "Left and right", "North and south poles", "Front and back"],
+    "correctIndex": 2,
+    "category": "magnets",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What happens when two north poles of magnets are placed together?",
+    "choices": ["They attract", "They repel", "Nothing happens", "They melt"],
+    "correctIndex": 1,
+    "category": "magnets",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which object would a magnet pick up?",
+    "choices": ["A wooden pencil", "A paper clip", "A rubber ball", "A glass marble"],
+    "correctIndex": 1,
+    "category": "magnets",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the invisible area around a magnet called?",
+    "choices": ["Gravity field", "Electric field", "Magnetic field", "Force field"],
+    "correctIndex": 2,
+    "category": "magnets",
+    "difficulty": "hard"
+  },
+  {
+    "question": "A compass needle is a magnet. What does it point toward?",
+    "choices": ["East", "West", "North", "The Sun"],
+    "correctIndex": 2,
+    "category": "magnets",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What are the three states of matter?",
+    "choices": ["Hot, warm, cold", "Solid, liquid, gas", "Big, medium, small", "Hard, soft, squishy"],
+    "correctIndex": 1,
+    "category": "matter",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which is an example of a gas?",
+    "choices": ["Ice", "Milk", "Air", "Sand"],
+    "correctIndex": 2,
+    "category": "matter",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What happens to water when it freezes?",
+    "choices": ["It becomes a gas", "It becomes a solid", "It disappears", "It becomes warmer"],
+    "correctIndex": 1,
+    "category": "matter",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What state of matter is steam?",
+    "choices": ["Solid", "Liquid", "Gas", "Plasma"],
+    "correctIndex": 2,
+    "category": "matter",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What happens to chocolate when you heat it?",
+    "choices": ["It freezes", "It melts", "It evaporates", "It turns into gas"],
+    "correctIndex": 1,
+    "category": "matter",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which state of matter has a fixed shape?",
+    "choices": ["Liquid", "Gas", "Solid", "All of them"],
+    "correctIndex": 2,
+    "category": "matter",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is it called when a solid turns into a liquid?",
+    "choices": ["Freezing", "Melting", "Evaporation", "Condensation"],
+    "correctIndex": 1,
+    "category": "matter",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which state of matter fills its entire container?",
+    "choices": ["Solid", "Liquid", "Gas", "None of them"],
+    "correctIndex": 2,
+    "category": "matter",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does a weather vane measure?",
+    "choices": ["Temperature", "Rainfall", "Wind direction", "Humidity"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is climate?",
+    "choices": ["Today's weather", "The weather pattern over many years", "A type of storm", "The temperature right now"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which climate zone is near the equator?",
+    "choices": ["Polar", "Temperate", "Tropical", "Arctic"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What tool measures rainfall?",
+    "choices": ["Thermometer", "Barometer", "Rain gauge", "Anemometer"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What type of cloud is tall and brings thunderstorms?",
+    "choices": ["Cirrus", "Stratus", "Cumulonimbus", "Cumulus"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What tool measures wind speed?",
+    "choices": ["Thermometer", "Rain gauge", "Anemometer", "Barometer"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does a barometer measure?",
+    "choices": ["Wind speed", "Air pressure", "Temperature", "Humidity"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which climate zone has four distinct seasons?",
+    "choices": ["Tropical", "Polar", "Temperate", "Desert"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "hard"
+  }
+]

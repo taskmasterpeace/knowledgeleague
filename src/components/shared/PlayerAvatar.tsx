@@ -5,10 +5,12 @@ interface Props {
   isWinning?: boolean
   isLosing?: boolean
   isLocked?: boolean
+  isHopping?: boolean
+  isRunning?: boolean
   avatarUrl?: string | null
 }
 
-export function PlayerAvatar({ name, color, size = 80, isWinning, isLosing, isLocked, avatarUrl }: Props) {
+export function PlayerAvatar({ name, color, size = 80, isWinning, isLosing, isLocked, isHopping, isRunning, avatarUrl }: Props) {
   const initials = name.slice(0, 2).toUpperCase()
 
   if (avatarUrl) {
@@ -19,7 +21,7 @@ export function PlayerAvatar({ name, color, size = 80, isWinning, isLosing, isLo
           alt={name}
           width={size}
           height={size}
-          className="rounded-lg border-2 transition-all"
+          className={`rounded-lg border-2 transition-all ${isHopping ? 'animate-hop' : ''} ${isRunning ? 'animate-running' : ''}`}
           style={{
             imageRendering: 'pixelated',
             borderColor: color,

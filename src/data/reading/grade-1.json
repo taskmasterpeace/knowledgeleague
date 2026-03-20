@@ -1,0 +1,422 @@
+[
+  {
+    "question": "Which word rhymes with cat?",
+    "choices": ["Dog", "Hat", "Cup", "Run"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word rhymes with dog?",
+    "choices": ["Log", "Sun", "Pen", "Milk"],
+    "correctIndex": 0,
+    "category": "rhyming",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word rhymes with cake?",
+    "choices": ["Bike", "Fork", "Lake", "Corn"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word rhymes with bug?",
+    "choices": ["Bag", "Rug", "Big", "Leg"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word rhymes with man?",
+    "choices": ["Men", "Fun", "Pan", "Mop"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word rhymes with hop?",
+    "choices": ["Hip", "Top", "Hug", "Tap"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with bell?",
+    "choices": ["Ball", "Bill", "Well", "Bull"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with king?",
+    "choices": ["Sing", "Kite", "Kind", "Kong"],
+    "correctIndex": 0,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with night?",
+    "choices": ["Neat", "Nest", "Light", "Nose"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with train?",
+    "choices": ["Tree", "Rain", "Trim", "True"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word rhymes with boat?",
+    "choices": ["Boot", "Coat", "Bite", "Bent"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word rhymes with mouse?",
+    "choices": ["Moose", "Mess", "House", "Miss"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the opposite of big?",
+    "choices": ["Tall", "Small", "Wide", "Long"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of hot?",
+    "choices": ["Warm", "Wet", "Cold", "Dry"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of happy?",
+    "choices": ["Glad", "Sad", "Mad", "Shy"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of fast?",
+    "choices": ["Quick", "Slow", "Far", "Near"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of up?",
+    "choices": ["Over", "Out", "Down", "In"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of dark?",
+    "choices": ["Light", "Black", "Gray", "Dim"],
+    "correctIndex": 0,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of open?",
+    "choices": ["Wide", "Shut", "Free", "Loose"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of wet?",
+    "choices": ["Damp", "Cool", "Dry", "Warm"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of loud?",
+    "choices": ["Quiet", "Soft", "Calm", "Still"],
+    "correctIndex": 0,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of empty?",
+    "choices": ["Bare", "Flat", "Thin", "Full"],
+    "correctIndex": 3,
+    "category": "opposites",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word starts with the same sound as ball?",
+    "choices": ["Dog", "Bat", "Cat", "Fan"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word starts with the same sound as sun?",
+    "choices": ["Sock", "Frog", "Milk", "Tent"],
+    "correctIndex": 0,
+    "category": "beginning-sounds",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word starts with the same sound as fish?",
+    "choices": ["Pig", "Fun", "Goat", "Hat"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word starts with the same sound as moon?",
+    "choices": ["Nose", "Lamp", "Map", "Ring"],
+    "correctIndex": 2,
+    "category": "beginning-sounds",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word starts with the same sound as tree?",
+    "choices": ["Drum", "Truck", "Frog", "Crab"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word starts with the same sound as chair?",
+    "choices": ["Sheep", "Chin", "King", "Top"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word starts with the same sound as ship?",
+    "choices": ["Chop", "Shoe", "Stop", "Thin"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word starts with the same sound as goat?",
+    "choices": ["Jet", "Kite", "Gift", "Door"],
+    "correctIndex": 2,
+    "category": "beginning-sounds",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word starts with the same sound as knee?",
+    "choices": ["Night", "King", "Milk", "Pen"],
+    "correctIndex": 0,
+    "category": "beginning-sounds",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word starts with the same sound as phone?",
+    "choices": ["Pen", "Fin", "Thin", "Vine"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "hard"
+  },
+  {
+    "question": "The frog can ___ very high.",
+    "choices": ["Jump", "Swim", "Read", "Paint"],
+    "correctIndex": 0,
+    "category": "fill-in-blank",
+    "difficulty": "easy"
+  },
+  {
+    "question": "The bird can ___ in the sky.",
+    "choices": ["Run", "Dig", "Fly", "Sit"],
+    "correctIndex": 2,
+    "category": "fill-in-blank",
+    "difficulty": "easy"
+  },
+  {
+    "question": "I use my ___ to see.",
+    "choices": ["Ears", "Eyes", "Hands", "Feet"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "easy"
+  },
+  {
+    "question": "The sun comes up in the ___.",
+    "choices": ["Night", "Evening", "Afternoon", "Morning"],
+    "correctIndex": 3,
+    "category": "fill-in-blank",
+    "difficulty": "easy"
+  },
+  {
+    "question": "We drink water when we are ___.",
+    "choices": ["Tired", "Thirsty", "Cold", "Happy"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The cat ___ on the soft bed.",
+    "choices": ["Slept", "Flew", "Sang", "Drove"],
+    "correctIndex": 0,
+    "category": "fill-in-blank",
+    "difficulty": "medium"
+  },
+  {
+    "question": "We go to the ___ to buy food.",
+    "choices": ["Park", "School", "Store", "Beach"],
+    "correctIndex": 2,
+    "category": "fill-in-blank",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The dog likes to ___ its tail.",
+    "choices": ["Throw", "Wag", "Clap", "Push"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "medium"
+  },
+  {
+    "question": "She put on her coat because it was ___.",
+    "choices": ["Sunny", "Hot", "Cold", "Dry"],
+    "correctIndex": 2,
+    "category": "fill-in-blank",
+    "difficulty": "hard"
+  },
+  {
+    "question": "The baby ___ when she was hungry.",
+    "choices": ["Laughed", "Cried", "Danced", "Sang"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word nap mean?",
+    "choices": ["To eat food", "A short sleep", "To run fast", "A kind of hat"],
+    "correctIndex": 1,
+    "category": "word-meaning",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word tiny mean?",
+    "choices": ["Very big", "Very fast", "Very small", "Very loud"],
+    "correctIndex": 2,
+    "category": "word-meaning",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word brave mean?",
+    "choices": ["Scared", "Not afraid", "Sleepy", "Hungry"],
+    "correctIndex": 1,
+    "category": "word-meaning",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word giggle mean?",
+    "choices": ["To cry", "To sleep", "To laugh", "To shout"],
+    "correctIndex": 2,
+    "category": "word-meaning",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word furry mean?",
+    "choices": ["Covered in soft hair", "Very cold", "Really tall", "Super fast"],
+    "correctIndex": 0,
+    "category": "word-meaning",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word chilly mean?",
+    "choices": ["Very hot", "A little cold", "Really wet", "Very dark"],
+    "correctIndex": 1,
+    "category": "word-meaning",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word sprint mean?",
+    "choices": ["To walk slowly", "To sit down", "To run very fast", "To jump high"],
+    "correctIndex": 2,
+    "category": "word-meaning",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word gaze mean?",
+    "choices": ["To look for a long time", "To run away", "To eat quickly", "To sing a song"],
+    "correctIndex": 0,
+    "category": "word-meaning",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word mend mean?",
+    "choices": ["To break apart", "To throw away", "To fix something", "To hide it"],
+    "correctIndex": 2,
+    "category": "word-meaning",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word cozy mean?",
+    "choices": ["Scary and dark", "Warm and comfy", "Loud and busy", "Cold and wet"],
+    "correctIndex": 1,
+    "category": "word-meaning",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word completes the sentence? I ___ a big dog.",
+    "choices": ["see", "be", "at", "is"],
+    "correctIndex": 0,
+    "category": "sight-words",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word completes the sentence? She ___ to the park.",
+    "choices": ["at", "went", "on", "an"],
+    "correctIndex": 1,
+    "category": "sight-words",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word completes the sentence? We ___ play outside.",
+    "choices": ["is", "am", "can", "at"],
+    "correctIndex": 2,
+    "category": "sight-words",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word completes the sentence? ___ is my best friend.",
+    "choices": ["He", "An", "It", "At"],
+    "correctIndex": 0,
+    "category": "sight-words",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word completes the sentence? I have ___ books.",
+    "choices": ["for", "two", "too", "to"],
+    "correctIndex": 1,
+    "category": "sight-words",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word completes the sentence? They ___ going to school.",
+    "choices": ["is", "am", "are", "be"],
+    "correctIndex": 2,
+    "category": "sight-words",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word completes the sentence? The cat sat ___ the mat.",
+    "choices": ["in", "on", "it", "up"],
+    "correctIndex": 1,
+    "category": "sight-words",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word completes the sentence? ___ you like to play?",
+    "choices": ["Does", "Was", "Would", "Is"],
+    "correctIndex": 2,
+    "category": "sight-words",
+    "difficulty": "hard"
+  }
+]

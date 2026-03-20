@@ -63,7 +63,7 @@ export const useGameState = create<GameState>((set) => ({
   setCPUCharacter: (cpu) => set((s) => ({
     cpuCharacter: cpu,
     players: s.players.map((p, i) =>
-      i === 1 ? { ...p, name: cpu.name, color: cpu.color, type: 'cpu' as const } : p
+      i === 1 ? { ...p, name: cpu.name, color: cpu.color, type: 'cpu' as const, avatarUrl: cpu.avatarUrl } : p
     ),
   })),
   setPlayerName: (id, name) => set((s) => ({
