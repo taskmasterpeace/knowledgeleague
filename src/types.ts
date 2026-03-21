@@ -1,14 +1,8 @@
 export type GamePhase =
-  | 'menu'
-  | 'cpu-select'
-  | 'avatar-select'
-  | 'event-select'
-  | 'phone-lobby'
-  | 'playing'
-  | 'victory'
-  | 'trophies'
+  | 'menu' | 'cpu-select' | 'avatar-select' | 'event-select'
+  | 'phone-lobby' | 'playing' | 'victory' | 'stats' | 'trophies' | 'leaderboards'
 
-export type GameEvent = 'marathon' | 'tug-of-war'
+export type GameEvent = 'marathon' | 'tug-of-war' | 'tower-climb'
 
 export type PlayerType = 'human' | 'cpu'
 
@@ -76,6 +70,45 @@ export interface GameQuestion {
   subject: Subject
   category: QuestionCategory
   difficulty: Difficulty
+  standard?: string
+}
+
+export type BehaviorTag = 'on-fire' | 'mashing' | 'guessing' | 'thinking' | 'struggling' | 'warming-up' | 'playing'
+
+export type AdaptiveTier = 1 | 2 | 3
+
+export interface PlayerAnalytics {
+  answersTotal: number
+  answersCorrect: number
+  last5Times: number[]
+  last5Correct: boolean[]
+  last5Choices: number[]
+  last10Correct: boolean[]
+  fullCorrectHistory: boolean[]
+  positionHistory: number[]
+  behaviorTagHistory: BehaviorTag[]
+  wrongWindowRecent5: boolean[]
+  categoryAccuracy: Record<string, { correct: number; total: number }>
+  responseTimes: number[]
+  behaviorTag: BehaviorTag
+  adaptiveTier: AdaptiveTier
+  adaptiveHistory: AdaptiveTier[]
+  blocksPlaced: number
+  blocksLost: number
+  missilesLaunched: number
+  missilesTaken: number
+  splashHitsTaken: number
+}
+
+export interface SpectatorConnection {
+  name: string
+  connId: string
+}
+
+export interface Superlative {
+  award: string
+  playerName: string
+  value: string
 }
 
 // Legacy math problem format (used internally by math generator)
