@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { usePeerClient } from '../../hooks/usePeerClient'
+import { SpectatorDashboard } from '../SpectatorDashboard/SpectatorDashboard'
 
 interface Props {
   roomId: string
@@ -16,15 +17,17 @@ const ANSWER_COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444']
 export function PhoneController({ roomId }: Props) {
   const [name, setName] = useState('')
   const [joined, setJoined] = useState(false)
+  const [selectedRole, setSelectedRole] = useState<'player' | 'spectator'>('player')
   const {
-    connected, playerId, question, choices, subject,
+    connected, playerId, role, question, choices, subject,
     lockedIn, correctIndex, myChoiceIndex, gameOver,
+    spectatorData,
     sendAnswer, connect,
   } = usePeerClient()
 
   const handleJoin = () => {
     if (!name.trim()) return
-    connect(roomId, name.trim())
+    connect(roomId, name.trim(), selectedRole)
     setJoined(true)
   }
 
@@ -34,6 +37,31 @@ export function PhoneController({ roomId }: Props) {
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 flex flex-col items-center justify-center gap-6 p-6">
         <h1 className="font-pixel text-3xl text-white text-glow">JOIN GAME</h1>
         <p className="font-pixel text-xs text-white/50">Room: {roomId}</p>
+
+        {/* Play / Watch toggle */}
+        <div className="flex gap-2 p-1 rounded-full bg-white/10 border border-white/20">
+          <button
+            onClick={() => setSelectedRole('player')}
+            className={`font-pixel text-sm px-5 py-2 rounded-full transition-all ${
+              selectedRole === 'player'
+                ? 'bg-yellow-500 text-gray-900'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            🎮 Play
+          </button>
+          <button
+            onClick={() => setSelectedRole('spectator')}
+            className={`font-pixel text-sm px-5 py-2 rounded-full transition-all ${
+              selectedRole === 'spectator'
+                ? 'bg-purple-500 text-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            👁️ Watch
+          </button>
+        </div>
+
         <input
           type="text"
           value={name}
@@ -47,9 +75,13 @@ export function PhoneController({ roomId }: Props) {
         <button
           onClick={handleJoin}
           disabled={!name.trim()}
-          className="pixel-btn font-pixel w-full max-w-xs py-5 bg-yellow-500 hover:bg-yellow-400 disabled:bg-white/10 disabled:text-white/30 text-gray-900 text-lg rounded-xl transition-all"
+          className={`pixel-btn font-pixel w-full max-w-xs py-5 disabled:bg-white/10 disabled:text-white/30 text-gray-900 text-lg rounded-xl transition-all ${
+            selectedRole === 'spectator'
+              ? 'bg-purple-500 hover:bg-purple-400 text-white'
+              : 'bg-yellow-500 hover:bg-yellow-400 text-gray-900'
+          }`}
         >
-          JOIN
+          {selectedRole === 'spectator' ? 'WATCH' : 'JOIN'}
         </button>
       </div>
     )
@@ -62,6 +94,21 @@ export function PhoneController({ roomId }: Props) {
         <div className="w-10 h-10 border-3 border-white/30 border-t-yellow-400 rounded-full animate-spin" />
         <p className="font-pixel text-sm text-white">Connecting...</p>
       </div>
+    )
+  }
+
+  // Spectator view
+  if (role === 'spectator') {
+    const analyticsData = spectatorData?.analytics ?? null
+    const playerInfoList = spectatorData?.players?.map((p: { name: string; color?: string }, i: number) => ({
+      name: p.name,
+      color: p.color ?? ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#c084fc', '#22d3ee'][i % 6],
+    }))
+    return (
+      <SpectatorDashboard
+        analyticsData={analyticsData}
+        playerInfo={playerInfoList}
+      />
     )
   }
 
