@@ -1,4 +1,5 @@
-import type { GameQuestion, Subject, GradeLevel, Difficulty, QuestionCategory } from '../types'
+import type { GameQuestion, Subject, GradeLevel, Difficulty, QuestionCategory, AdaptiveTier } from '../types'
+import { tierToGradeLevel, tierToDifficulty } from './adaptiveDifficulty'
 import { generateProblem, getDifficulty, GRADE_MATH_CATEGORIES } from './mathProblems'
 
 interface BankQuestion {
@@ -174,3 +175,13 @@ export function resetQuestionEngine(): void {
 }
 
 export { getDifficulty }
+
+export function generateQuestionForTier(
+  tier: AdaptiveTier,
+  enabledSubjects: Subject[],
+  enabledCategories?: QuestionCategory[],
+): GameQuestion {
+  const gradeLevel = tierToGradeLevel(tier)
+  const difficulty = tierToDifficulty(tier)
+  return generateQuestion({ enabledSubjects, gradeLevel, difficulty, enabledCategories })
+}

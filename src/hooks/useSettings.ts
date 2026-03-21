@@ -14,6 +14,8 @@ export interface Settings {
   announcerEnabled: boolean
   announcerVoice: 'alex' | 'ashley' | 'dennis' | 'darlene'
   announcerFrequency: 'chatty' | 'normal' | 'quiet'
+  adaptiveMode: 'off' | 'per-player'
+  behaviorTags: 'spectators-only' | 'post-game' | 'always'
 }
 
 const STORAGE_KEY = 'brainGames:settings'
@@ -32,6 +34,8 @@ const defaults: Settings = {
   announcerEnabled: false,
   announcerVoice: 'alex',
   announcerFrequency: 'normal',
+  adaptiveMode: 'off',
+  behaviorTags: 'spectators-only',
 }
 
 function loadSettings(): Settings {
