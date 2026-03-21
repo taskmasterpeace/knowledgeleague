@@ -18,10 +18,11 @@ export function PhoneController({ roomId }: Props) {
   const [name, setName] = useState('')
   const [joined, setJoined] = useState(false)
   const [selectedRole, setSelectedRole] = useState<'player' | 'spectator'>('player')
+  const [showStats, setShowStats] = useState(false)
   const {
     connected, playerId, role, question, choices, subject,
     lockedIn, correctIndex, myChoiceIndex, gameOver,
-    spectatorData,
+    spectatorData, personalStats, superlatives,
     sendAnswer, connect,
   } = usePeerClient()
 
@@ -118,46 +119,137 @@ export function PhoneController({ roomId }: Props) {
     const isWinner = gameOver.winnerName === name
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 flex flex-col items-center justify-center gap-5 p-6">
-        {isWinner ? (
+        {!showStats ? (
           <>
-            <div className="text-6xl">🏆</div>
-            <h1 className="font-pixel text-2xl text-yellow-300 text-glow animate-bounce">YOU WIN!</h1>
+            {isWinner ? (
+              <>
+                <div className="text-6xl">🏆</div>
+                <h1 className="font-pixel text-2xl text-yellow-300 text-glow animate-bounce">YOU WIN!</h1>
+              </>
+            ) : (
+              <>
+                <div className="text-5xl">{myRank <= 3 ? '🎉' : '👏'}</div>
+                <h1 className="font-pixel text-xl text-white text-glow">GAME OVER</h1>
+                <p className="font-pixel text-sm text-yellow-300">{gameOver.winnerName} wins!</p>
+              </>
+            )}
+
+            {/* Leaderboard */}
+            <div className="w-full max-w-xs flex flex-col gap-2 mt-2">
+              {gameOver.rankings.map((r, i) => {
+                const isMe = r.name === name
+                const placeLabels = ['1ST', '2ND', '3RD']
+                const placeLabel = i < 3 ? placeLabels[i] : `${i + 1}TH`
+                const placeColors = ['text-yellow-300', 'text-gray-300', 'text-amber-500', 'text-white/40']
+                return (
+                  <div
+                    key={i}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg ${
+                      isMe ? 'bg-yellow-500/20 border border-yellow-400/40' : 'bg-white/5'
+                    }`}
+                  >
+                    <span className={`font-pixel text-[9px] font-bold w-8 ${placeColors[i] ?? 'text-white/40'}`}>
+                      {placeLabel}
+                    </span>
+                    <span className={`font-pixel text-xs flex-1 ${isMe ? 'text-yellow-300' : 'text-white/80'}`}>
+                      {r.name}{isMe ? ' (you)' : ''}
+                    </span>
+                    <span className="font-pixel text-[8px] text-white/50">{r.score} pts</span>
+                  </div>
+                )
+              })}
+            </div>
+
+            {personalStats && (
+              <button
+                onClick={() => setShowStats(true)}
+                className="font-pixel text-sm px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white transition-all mt-2"
+              >
+                VIEW MY STATS
+              </button>
+            )}
+
+            <p className="font-pixel text-[8px] text-white/30 mt-2">Waiting for host...</p>
           </>
         ) : (
           <>
-            <div className="text-5xl">{myRank <= 3 ? '🎉' : '👏'}</div>
-            <h1 className="font-pixel text-xl text-white text-glow">GAME OVER</h1>
-            <p className="font-pixel text-sm text-yellow-300">{gameOver.winnerName} wins!</p>
+            <button
+              onClick={() => setShowStats(false)}
+              className="self-start font-pixel text-[9px] text-white/50 hover:text-white transition-colors mb-2"
+            >
+              ← BACK
+            </button>
+
+            {personalStats && (
+              <div className="w-full max-w-xs p-4 space-y-4">
+                <h2 className="font-pixel text-sm text-white text-center">YOUR STATS</h2>
+
+                {/* Accuracy */}
+                <div className="pixel-card rounded-lg p-4">
+                  <div className="font-pixel text-[9px] text-white/50 mb-1">ACCURACY</div>
+                  <div className="font-pixel text-lg text-cyan-400">
+                    {personalStats.answersTotal > 0
+                      ? `${Math.round((personalStats.answersCorrect / personalStats.answersTotal) * 100)}%`
+                      : '—'}
+                  </div>
+                  <div className="font-pixel text-[8px] text-white/40">
+                    {personalStats.answersCorrect}/{personalStats.answersTotal} correct
+                  </div>
+                </div>
+
+                {/* Avg Response Time */}
+                <div className="pixel-card rounded-lg p-4">
+                  <div className="font-pixel text-[9px] text-white/50 mb-1">AVG RESPONSE</div>
+                  <div className="font-pixel text-lg text-yellow-400">
+                    {personalStats.responseTimes && personalStats.responseTimes.length > 0
+                      ? `${(personalStats.responseTimes.reduce((a: number, b: number) => a + b, 0) / personalStats.responseTimes.length / 1000).toFixed(1)}s`
+                      : '—'}
+                  </div>
+                </div>
+
+                {/* Best Streak */}
+                <div className="pixel-card rounded-lg p-4">
+                  <div className="font-pixel text-[9px] text-white/50 mb-1">BEST STREAK</div>
+                  <div className="font-pixel text-lg text-green-400">
+                    {(() => {
+                      let max = 0, cur = 0
+                      for (const c of (personalStats.fullCorrectHistory ?? [])) {
+                        if (c) { cur++; max = Math.max(max, cur) } else cur = 0
+                      }
+                      return max
+                    })()}
+                  </div>
+                </div>
+
+                {/* Behavior Tag */}
+                {personalStats.behaviorTag && (
+                  <div className="pixel-card rounded-lg p-4">
+                    <div className="font-pixel text-[9px] text-white/50 mb-1">PLAY STYLE</div>
+                    <div className="font-pixel text-sm text-purple-400">
+                      {personalStats.behaviorTag.replace('-', ' ').toUpperCase()}
+                    </div>
+                  </div>
+                )}
+
+                {/* Superlatives the player earned */}
+                {superlatives && superlatives.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="font-pixel text-[9px] text-white/50 text-center">AWARDS</div>
+                    {superlatives.map((s: { award: string; value: string | number }) => (
+                      <div key={s.award} className="pixel-card rounded-lg p-3 flex items-center gap-3">
+                        <span className="text-xl">🏆</span>
+                        <div>
+                          <div className="font-pixel text-[9px] text-yellow-400">{s.award}</div>
+                          <div className="font-pixel text-[8px] text-white/60">{s.value}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
-
-        {/* Leaderboard */}
-        <div className="w-full max-w-xs flex flex-col gap-2 mt-2">
-          {gameOver.rankings.map((r, i) => {
-            const isMe = r.name === name
-            const placeLabels = ['1ST', '2ND', '3RD']
-            const placeLabel = i < 3 ? placeLabels[i] : `${i + 1}TH`
-            const placeColors = ['text-yellow-300', 'text-gray-300', 'text-amber-500', 'text-white/40']
-            return (
-              <div
-                key={i}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg ${
-                  isMe ? 'bg-yellow-500/20 border border-yellow-400/40' : 'bg-white/5'
-                }`}
-              >
-                <span className={`font-pixel text-[9px] font-bold w-8 ${placeColors[i] ?? 'text-white/40'}`}>
-                  {placeLabel}
-                </span>
-                <span className={`font-pixel text-xs flex-1 ${isMe ? 'text-yellow-300' : 'text-white/80'}`}>
-                  {r.name}{isMe ? ' (you)' : ''}
-                </span>
-                <span className="font-pixel text-[8px] text-white/50">{r.score} pts</span>
-              </div>
-            )
-          })}
-        </div>
-
-        <p className="font-pixel text-[8px] text-white/30 mt-4">Waiting for host...</p>
       </div>
     )
   }
