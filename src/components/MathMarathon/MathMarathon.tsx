@@ -17,11 +17,14 @@ import {
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
 import { sounds } from '../../utils/sounds'
-import type { PlayerId, Badge, QuestionCategory } from '../../types'
+import type { PlayerId, Badge, QuestionCategory, PlayerAnalytics } from '../../types'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import { BadgeToast } from '../shared/BadgeToast'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
 import { usePeerContext } from '../../hooks/usePeerContext'
+import { createPlayerAnalytics, recordAnalyticsAnswer } from '../../utils/playerAnalytics'
+import { gradeToStartingTier } from '../../utils/adaptiveDifficulty'
+import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
@@ -45,7 +48,7 @@ export function MathMarathon() {
     incrementScore, setWinner, cpuCharacter,
     controllerType, setControllerType,
   } = useGameState()
-  const { timePerQuestion, trackLength, difficulty, soundEnabled } = useSettings()
+  const { timePerQuestion, trackLength, difficulty, soundEnabled, gradeLevel } = useSettings()
   const { currentProblem, nextProblem, problemCount } = useQuestionEngine(
     difficulty === 'adaptive' ? undefined : difficulty
   )
@@ -59,12 +62,13 @@ export function MathMarathon() {
   const [hoppingPlayers, setHoppingPlayers] = useState<Set<PlayerId>>(new Set())
   const { announceCorrect, announceWrong } = useAnnouncer()
 
-  const { broadcastProblem, broadcastResult } = usePeerContext()
+  const { broadcastProblem, broadcastResult, broadcastSpectatorUpdate } = usePeerContext()
 
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
   const timerStartRef = useRef(Date.now())
+  const analyticsRef = useRef<Map<PlayerId, PlayerAnalytics>>(new Map())
 
   useEffect(() => {
     for (const player of players) {
@@ -74,6 +78,24 @@ export function MathMarathon() {
       }
     }
   }, [players])
+
+  useEffect(() => {
+    const tier = gradeToStartingTier(gradeLevel)
+    for (const player of players) {
+      if (!analyticsRef.current.has(player.id as PlayerId)) {
+        analyticsRef.current.set(player.id as PlayerId, createPlayerAnalytics(tier))
+      }
+    }
+  }, [players, gradeLevel])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (analyticsRef.current.size > 0 && broadcastSpectatorUpdate) {
+        broadcastSpectatorUpdate(Object.fromEntries(analyticsRef.current))
+      }
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [broadcastSpectatorUpdate])
 
   // Broadcast current problem to phone controllers
   useEffect(() => {
@@ -129,6 +151,26 @@ export function MathMarathon() {
       if (badge) {
         setEarnedBadge(badge)
         if (soundEnabled) sounds.badge()
+      }
+    }
+
+    // Update analytics for all players
+    for (const player of players) {
+      const pid = player.id as PlayerId
+      const result = playerResults.get(pid)
+      if (!result) continue
+      const responseTime = result.answer ? result.answer.timestamp - timerStartRef.current : timePerQuestion * 1000
+      const prev = analyticsRef.current.get(pid)
+      if (prev) {
+        const updated = recordAnalyticsAnswer(
+          prev,
+          result.answer?.choiceIndex ?? -1,
+          result.answer?.correct ?? false,
+          responseTime,
+          currentProblem.category,
+        )
+        updated.positionHistory = [...updated.positionHistory, player.position + (result.spaces ?? 0)]
+        analyticsRef.current.set(pid, updated)
       }
     }
 
@@ -201,6 +243,7 @@ export function MathMarathon() {
 
     if (winnerId) {
       setWinner(winnerId)
+      storeGameAnalytics(analyticsRef.current, new Map(players.map(p => [p.id as PlayerId, p.name])))
       return
     }
 
