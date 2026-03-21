@@ -1,4 +1,5 @@
 import type { Subject } from '../types'
+import { speakLocal, isAvailable as isSpeechAvailable } from './speechSynthesis'
 
 export interface AnnouncerLine {
   text: string
@@ -22,7 +23,7 @@ let lastSpoken = 0
 let currentAudio: HTMLAudioElement | null = null
 const recentLines = new Set<string>()
 
-export function speak(line: AnnouncerLine, config: AnnouncerConfig): void {
+export function speak(line: AnnouncerLine, config: AnnouncerConfig, useSpeechSynthesis = false): void {
   if (!config.enabled) return
 
   const now = Date.now()
@@ -46,6 +47,12 @@ export function speak(line: AnnouncerLine, config: AnnouncerConfig): void {
   }
 
   lastSpoken = now
+
+  // Use browser SpeechSynthesis if requested and available (faster, no network)
+  if (useSpeechSynthesis && isSpeechAvailable()) {
+    speakLocal(line.text)
+    return
+  }
 
   // Try pre-generated file first
   if (line.pregenId) {
