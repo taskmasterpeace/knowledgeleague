@@ -289,8 +289,134 @@ Each game mode imports universal `speak()` + `correctLine()` / `wrongLine()`, th
 
 ---
 
+## Section 8: Type System & Interface Changes
+
+### New Types
+```typescript
+// Add to GamePhase union
+type GamePhase = '...' | 'stats' | 'leaderboards'
+
+// Add to GameEvent union
+type GameEvent = 'marathon' | 'tug-of-war' | 'tower-climb'
+
+// Add optional standard field to GameQuestion
+interface GameQuestion {
+  // ...existing fields...
+  standard?: string  // e.g., "2.OA.B.2"
+}
+
+// New: per-player analytics (maintained during gameplay)
+interface PlayerAnalytics {
+  answersTotal: number
+  answersCorrect: number
+  last5Times: number[]        // response times in ms
+  last5Correct: boolean[]     // right or wrong
+  last5Choices: number[]      // which button index picked
+  categoryAccuracy: Record<string, { correct: number; total: number }>
+  responseTimes: number[]     // ALL response times (for std dev calc)
+  behaviorTag: BehaviorTag
+  adaptiveTier: 1 | 2 | 3
+  adaptiveHistory: number[]   // tier at each question for progression display
+  // Tower Climb specific
+  blocksPlaced: number
+  blocksLost: number
+  missilesLaunched: number
+  missilesTaken: number
+  splashHitsTaken: number
+}
+
+type BehaviorTag = 'on-fire' | 'mashing' | 'guessing' | 'thinking' | 'struggling' | 'warming-up' | 'playing'
+
+// Spectator connection type
+interface SpectatorConnection {
+  name: string
+  connId: string
+  conn: DataConnection
+}
+```
+
+### Player Interface Additions
+No changes to `Player` interface — analytics are tracked separately in a `Map<PlayerId, PlayerAnalytics>` managed by the game mode component, not in the Zustand store. This keeps the existing store clean and avoids serialization overhead.
+
+---
+
+## Section 9: Edge Cases & Protocol Details
+
+### Tower Climb Edge Cases
+
+**Missile target has 0 blocks:**
+Missile fizzles with a "poof" particle effect. Announcer: *"Missile wasted! Nothing to hit!"* No retarget.
+
+**Simultaneous win (two players reach 10 on same round):**
+First answer received by the host wins. PeerJS messages arrive sequentially — the host processes them in order. Tie is resolved by arrival time.
+
+**Single player with CPU:**
+CPU has a visible tower in the 3D scene. CPU "answers" via the existing CPU timing logic (speed + accuracy from CPU character stats). CPU tower uses same physics. CPU can be hit by missiles and can launch missiles at the human player.
+
+**Instability rolling window:**
+Window size = 5 questions. Resets to 0 after a block falls off. This means you need 3 wrong out of 5 consecutive answers to lose a block, then the count starts fresh.
+
+### Spectator Protocol
+
+**Join flow:**
+1. Phone connects via PeerJS same as player
+2. Phone sends `{ type: 'join', name: 'Name', role: 'spectator' }` (new `role` field, defaults to `'player'` for backward compat)
+3. Host stores connection in separate `spectatorsRef` Map (not `connsRef`)
+4. Host does NOT assign a playerId to spectators
+5. Host sends `{ type: 'spectatorInit', players: [...], analytics: {...} }` on connect
+
+**Ongoing updates:**
+- Host broadcasts `{ type: 'spectatorUpdate', analytics: Map<PlayerId, PlayerAnalytics> }` every 3 seconds
+- Spectator connections are separate from player connections — no questions sent
+
+**Max spectators:** Cap at 10. Beyond that, connection is rejected with `{ type: 'lobbyFull', reason: 'spectator' }`.
+
+**Mid-game join:**
+Spectator receives `spectatorInit` with full current state on connect. No need to replay history.
+
+### Adaptive Difficulty Edge Cases
+
+**Question bank exhausted at tier:**
+Fall back to nearest available tier. If Tier 3 has no questions for a category, use Tier 2. If Tier 2 is also empty, use Tier 1. Never skip a question.
+
+**Rematch behavior:**
+Adaptive tier resets to starting tier (based on gradeLevel setting) on rematch. Analytics reset completely. Fresh start each game.
+
+**Window sizes:**
+Intentionally different — adaptive difficulty uses last 10 (slower adjustment, more stable) while behavior detection uses last 5 (faster reaction, more responsive tags). These serve different purposes.
+
+### Stats Phase Protocol
+
+**Phone message:**
+After victory broadcast, host sends `{ type: 'statsUpdate', personalStats: PlayerAnalytics, superlatives: Superlative[] }` to each player with their personal data.
+
+Phone controller adds a stats view state between gameOver and idle.
+
+### SpeechSynthesis Fallback
+
+**If `window.speechSynthesis` is unavailable:**
+Fall back to Replicate TTS (accept the latency). If Replicate is also unavailable (no API token), announcer is silently disabled for that session.
+
+**Voice selection:**
+Use `speechSynthesis.getVoices()`, prefer voices with `lang === 'en-US'`. Pick the first available male voice for consistency. Cache the selected voice on first use.
+
+### Bundle Size Strategy
+
+**Three.js lazy loading:**
+Tower Climb component is lazy-loaded via `React.lazy()`. Three.js + Cannon.js (~1MB) only loads when Tower Climb is selected from EventSelect. Marathon and Tug of War are unaffected.
+
+```typescript
+const TowerClimb = React.lazy(() => import('./components/TowerClimb/TowerClimb'))
+```
+
+### Physics & Frame Rate
+
+Physics simulation is purely visual on the big screen. Game state (block count, who's winning) is tracked in JavaScript independent of the physics engine. Physics is eye candy — if a machine runs at 30fps vs 60fps, the towers look slightly different but gameplay is identical. Tower state (blocks placed, blocks lost) is authoritative; the physics engine just renders it prettily.
+
+---
+
 ## Future Batches (Not In This Build)
 - Visual Novel game mode
 - CSV custom question pack import
 - Teacher/classroom dashboard
-- Mixed-age group play (different difficulty per player in same game)
+- Mixed-age group play (per-player difficulty within same lobby — distinct from adaptive which adjusts over time; mixed-age means players START at different tiers based on their individual grade input)
