@@ -40,3 +40,26 @@ export const sounds = {
   victory: () => playSound('victory.wav', 0.7),
   gameStart: () => playSound('game-start.wav', 0.6),
 }
+
+// Mode-specific sounds
+export const marathonSounds = {
+  step: () => playSound('marathon/step.wav', 0.4),
+  finishLine: () => playSound('marathon/finish-line.wav', 0.7),
+}
+
+export const tugSounds = {
+  ropePull: () => playSound('tug/rope-pull.wav', 0.5),
+  superPull: () => playSound('tug/super-pull.wav', 0.6),
+  ropeSnap: () => playSound('tug/rope-snap.wav', 0.7),
+}
+
+export const towerSounds = {
+  blockPlace: () => playSound('tower/block-place.wav', 0.5),
+  blockCrumble: () => playSound('tower/block-crumble.wav', 0.5),
+  towerCreak: () => playSound('tower/tower-creak.wav', 0.5),
+  towerCollapse: () => playSound('tower/tower-collapse.wav', 0.6),
+  missileLaunch: () => playSound('tower/missile-launch.wav', 0.6),
+  missileHit: () => playSound('tower/missile-hit.wav', 0.6),
+  splashHit: () => playSound('tower/splash-hit.wav', 0.3),
+  towerComplete: () => playSound('tower/tower-complete.wav', 0.7),
+}
