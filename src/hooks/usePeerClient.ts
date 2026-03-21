@@ -8,7 +8,7 @@ export interface GameOverData {
 }
 
 interface HostMessage {
-  type: 'problem' | 'result' | 'assigned' | 'lockedIn' | 'gameOver'
+  type: 'problem' | 'result' | 'assigned' | 'lockedIn' | 'gameOver' | 'spectatorInit' | 'spectatorUpdate' | 'statsUpdate' | 'lobbyFull'
   question?: string
   choices?: string[]
   subject?: string
@@ -17,11 +17,13 @@ interface HostMessage {
   name?: string
   winnerName?: string
   rankings?: { name: string; score: number; position: number }[]
+  players?: { name: string; playerId: number }[]
 }
 
 export function usePeerClient() {
   const [connected, setConnected] = useState(false)
   const [playerId, setPlayerId] = useState<number | null>(null)
+  const [role, setRole] = useState<'player' | 'spectator'>('player')
   const [question, setQuestion] = useState<string | null>(null)
   const [choices, setChoices] = useState<string[]>([])
   const [subject, setSubject] = useState<string>('math')
@@ -29,6 +31,9 @@ export function usePeerClient() {
   const [correctIndex, setCorrectIndex] = useState<number | null>(null)
   const [myChoiceIndex, setMyChoiceIndex] = useState<number | null>(null)
   const [gameOver, setGameOver] = useState<GameOverData | null>(null)
+  const [spectatorData, setSpectatorData] = useState<any>(null)
+  const [personalStats, setPersonalStats] = useState<any>(null)
+  const [superlatives, setSuperlatives] = useState<any>(null)
   const connRef = useRef<DataConnection | null>(null)
   const peerRef = useRef<Peer | null>(null)
 
@@ -40,7 +45,8 @@ export function usePeerClient() {
     }
   }, [lockedIn])
 
-  const connect = useCallback((roomId: string, name: string) => {
+  const connect = useCallback((roomId: string, name: string, connectRole: 'player' | 'spectator' = 'player') => {
+    setRole(connectRole)
     const peer = new Peer()
     peerRef.current = peer
 
@@ -50,7 +56,7 @@ export function usePeerClient() {
 
       conn.on('open', () => {
         setConnected(true)
-        conn.send({ type: 'join', name })
+        conn.send({ type: 'join', name, role: connectRole })
       })
 
       conn.on('data', (raw) => {
@@ -71,6 +77,19 @@ export function usePeerClient() {
             winnerName: data.winnerName ?? 'Unknown',
             rankings: data.rankings ?? [],
           })
+        } else if (data.type === 'spectatorInit') {
+          setSpectatorData({ players: data.players ?? [] })
+        } else if (data.type === 'spectatorUpdate') {
+          setSpectatorData((prev: any) => ({ ...(prev ?? {}), ...data }))
+        } else if (data.type === 'statsUpdate') {
+          const { type: _type, ...stats } = data as any
+          if (stats.superlatives !== undefined) {
+            setSuperlatives(stats.superlatives)
+          }
+          setPersonalStats((prev: any) => ({ ...(prev ?? {}), ...stats }))
+        } else if (data.type === 'lobbyFull') {
+          setConnected(false)
+          conn.close()
         }
       })
 
@@ -88,8 +107,9 @@ export function usePeerClient() {
   }, [])
 
   return {
-    connected, playerId, question, choices, subject,
+    connected, playerId, role, question, choices, subject,
     lockedIn, correctIndex, myChoiceIndex, gameOver,
+    spectatorData, personalStats, superlatives,
     sendAnswer, connect,
   }
 }

@@ -12,6 +12,7 @@ interface PeerMessage {
   type: 'join' | 'answer'
   name?: string
   choiceIndex?: number
+  role?: 'player' | 'spectator'
 }
 
 interface UsePeerHostProps {
@@ -23,8 +24,10 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
   const [roomId, setRoomId] = useState<string | null>(null)
   const [remotePlayers, setRemotePlayers] = useState<RemotePlayer[]>([])
   const [joinUrl, setJoinUrl] = useState<string | null>(null)
+  const [spectators, setSpectators] = useState<{ name: string; connId: string }[]>([])
   const peerRef = useRef<Peer | null>(null)
   const connsRef = useRef<Map<string, DataConnection>>(new Map())
+  const spectatorsRef = useRef<Map<string, DataConnection>>(new Map())
   const onRemoteAnswerRef = useRef(onRemoteAnswer)
   const remotePlayersRef = useRef<RemotePlayer[]>([])
   onRemoteAnswerRef.current = onRemoteAnswer
@@ -61,6 +64,18 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
     }
   }, [])
 
+  const broadcastSpectatorUpdate = useCallback((data: Record<string, unknown>) => {
+    for (const conn of spectatorsRef.current.values()) {
+      conn.send({ type: 'spectatorUpdate', ...data })
+    }
+  }, [])
+
+  const broadcastStats = useCallback((stats: Record<string, unknown>) => {
+    for (const conn of connsRef.current.values()) {
+      conn.send({ type: 'statsUpdate', ...stats })
+    }
+  }, [])
+
   useEffect(() => {
     if (!enabled) return
     if (peerRef.current) return
@@ -78,7 +93,6 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
 
     peer.on('connection', (conn) => {
       conn.on('open', () => {
-        connsRef.current.set(conn.connectionId, conn)
         if (currentChoicesRef.current.length > 0) {
           conn.send({
             type: 'problem',
@@ -92,16 +106,36 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
       conn.on('data', (raw) => {
         const data = raw as PeerMessage
         if (data.type === 'join' && data.name) {
-          setRemotePlayers(prev => {
-            if (prev.find(p => p.connId === conn.connectionId)) return prev
-            const usedIds = new Set(prev.map(p => p.playerId))
-            let playerId = 2
-            while (usedIds.has(playerId)) playerId++
+          if (data.role === 'spectator') {
+            // Cap spectators at 10
+            if (spectatorsRef.current.size >= 10) {
+              conn.send({ type: 'lobbyFull' })
+              return
+            }
+            spectatorsRef.current.set(conn.connectionId, conn)
+            setSpectators(prev => {
+              if (prev.find(s => s.connId === conn.connectionId)) return prev
+              return [...prev, { name: data.name!, connId: conn.connectionId }]
+            })
+            // Send current players list to the new spectator
+            conn.send({
+              type: 'spectatorInit',
+              players: remotePlayersRef.current.map(p => ({ name: p.name, playerId: p.playerId })),
+            })
+          } else {
+            // Player role (default)
+            connsRef.current.set(conn.connectionId, conn)
+            setRemotePlayers(prev => {
+              if (prev.find(p => p.connId === conn.connectionId)) return prev
+              const usedIds = new Set(prev.map(p => p.playerId))
+              let playerId = 2
+              while (usedIds.has(playerId)) playerId++
 
-            const rp: RemotePlayer = { connId: conn.connectionId, name: data.name!, playerId }
-            conn.send({ type: 'assigned', playerId, name: data.name })
-            return [...prev, rp]
-          })
+              const rp: RemotePlayer = { connId: conn.connectionId, name: data.name!, playerId }
+              conn.send({ type: 'assigned', playerId, name: data.name })
+              return [...prev, rp]
+            })
+          }
         } else if (data.type === 'answer' && data.choiceIndex !== undefined) {
           const rp = remotePlayersRef.current.find(p => p.connId === conn.connectionId)
           if (rp) {
@@ -112,20 +146,29 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
 
       conn.on('close', () => {
         connsRef.current.delete(conn.connectionId)
+        spectatorsRef.current.delete(conn.connectionId)
         setRemotePlayers(prev => prev.filter(p => p.connId !== conn.connectionId))
+        setSpectators(prev => prev.filter(s => s.connId !== conn.connectionId))
       })
     })
 
     return () => {
       for (const conn of connsRef.current.values()) conn.close()
       connsRef.current.clear()
+      for (const conn of spectatorsRef.current.values()) conn.close()
+      spectatorsRef.current.clear()
       peer.destroy()
       peerRef.current = null
       setRoomId(null)
       setJoinUrl(null)
       setRemotePlayers([])
+      setSpectators([])
     }
   }, [enabled])
 
-  return { roomId, joinUrl, remotePlayers, broadcastProblem, broadcastResult, broadcastLockIn, broadcastGameOver }
+  return {
+    roomId, joinUrl, remotePlayers, spectators,
+    broadcastProblem, broadcastResult, broadcastLockIn, broadcastGameOver,
+    broadcastSpectatorUpdate, broadcastStats,
+  }
 }
