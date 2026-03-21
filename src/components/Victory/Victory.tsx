@@ -7,7 +7,7 @@ import { useSettings } from '../../hooks/useSettings'
 import { sounds } from '../../utils/sounds'
 
 export function Victory() {
-  const { players, winner, resetGame, rematch } = useGameState()
+  const { players, winner, resetGame, rematch, setPhase } = useGameState()
   const { broadcastGameOver } = usePeerContext()
   const { soundEnabled } = useSettings()
 
@@ -25,6 +25,12 @@ export function Victory() {
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Auto-advance to stats after 4 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setPhase('stats'), 4000)
+    return () => clearTimeout(timer)
   }, [])
 
   if (!winner) return null
@@ -141,6 +147,12 @@ export function Victory() {
           className="pixel-btn font-pixel py-4 px-8 bg-cyan-600 hover:bg-cyan-500 text-white text-xs rounded-lg transition-colors"
         >
           REMATCH
+        </button>
+        <button
+          onClick={() => setPhase('stats')}
+          className="pixel-btn font-pixel py-4 px-8 bg-purple-700 hover:bg-purple-600 text-white text-xs rounded-lg transition-colors"
+        >
+          SKIP
         </button>
         <button
           onClick={resetGame}
