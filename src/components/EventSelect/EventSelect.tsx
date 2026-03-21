@@ -3,7 +3,7 @@ import { useGameState } from '../../hooks/useGameState'
 export function EventSelect() {
   const { setEvent, setPhase, playerCount } = useGameState()
 
-  const selectEvent = (event: 'marathon' | 'tug-of-war') => {
+  const selectEvent = (event: 'marathon' | 'tug-of-war' | 'tower-climb') => {
     setEvent(event)
     setPhase('playing')
   }
@@ -107,6 +107,29 @@ export function EventSelect() {
           {playerCount > 2 && (
             <span className="font-pixel text-[6px] text-yellow-300/70 text-center mt-1">Teams mode!</span>
           )}
+        </button>
+
+        {/* Tower Climb card */}
+        <button
+          onClick={() => selectEvent('tower-climb')}
+          className="pixel-card rounded-lg flex flex-col items-center gap-4 p-8 hover:scale-105 transition-all active:scale-95 w-64 group"
+        >
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <rect x="35" y="70" width="30" height="12" fill="#3b82f6" stroke="#2563eb" strokeWidth="1" rx="1" />
+            <rect x="35" y="56" width="30" height="12" fill="#22c55e" stroke="#16a34a" strokeWidth="1" rx="1" />
+            <rect x="35" y="42" width="30" height="12" fill="#f59e0b" stroke="#d97706" strokeWidth="1" rx="1" />
+            <rect x="35" y="28" width="30" height="12" fill="#ef4444" stroke="#dc2626" strokeWidth="1" rx="1" />
+            <rect x="37" y="10" width="26" height="10" fill="#a855f7" stroke="#9333ea" strokeWidth="1" rx="1" opacity="0.7" />
+            <line x1="42" y1="22" x2="42" y2="18" stroke="white" strokeWidth="1" opacity="0.4" />
+            <line x1="50" y1="22" x2="50" y2="16" stroke="white" strokeWidth="1" opacity="0.4" />
+            <line x1="58" y1="22" x2="58" y2="18" stroke="white" strokeWidth="1" opacity="0.4" />
+            <polygon points="82,40 84,36 88,38 86,34 90,32 86,30 88,26 84,28 82,24 80,28 76,26 78,30 74,32 78,34 76,38 80,36" fill="#f59e0b" opacity="0.8" />
+          </svg>
+
+          <span className="font-pixel text-xs text-white group-hover:text-cyan-300 transition-colors text-center leading-relaxed">
+            TOWER CLIMB
+          </span>
+          <span className="font-pixel text-[7px] text-white/50 text-center">Build fast, attack faster!</span>
         </button>
       </div>
     </div>

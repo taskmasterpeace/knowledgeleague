@@ -1,4 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react'
+
+// TODO: PostGameStats component not yet implemented
+const TowerClimb = lazy(() => import('./components/TowerClimb/TowerClimb').then(m => ({ default: m.TowerClimb })))
 import { useGameState } from './hooks/useGameState'
 import { usePeerHost } from './hooks/usePeerHost'
 import { PeerContext } from './hooks/usePeerContext'
@@ -136,6 +139,16 @@ function HostApp({ peerEnabled, setPeerEnabled, phase, event }: {
       )}
       {phase === 'playing' && event === 'marathon' && <MathMarathon />}
       {phase === 'playing' && event === 'tug-of-war' && <TugOfWar />}
+      {phase === 'playing' && event === 'tower-climb' && (
+        <Suspense fallback={
+          <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+            <p className="font-pixel text-white animate-pulse">Loading Tower Climb...</p>
+          </div>
+        }>
+          <TowerClimb />
+        </Suspense>
+      )}
+      {phase === 'stats' && <div className="min-h-screen bg-gray-900 flex items-center justify-center"><p className="font-pixel text-white">Stats loading...</p></div>}
       {phase === 'victory' && <Victory />}
       {phase === 'trophies' && <TrophyShelf />}
       {phase === 'leaderboards' && <Leaderboards />}
