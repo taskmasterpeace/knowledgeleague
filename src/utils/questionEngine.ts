@@ -1,6 +1,7 @@
 import type { GameQuestion, Subject, GradeLevel, Difficulty, QuestionCategory, AdaptiveTier } from '../types'
 import { tierToGradeLevel, tierToDifficulty } from './adaptiveDifficulty'
 import { generateProblem, getDifficulty, GRADE_MATH_CATEGORIES } from './mathProblems'
+import { getStandard } from './standardsMap'
 
 interface BankQuestion {
   question: string
@@ -61,6 +62,7 @@ function pickFromBank(
   bank: BankQuestion[],
   subject: Subject,
   difficulty: Difficulty,
+  gradeLevel: GradeLevel,
   enabledCategories?: QuestionCategory[]
 ): GameQuestion {
   let pool = bank
@@ -101,6 +103,7 @@ function pickFromBank(
     subject,
     category: picked.category as QuestionCategory,
     difficulty,
+    standard: getStandard(picked.category as QuestionCategory, gradeLevel),
   }
 }
 
@@ -126,6 +129,7 @@ function mathToGameQuestion(
     subject: 'math',
     category: problem.type as QuestionCategory,
     difficulty: problem.difficulty,
+    standard: getStandard(problem.type as QuestionCategory, gradeLevel),
   }
 }
 
@@ -149,7 +153,7 @@ export function generateQuestion(options: QuestionEngineOptions): GameQuestion {
     case 'science': {
       const bank = scienceBanks?.[gradeLevel]
       if (bank && bank.length > 0) {
-        return pickFromBank(bank, 'science', difficulty, enabledCategories)
+        return pickFromBank(bank, 'science', difficulty, gradeLevel, enabledCategories)
       }
       // Fallback to math if banks not loaded yet
       return mathToGameQuestion(gradeLevel, difficulty, enabledCategories)
@@ -158,7 +162,7 @@ export function generateQuestion(options: QuestionEngineOptions): GameQuestion {
     case 'reading': {
       const bank = readingBanks?.[gradeLevel]
       if (bank && bank.length > 0) {
-        return pickFromBank(bank, 'reading', difficulty, enabledCategories)
+        return pickFromBank(bank, 'reading', difficulty, gradeLevel, enabledCategories)
       }
       return mathToGameQuestion(gradeLevel, difficulty, enabledCategories)
     }
