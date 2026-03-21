@@ -23,7 +23,8 @@ import { BadgeToast } from '../shared/BadgeToast'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
 import { usePeerContext } from '../../hooks/usePeerContext'
 import { createPlayerAnalytics, recordAnalyticsAnswer } from '../../utils/playerAnalytics'
-import { gradeToStartingTier } from '../../utils/adaptiveDifficulty'
+import { gradeToStartingTier, adjustTier } from '../../utils/adaptiveDifficulty'
+import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
@@ -69,6 +70,11 @@ export function MathMarathon() {
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
   const timerStartRef = useRef(Date.now())
   const analyticsRef = useRef<Map<PlayerId, PlayerAnalytics>>(new Map())
+
+  useEffect(() => {
+    playMusic('marathon')
+    return () => stopMusic()
+  }, [])
 
   useEffect(() => {
     for (const player of players) {
@@ -170,6 +176,11 @@ export function MathMarathon() {
           currentProblem.category,
         )
         updated.positionHistory = [...updated.positionHistory, player.position + (result.spaces ?? 0)]
+        const newTier = adjustTier(updated.adaptiveTier, updated.last10Correct)
+        if (newTier !== updated.adaptiveTier) {
+          updated.adaptiveTier = newTier
+          updated.adaptiveHistory = [...updated.adaptiveHistory, newTier]
+        }
         analyticsRef.current.set(pid, updated)
       }
     }

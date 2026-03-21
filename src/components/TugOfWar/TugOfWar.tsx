@@ -17,7 +17,8 @@ import { useSettings } from '../../hooks/useSettings'
 import { sounds } from '../../utils/sounds'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import { createPlayerAnalytics, recordAnalyticsAnswer } from '../../utils/playerAnalytics'
-import { gradeToStartingTier } from '../../utils/adaptiveDifficulty'
+import { gradeToStartingTier, adjustTier } from '../../utils/adaptiveDifficulty'
+import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
 import type { Badge, PlayerAnalytics, PlayerId } from '../../types'
 import { BadgeToast } from '../shared/BadgeToast'
@@ -56,6 +57,11 @@ export function TugOfWar() {
     const idx = players.findIndex(p => p.id === playerId)
     return idx % 2 === 0 ? 1 : 2
   }, [players])
+
+  useEffect(() => {
+    playMusic('tug-of-war')
+    return () => stopMusic()
+  }, [])
 
   useEffect(() => {
     for (const player of players) {
@@ -146,6 +152,11 @@ export function TugOfWar() {
           currentProblem.category,
         )
         updated.positionHistory = [...updated.positionHistory, newPos]
+        const newTier = adjustTier(updated.adaptiveTier, updated.last10Correct)
+        if (newTier !== updated.adaptiveTier) {
+          updated.adaptiveTier = newTier
+          updated.adaptiveHistory = [...updated.adaptiveHistory, newTier]
+        }
         analyticsRef.current.set(playerId as PlayerId, updated)
       }
 
@@ -182,6 +193,11 @@ export function TugOfWar() {
           currentProblem.category,
         )
         updated.positionHistory = [...updated.positionHistory, newPos]
+        const newTier = adjustTier(updated.adaptiveTier, updated.last10Correct)
+        if (newTier !== updated.adaptiveTier) {
+          updated.adaptiveTier = newTier
+          updated.adaptiveHistory = [...updated.adaptiveHistory, newTier]
+        }
         analyticsRef.current.set(playerId as PlayerId, updated)
       }
 

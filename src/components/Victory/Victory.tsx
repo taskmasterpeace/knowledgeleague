@@ -5,6 +5,7 @@ import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { Fireworks } from '../shared/Effects'
 import { useSettings } from '../../hooks/useSettings'
 import { sounds } from '../../utils/sounds'
+import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 
 export function Victory() {
   const { players, winner, resetGame, rematch, setPhase } = useGameState()
@@ -13,6 +14,11 @@ export function Victory() {
 
   // Rank all players by position (descending), then by score
   const ranked = [...players].sort((a, b) => b.position - a.position || b.score - a.score)
+
+  useEffect(() => {
+    playMusic('victory')
+    return () => stopMusic()
+  }, [])
 
   useEffect(() => {
     if (soundEnabled) sounds.victory()

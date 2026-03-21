@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useGamepad } from '../../hooks/useGamepad'
 import { usePeerContext } from '../../hooks/usePeerContext'
@@ -6,12 +6,17 @@ import { ControllerHint } from '../shared/ControllerButtons'
 import { Settings } from '../Settings/Settings'
 import { useSettings } from '../../hooks/useSettings'
 import { sounds, preloadSounds } from '../../utils/sounds'
+import { playMusic } from '../../utils/backgroundMusic'
 
 export function Menu() {
   const { setPhase, startSinglePlayer, setPlayerCount, controllerType, setControllerType } = useGameState()
   const { setEnabled: setPeerEnabled } = usePeerContext()
   const [showSettings, setShowSettings] = useState(false)
   const { soundEnabled } = useSettings()
+
+  useEffect(() => {
+    playMusic('menu')
+  }, [])
 
   useGamepad({
     onP1Answer: () => {},

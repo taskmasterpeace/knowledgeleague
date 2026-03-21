@@ -14,6 +14,7 @@ import { useAnnouncer } from '../../hooks/useAnnouncer'
 import { TowerScene } from './TowerScene'
 import { createPlayerAnalytics, recordAnalyticsAnswer } from '../../utils/playerAnalytics'
 import { gradeToStartingTier } from '../../utils/adaptiveDifficulty'
+import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
 import type { PlayerId, PlayerAnalytics } from '../../types'
 
@@ -46,6 +47,11 @@ export function TowerClimb() {
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
   const timerStartRef = useRef(Date.now())
+
+  useEffect(() => {
+    playMusic('tower-climb')
+    return () => stopMusic()
+  }, [])
 
   // Initialize tower blocks and analytics for each player
   useEffect(() => {
