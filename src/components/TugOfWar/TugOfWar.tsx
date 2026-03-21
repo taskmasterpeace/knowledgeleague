@@ -16,7 +16,10 @@ import {
 import { useSettings } from '../../hooks/useSettings'
 import { sounds } from '../../utils/sounds'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
-import type { Badge } from '../../types'
+import { createPlayerAnalytics, recordAnalyticsAnswer } from '../../utils/playerAnalytics'
+import { gradeToStartingTier } from '../../utils/adaptiveDifficulty'
+import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
+import type { Badge, PlayerAnalytics, PlayerId } from '../../types'
 import { BadgeToast } from '../shared/BadgeToast'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
 import { usePeerContext } from '../../hooks/usePeerContext'
@@ -27,7 +30,7 @@ export function TugOfWar() {
     incrementScore, setWinner, cpuCharacter,
     controllerType, setControllerType,
   } = useGameState()
-  const { timePerQuestion, difficulty, soundEnabled } = useSettings()
+  const { timePerQuestion, difficulty, soundEnabled, gradeLevel } = useSettings()
   const { currentProblem, nextProblem, problemCount } = useQuestionEngine(
     difficulty === 'adaptive' ? undefined : difficulty
   )
@@ -40,9 +43,10 @@ export function TugOfWar() {
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
   const { announceCorrect, announceWrong } = useAnnouncer()
 
-  const { broadcastProblem, broadcastResult } = usePeerContext()
+  const { broadcastProblem, broadcastResult, broadcastSpectatorUpdate } = usePeerContext()
 
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
+  const analyticsRef = useRef<Map<PlayerId, PlayerAnalytics>>(new Map())
   const timerStartRef = useRef(Date.now())
 
   // Team assignments: odd player IDs = Team 1 (left), even = Team 2 (right)
@@ -62,10 +66,28 @@ export function TugOfWar() {
     }
   }, [players])
 
+  useEffect(() => {
+    const tier = gradeToStartingTier(gradeLevel)
+    for (const player of players) {
+      if (!analyticsRef.current.has(player.id as PlayerId)) {
+        analyticsRef.current.set(player.id as PlayerId, createPlayerAnalytics(tier))
+      }
+    }
+  }, [players, gradeLevel])
+
   // Broadcast current problem to phone controllers
   useEffect(() => {
     broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject)
   }, [currentProblem, broadcastProblem])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (analyticsRef.current.size > 0 && broadcastSpectatorUpdate) {
+        broadcastSpectatorUpdate(Object.fromEntries(analyticsRef.current))
+      }
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [broadcastSpectatorUpdate])
 
   const ropePos = players[0].position
 
@@ -112,7 +134,23 @@ export function TugOfWar() {
       setTimeout(() => setFlashType(null), 150)
       setTimeout(() => setShowBurst(false), 600)
 
+      // Update analytics
+      const prevAnalytics = analyticsRef.current.get(playerId as PlayerId)
+      if (prevAnalytics) {
+        const responseTime = Date.now() - timerStartRef.current
+        const updated = recordAnalyticsAnswer(
+          prevAnalytics,
+          choiceIndex,
+          isCorrect,
+          responseTime,
+          currentProblem.category,
+        )
+        updated.positionHistory = [...updated.positionHistory, newPos]
+        analyticsRef.current.set(playerId as PlayerId, updated)
+      }
+
       if (Math.abs(newPos) >= TUG_WIN_THRESHOLD) {
+        storeGameAnalytics(analyticsRef.current, new Map(players.map(p => [p.id as PlayerId, p.name])))
         broadcastResult(currentProblem.correctIndex)
         setWinner(newPos < 0 ? 1 : 2)
         return
@@ -132,7 +170,23 @@ export function TugOfWar() {
       setTimeout(() => setFlashType(null), 150)
       setTimeout(() => setShaking(false), 250)
 
+      // Update analytics
+      const prevAnalytics = analyticsRef.current.get(playerId as PlayerId)
+      if (prevAnalytics) {
+        const responseTime = Date.now() - timerStartRef.current
+        const updated = recordAnalyticsAnswer(
+          prevAnalytics,
+          choiceIndex,
+          isCorrect,
+          responseTime,
+          currentProblem.category,
+        )
+        updated.positionHistory = [...updated.positionHistory, newPos]
+        analyticsRef.current.set(playerId as PlayerId, updated)
+      }
+
       if (Math.abs(newPos) >= TUG_WIN_THRESHOLD) {
+        storeGameAnalytics(analyticsRef.current, new Map(players.map(p => [p.id as PlayerId, p.name])))
         broadcastResult(currentProblem.correctIndex)
         setWinner(newPos < 0 ? 1 : 2)
         return
