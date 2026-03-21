@@ -105,6 +105,47 @@ export function Settings({ onClose }: Props) {
             </div>
           </div>
 
+          {/* Adaptive Mode Toggle */}
+          <div className="pixel-card rounded-lg px-4 py-3 flex items-center justify-between">
+            <span className="font-pixel text-[9px] text-white/60 uppercase">Adaptive (per player)</span>
+            <button
+              onClick={() => settings.update({ adaptiveMode: settings.adaptiveMode === 'per-player' ? 'off' : 'per-player' })}
+              className={`w-14 h-7 rounded-full transition-all relative ${
+                settings.adaptiveMode === 'per-player' ? 'bg-green-500' : 'bg-white/20'
+              }`}
+            >
+              <div
+                className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-all ${
+                  settings.adaptiveMode === 'per-player' ? 'left-7' : 'left-0.5'
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Behavior Tags */}
+          <div>
+            <label className="font-pixel text-[9px] text-white/50 uppercase tracking-wide block mb-2">Behavior Tags</label>
+            <div className="flex gap-2">
+              {([
+                ['spectators-only', 'Spectators Only'],
+                ['post-game', 'Post-Game'],
+                ['always', 'Always Visible'],
+              ] as const).map(([value, label]) => (
+                <button
+                  key={value}
+                  onClick={() => settings.update({ behaviorTags: value })}
+                  className={`flex-1 py-2 rounded-lg font-pixel text-[7px] transition-all pixel-btn ${
+                    settings.behaviorTags === value
+                      ? 'bg-cyan-500 text-gray-900'
+                      : 'bg-white/10 text-white/50 hover:bg-white/20'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Problem Types */}
           <div>
             <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide block mb-2">Problem Types</label>
