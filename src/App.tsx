@@ -12,6 +12,7 @@ import { MathMarathon } from './components/MathMarathon/MathMarathon'
 import { TugOfWar } from './components/TugOfWar/TugOfWar'
 import { Victory } from './components/Victory/Victory'
 import { TrophyShelf } from './components/TrophyShelf/TrophyShelf'
+import { Leaderboards } from './components/Leaderboards/Leaderboards'
 import { PhoneController } from './components/PhoneController/PhoneController'
 import { PhoneLobby } from './components/PhoneLobby/PhoneLobby'
 import { PLAYER_COLORS } from './utils/constants'
@@ -137,6 +138,7 @@ function HostApp({ peerEnabled, setPeerEnabled, phase, event }: {
       {phase === 'playing' && event === 'tug-of-war' && <TugOfWar />}
       {phase === 'victory' && <Victory />}
       {phase === 'trophies' && <TrophyShelf />}
+      {phase === 'leaderboards' && <Leaderboards />}
     </PeerContext.Provider>
   )
 }

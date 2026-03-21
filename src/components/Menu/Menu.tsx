@@ -114,6 +114,12 @@ export function Menu() {
         >
           TROPHIES
         </button>
+        <button
+          onClick={() => { preloadSounds(); if (soundEnabled) sounds.select(); setPhase('leaderboards') }}
+          className="pixel-btn font-pixel w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded-lg transition-colors"
+        >
+          LEADERBOARDS
+        </button>
       </div>
 
       {/* Footer keyboard hints */}
