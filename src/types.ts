@@ -2,7 +2,7 @@ export type GamePhase =
   | 'menu' | 'cpu-select' | 'avatar-select' | 'event-select'
   | 'phone-lobby' | 'playing' | 'victory' | 'stats' | 'trophies' | 'leaderboards'
 
-export type GameEvent = 'marathon' | 'tug-of-war' | 'tower-climb'
+export type GameEvent = 'marathon' | 'tug-of-war'
 
 export type PlayerType = 'human' | 'cpu'
 
@@ -33,7 +33,7 @@ export interface CPUCharacter {
 export type Difficulty = 'easy' | 'medium' | 'hard'
 
 export type Subject = 'math' | 'science' | 'reading'
-export type GradeLevel = 'grade-1' | 'grade-3' | 'adult'
+export type GradeLevel = 'grade-1' | 'grade-2' | 'grade-3' | 'adult'
 
 export type ProblemType = 'addition' | 'subtraction' | 'missing' | 'comparison' | 'skip-counting'
 
@@ -93,11 +93,6 @@ export interface PlayerAnalytics {
   behaviorTag: BehaviorTag
   adaptiveTier: AdaptiveTier
   adaptiveHistory: AdaptiveTier[]
-  blocksPlaced: number
-  blocksLost: number
-  missilesLaunched: number
-  missilesTaken: number
-  splashHitsTaken: number
 }
 
 export interface SpectatorConnection {
@@ -118,4 +113,19 @@ export interface MathProblem {
   choices: number[]       // 4 choices, one is correct
   type: ProblemType
   difficulty: Difficulty
+}
+
+export type TugArenaType = 'mud-pit' | 'stadium' | 'schoolyard'
+
+export interface PixelArtManifest {
+  characters: Record<string, {
+    idle: string      // path to idle sprite/animation
+    run: string       // path to run animation
+    celebrate: string // path to celebrate animation
+    pull?: string     // path to pull animation (tug of war)
+    portrait: string  // path to static portrait
+  }>
+  tilesets: Record<string, string>  // name → path
+  objects: Record<string, string>   // name → path
+  menuObjects: string[]             // array of paths to flying objects
 }
