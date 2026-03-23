@@ -26,6 +26,7 @@ import { createPlayerAnalytics, recordAnalyticsAnswer } from '../../utils/player
 import { gradeToStartingTier, adjustTier } from '../../utils/adaptiveDifficulty'
 import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
+import { MarathonScene } from './MarathonScene'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
@@ -165,7 +166,7 @@ export function MathMarathon() {
       const pid = player.id as PlayerId
       const result = playerResults.get(pid)
       if (!result) continue
-      const responseTime = result.answer ? result.answer.timestamp - timerStartRef.current : timePerQuestion * 1000
+      const responseTime = result.answer ? result.answer.timestamp - timerStartRef.current : timePerQuestion
       const prev = analyticsRef.current.get(pid)
       if (prev) {
         const updated = recordAnalyticsAnswer(
@@ -244,7 +245,8 @@ export function MathMarathon() {
     let winnerPos = 0
     for (const player of players) {
       const pid = player.id as PlayerId
-      const result = playerResults.get(pid)!
+      const result = playerResults.get(pid)
+      if (!result) continue
       const newPos = player.position + result.spaces
       if (newPos >= trackLength && newPos > winnerPos) {
         winnerId = pid
@@ -295,10 +297,10 @@ export function MathMarathon() {
 
   // Register handler for phone controller answers via PeerJS
   useEffect(() => {
-    (window as any).__remoteAnswerHandler = (playerId: number, choiceIndex: number) => {
+    window.__remoteAnswerHandler = (playerId: number, choiceIndex: number) => {
       handleAnswer(playerId as PlayerId, choiceIndex)
     }
-    return () => { delete (window as any).__remoteAnswerHandler }
+    return () => { delete window.__remoteAnswerHandler }
   }, [handleAnswer])
 
   const humanCount = players.filter(p => p.type === 'human').length
@@ -340,6 +342,9 @@ export function MathMarathon() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col p-4 gap-4">
       <BadgeToast badge={earnedBadge} />
       <FlashOverlay type={flashType} />
+
+      {/* Pixel Art Marathon Scene */}
+      <MarathonScene players={players} totalSpaces={trackLength} />
 
       {/* HUD Panel - Score Bars */}
       <div className="pixel-card rounded-lg p-3">
@@ -425,7 +430,7 @@ export function MathMarathon() {
       <div className="flex-1 flex items-center justify-center relative">
         <ParticleBurst active={showBurst} color="#4ade80" />
         {showingResult && roundResult ? (
-          <div className="pixel-card rounded-lg p-6 w-full max-w-3xl screen-enter">
+          <div className="pixel-card rounded-lg p-6 w-full max-w-3xl mx-auto screen-enter">
             <div className="text-center mb-4">
               <span className="font-pixel text-lg text-white">{roundResult.question} = </span>
               <span className="font-pixel text-lg text-green-400 text-glow">{roundResult.correctAnswer}</span>
@@ -455,7 +460,7 @@ export function MathMarathon() {
         ) : (
           <MathProblem
             problem={currentProblem}
-            onAnswer={() => {}}
+            onAnswer={(i) => handleAnswer(1, i)}
             lockedP1={answersRef.current.has(1)}
             lockedP2={answersRef.current.has(2)}
             p1Keys={['1', '2', '3', '4']}
