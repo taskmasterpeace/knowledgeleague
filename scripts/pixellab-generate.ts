@@ -11,12 +11,8 @@ interface PlanItem {
   output: string;
 }
 
-interface ApiResponse {
-  success: boolean;
-  data: Record<string, unknown>;
-  error: string | null;
-  usage: Record<string, unknown>;
-}
+// PixelLab API returns flat JSON (no wrapper) — fields vary by endpoint
+type ApiResponse = Record<string, unknown>;
 
 interface ResultEntry {
   id: string;
@@ -90,6 +86,10 @@ async function apiPost(apiKey: string, endpoint: string, body: Record<string, un
     },
     body: JSON.stringify(body),
   });
+  if (res.status >= 400) {
+    const text = await res.text();
+    throw new Error(`API ${endpoint} returned ${res.status}: ${text}`);
+  }
   const json = await res.json() as ApiResponse;
   return { status: res.status, json };
 }
@@ -98,6 +98,10 @@ async function apiGet(apiKey: string, endpoint: string): Promise<{ status: numbe
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     headers: { "Authorization": `Bearer ${apiKey}` },
   });
+  if (res.status >= 400 && res.status !== 423) {
+    const text = await res.text();
+    throw new Error(`API ${endpoint} returned ${res.status}: ${text}`);
+  }
   const json = await res.json() as ApiResponse;
   return { status: res.status, json };
 }
@@ -109,9 +113,9 @@ function sleep(ms: number): Promise<void> {
 async function pollBackgroundJob(apiKey: string, jobId: string): Promise<ApiResponse> {
   while (true) {
     const { json } = await apiGet(apiKey, `/background-jobs/${jobId}`);
-    const status = json.data?.status as string | undefined;
-    if (status === "completed") return json;
-    if (status === "failed") throw new Error(`Background job ${jobId} failed: ${JSON.stringify(json.error || json.data)}`);
+    const jobStatus = json.status as string | undefined;
+    if (jobStatus === "completed") return json;
+    if (jobStatus === "failed") throw new Error(`Background job ${jobId} failed: ${JSON.stringify(json)}`);
     process.stdout.write(".");
     await sleep(POLL_INTERVAL_MS);
   }
@@ -130,44 +134,102 @@ async function pollTileset(apiKey: string, tilesetId: string): Promise<ApiRespon
   }
 }
 
-function saveBase64Image(base64Data: string, filePath: string): void {
+function saveBuffer(buf: Buffer, filePath: string): void {
   const dir = path.dirname(filePath);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(filePath, Buffer.from(base64Data, "base64"));
+  fs.writeFileSync(filePath, buf);
 }
 
-function extractAndSaveImages(data: Record<string, unknown>, outputDir: string, prefix: string): string[] {
+async function downloadFile(url: string, filePath: string): Promise<void> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to download ${url}: ${res.status}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  saveBuffer(buf, filePath);
+}
+
+function rgbaToRawPng(base64: string, width: number, height: number): Buffer {
+  // Save raw RGBA as a simple PNG-compatible format
+  // For simplicity, just save the raw RGBA bytes — we'll convert with sharp if needed
+  // Actually, let's just save as raw RGBA and rename to .rgba for now
+  return Buffer.from(base64, "base64");
+}
+
+async function extractAndSaveImages(data: Record<string, unknown>, outputDir: string, prefix: string): Promise<string[]> {
   const absOutputDir = path.join(PROJECT_ROOT, outputDir);
   fs.mkdirSync(absOutputDir, { recursive: true });
   const savedFiles: string[] = [];
 
-  // Recursively find all base64 image objects in the response
-  function walk(obj: unknown, keyPath: string): void {
+  // Handle rotation_urls (character GET response) — download PNGs from URLs
+  if (data.rotation_urls && typeof data.rotation_urls === "object") {
+    const urls = data.rotation_urls as Record<string, string>;
+    for (const [direction, url] of Object.entries(urls)) {
+      if (typeof url !== "string" || !url.startsWith("http")) continue;
+      const filename = `${prefix}-${direction}.png`;
+      const filePath = path.join(absOutputDir, filename);
+      await downloadFile(url, filePath);
+      savedFiles.push(path.relative(PROJECT_ROOT, filePath));
+    }
+  }
+
+  // Handle animation_urls (character GET response after animation)
+  if (data.animations && Array.isArray(data.animations)) {
+    for (const anim of data.animations) {
+      const a = anim as Record<string, unknown>;
+      const animName = a.name as string || "anim";
+      if (a.sprite_sheet_urls && typeof a.sprite_sheet_urls === "object") {
+        const urls = a.sprite_sheet_urls as Record<string, string>;
+        for (const [direction, url] of Object.entries(urls)) {
+          if (typeof url !== "string" || !url.startsWith("http")) continue;
+          const filename = `${prefix}-${animName}-${direction}.png`;
+          const filePath = path.join(absOutputDir, filename);
+          await downloadFile(url, filePath);
+          savedFiles.push(path.relative(PROJECT_ROOT, filePath));
+        }
+      }
+    }
+  }
+
+  // Handle image_url (map object GET response)
+  if (typeof data.image_url === "string" && data.image_url.startsWith("http")) {
+    const filename = `${prefix}.png`;
+    const filePath = path.join(absOutputDir, filename);
+    await downloadFile(data.image_url as string, filePath);
+    savedFiles.push(path.relative(PROJECT_ROOT, filePath));
+  }
+
+  // Recursively find inline base64 image objects (tileset tiles, etc.)
+  function walkSync(obj: unknown, keyPath: string): void {
     if (!obj || typeof obj !== "object") return;
     const rec = obj as Record<string, unknown>;
 
-    // Check if this is an image data object
-    if (rec.type === "base64" && typeof rec.base64 === "string") {
-      const ext = (rec.format as string) || "png";
+    // Handle base64 or rgba_bytes image data
+    if (typeof rec.base64 === "string" && typeof rec.type === "string") {
+      const w = rec.width as number | undefined;
+      const h = rec.height as number | undefined;
+      const ext = rec.type === "rgba_bytes" ? "rgba" : ((rec.format as string) || "png");
       const filename = `${prefix}${keyPath ? `-${keyPath}` : ""}.${ext}`;
       const filePath = path.join(absOutputDir, filename);
-      saveBase64Image(rec.base64 as string, filePath);
+      saveBuffer(Buffer.from(rec.base64 as string, "base64"), filePath);
+      // Also save dimensions for rgba files
+      if (ext === "rgba" && w && h) {
+        fs.writeFileSync(filePath + ".meta", JSON.stringify({ width: w, height: h }));
+      }
       savedFiles.push(path.relative(PROJECT_ROOT, filePath));
       return;
     }
 
     // Recurse into arrays and objects
     if (Array.isArray(obj)) {
-      obj.forEach((item, i) => walk(item, `${keyPath}${keyPath ? "-" : ""}${i}`));
+      obj.forEach((item, i) => walkSync(item, `${keyPath}${keyPath ? "-" : ""}${i}`));
     } else {
       for (const [k, v] of Object.entries(rec)) {
-        if (k === "usage") continue; // skip usage metadata
-        walk(v, `${keyPath}${keyPath ? "-" : ""}${k}`);
+        if (k === "usage" || k === "rotation_urls" || k === "animations" || k === "image_url") continue;
+        walkSync(v, `${keyPath}${keyPath ? "-" : ""}${k}`);
       }
     }
   }
 
-  walk(data, "");
+  walkSync(data, "");
   return savedFiles;
 }
 
@@ -178,27 +240,23 @@ async function processCreateCharacter(
   item: PlanItem,
   _completedItems: Map<string, ResultEntry>
 ): Promise<ResultEntry> {
-  const { status, json } = await apiPost(apiKey, "/create-character-with-4-directions", item.params);
+  const { json } = await apiPost(apiKey, "/create-character-with-4-directions", item.params);
 
-  if (!json.success && status !== 202) {
-    throw new Error(`Create character failed (${status}): ${JSON.stringify(json.error)}`);
-  }
-
-  const characterId = json.data?.character_id as string | undefined;
-  const jobId = json.data?.background_job_id as string | undefined;
+  const characterId = json.character_id as string | undefined;
+  const jobId = json.background_job_id as string | undefined;
 
   if (jobId) {
     await pollBackgroundJob(apiKey, jobId);
   }
 
   // Fetch the final character data
-  let finalData = json.data;
+  let finalData: Record<string, unknown> = json;
   if (characterId) {
     const charRes = await apiGet(apiKey, `/characters/${characterId}`);
-    finalData = charRes.json.data;
+    finalData = charRes.json;
   }
 
-  const files = extractAndSaveImages(finalData as Record<string, unknown>, item.output, item.id);
+  const files = await extractAndSaveImages(finalData as Record<string, unknown>, item.output, item.id);
 
   return {
     id: item.id,
@@ -227,20 +285,40 @@ async function processAnimateCharacter(
     async_mode: true,
   };
 
-  const { status, json } = await apiPost(apiKey, "/characters/animations", body);
+  const { json } = await apiPost(apiKey, "/characters/animations", body);
 
-  if (!json.success && status !== 202) {
-    throw new Error(`Animate character failed (${status}): ${JSON.stringify(json.error)}`);
+  // API returns background_job_ids (array) for animations
+  const jobIds = json.background_job_ids as string[] | undefined;
+  const absOutputDir = path.join(PROJECT_ROOT, item.output);
+  fs.mkdirSync(absOutputDir, { recursive: true });
+  const savedFiles: string[] = [];
+
+  if (jobIds && jobIds.length > 0) {
+    for (const jobId of jobIds) {
+      const jobResult = await pollBackgroundJob(apiKey, jobId);
+      const lr = jobResult.last_response as Record<string, unknown> | undefined;
+      if (!lr) continue;
+
+      const direction = lr.direction as string || "east";
+      const animName = item.params.animation_name as string || "anim";
+
+      // Download frame PNGs from storage_urls
+      const storageUrls = lr.storage_urls as Record<string, unknown> | undefined;
+      const frameUrls = storageUrls?.frames as string[] | undefined;
+      if (frameUrls && frameUrls.length > 0) {
+        for (let f = 0; f < frameUrls.length; f++) {
+          const url = frameUrls[f];
+          if (!url.startsWith("http")) continue;
+          const filename = `${item.id}-${animName}-${direction}-frame${f}.png`;
+          const filePath = path.join(absOutputDir, filename);
+          await downloadFile(url, filePath);
+          savedFiles.push(path.relative(PROJECT_ROOT, filePath));
+        }
+      }
+    }
   }
 
-  const jobId = (json.data?.job_id || json.data?.background_job_id) as string | undefined;
-  if (jobId) {
-    await pollBackgroundJob(apiKey, jobId);
-  }
-
-  // Fetch updated character data with animations
-  const charRes = await apiGet(apiKey, `/characters/${dep.apiId}`);
-  const files = extractAndSaveImages(charRes.json.data as Record<string, unknown>, item.output, `${item.id}`);
+  const files = savedFiles;
 
   return {
     id: item.id,
@@ -259,19 +337,15 @@ async function processCreateTileset(
 ): Promise<ResultEntry> {
   const { status, json } = await apiPost(apiKey, "/create-tileset-sidescroller", item.params);
 
-  if (!json.success && status !== 202) {
-    throw new Error(`Create tileset failed (${status}): ${JSON.stringify(json.error)}`);
-  }
-
-  const tilesetId = (json.data?.tileset_id || json.data?.job_id) as string | undefined;
+  const tilesetId = (json.tileset_id || json.job_id) as string | undefined;
   if (!tilesetId) {
-    throw new Error(`No tileset_id or job_id in response: ${JSON.stringify(json.data)}`);
+    throw new Error(`No tileset_id or job_id in response: ${JSON.stringify(json)}`);
   }
 
   // For 202 responses, poll until ready
   if (status === 202) {
     const tilesetRes = await pollTileset(apiKey, tilesetId);
-    const files = extractAndSaveImages(tilesetRes.data as Record<string, unknown>, item.output, item.id);
+    const files = await extractAndSaveImages(tilesetRes as Record<string, unknown>, item.output, item.id);
     return {
       id: item.id,
       type: item.type,
@@ -282,7 +356,7 @@ async function processCreateTileset(
     };
   }
 
-  const files = extractAndSaveImages(json.data as Record<string, unknown>, item.output, item.id);
+  const files = await extractAndSaveImages(json as Record<string, unknown>, item.output, item.id);
   return {
     id: item.id,
     type: item.type,
@@ -298,24 +372,41 @@ async function processCreateMapObject(
   item: PlanItem,
   _completedItems: Map<string, ResultEntry>
 ): Promise<ResultEntry> {
-  const { status, json } = await apiPost(apiKey, "/map-objects", item.params);
+  const { json } = await apiPost(apiKey, "/map-objects", item.params);
 
-  if (!json.success) {
-    throw new Error(`Create map object failed (${status}): ${JSON.stringify(json.error)}`);
+  const objectId = json.object_id as string | undefined;
+  const mapJobId = json.background_job_id as string | undefined;
+
+  // Map objects are async — poll until done, then extract image from job result
+  let jobResult: ApiResponse | null = null;
+  if (mapJobId) {
+    jobResult = await pollBackgroundJob(apiKey, mapJobId);
   }
 
-  const objectId = json.data?.object_id as string | undefined;
-  let finalData = json.data;
+  // The image is in the background job's last_response.image (base64 PNG)
+  const absOutputDir = path.join(PROJECT_ROOT, item.output);
+  fs.mkdirSync(absOutputDir, { recursive: true });
+  const savedFiles: string[] = [];
 
-  // If we got an object_id, fetch the full object
-  if (objectId) {
-    const objRes = await apiGet(apiKey, `/objects/${objectId}`);
-    if (objRes.status === 200) {
-      finalData = objRes.json.data;
+  const lastResponse = jobResult?.last_response as Record<string, unknown> | undefined;
+  if (lastResponse?.image && typeof lastResponse.image === "string") {
+    const filePath = path.join(absOutputDir, `${item.id}.png`);
+    saveBuffer(Buffer.from(lastResponse.image as string, "base64"), filePath);
+    savedFiles.push(path.relative(PROJECT_ROOT, filePath));
+  } else {
+    // Fallback: try fetching from object endpoint or extracting inline data
+    let finalData: Record<string, unknown> = json;
+    if (objectId) {
+      const objRes = await apiGet(apiKey, `/objects/${objectId}`);
+      if (objRes.status === 200) {
+        finalData = objRes.json;
+      }
     }
+    const extracted = await extractAndSaveImages(finalData, item.output, item.id);
+    savedFiles.push(...extracted);
   }
 
-  const files = extractAndSaveImages(finalData as Record<string, unknown>, item.output, item.id);
+  const files = savedFiles;
 
   return {
     id: item.id,
@@ -380,6 +471,13 @@ async function main() {
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const label = getLabel(item);
+
+    // Skip already-completed items
+    if (completedItems.has(item.id)) {
+      console.log(`[${i + 1}/${items.length}] ${label}... skipped (already done)`);
+      continue;
+    }
+
     process.stdout.write(`[${i + 1}/${items.length}] ${label}...`);
     const start = Date.now();
 
