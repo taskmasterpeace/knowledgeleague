@@ -1,0 +1,62 @@
+{
+  "phase1_test": [
+    {
+      "id": "kevin",
+      "type": "create_character",
+      "params": {
+        "description": "red-haired boy in red t-shirt and dark shorts, athletic and energetic, kid character",
+        "image_size": { "width": 32, "height": 32 },
+        "outline": "thin",
+        "shading": "soft",
+        "detail": "medium",
+        "view": "side",
+        "n_directions": 4,
+        "name": "Kevin"
+      },
+      "output": "public/pixelart/characters/kevin"
+    },
+    {
+      "id": "kevin_run",
+      "type": "animate_character",
+      "depends_on": "kevin",
+      "params": {
+        "template_animation_id": "run",
+        "animation_name": "run",
+        "directions": ["east"]
+      },
+      "output": "public/pixelart/characters/kevin"
+    },
+    {
+      "id": "dirt_track",
+      "type": "create_sidescroller_tileset",
+      "params": {
+        "lower_description": "brown dirt running track surface",
+        "transition_description": "grass turf edge growing on top",
+        "transition_size": 0.25,
+        "tile_size": { "width": 16, "height": 16 }
+      },
+      "output": "public/pixelart/tilesets/dirt-track"
+    },
+    {
+      "id": "grass",
+      "type": "create_sidescroller_tileset",
+      "params": {
+        "lower_description": "green grass ground",
+        "transition_description": "tall grass blades on top",
+        "transition_size": 0.25,
+        "tile_size": { "width": 16, "height": 16 }
+      },
+      "output": "public/pixelart/tilesets/grass"
+    },
+    {
+      "id": "airplane",
+      "type": "create_map_object",
+      "params": {
+        "description": "small pixel art paper airplane, white with blue lines, flying through air",
+        "image_size": { "width": 32, "height": 24 },
+        "view": "side"
+      },
+      "output": "public/pixelart/menu/airplane"
+    }
+  ]
+}
