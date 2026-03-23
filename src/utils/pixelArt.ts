@@ -1,99 +1,108 @@
-import type { PixelArtManifest, TugArenaType } from '../types'
+import type { TugArenaType } from '../types'
 
 const BASE = '/pixelart'
 
-function charPaths(name: string) {
-  return {
-    idle: `characters/${name}/idle.png`,
-    run: `characters/${name}/run.png`,
-    celebrate: `characters/${name}/celebrate.png`,
-    pull: `characters/${name}/pull.png`,
-    portrait: `characters/${name}/portrait.png`,
+// ── Character assets mapped to actual generated files ──
+
+interface CharacterAssets {
+  idle: string      // standing sprite (east-facing)
+  run: string[]     // run animation frames
+  south: string     // front-facing sprite
+}
+
+const CHARACTERS: Record<string, CharacterAssets> = {
+  kevin: {
+    idle: `${BASE}/characters/kevin/kevin-east.png`,
+    run: [
+      `${BASE}/characters/kevin/kevin_run-run-east-frame0.png`,
+      `${BASE}/characters/kevin/kevin_run-run-east-frame1.png`,
+      `${BASE}/characters/kevin/kevin_run-run-east-frame2.png`,
+      `${BASE}/characters/kevin/kevin_run-run-east-frame3.png`,
+    ],
+    south: `${BASE}/characters/kevin/kevin-south.png`,
+  },
+  sally: {
+    idle: `${BASE}/characters/sally/sally-east.png`,
+    run: [`${BASE}/characters/sally/sally-east.png`], // no animation yet — use static
+    south: `${BASE}/characters/sally/sally-south.png`,
+  },
+  // Characters not yet generated — will use fallback colored squares
+  benny: { idle: '', run: [], south: '' },
+  mia: { idle: '', run: [], south: '' },
+  'default-player': { idle: '', run: [], south: '' },
+}
+
+// ── Tileset assets — use first tile as representative ──
+
+export const TILESETS = {
+  'dirt-track': `${BASE}/tilesets/dirt-track/dirt_track-tileset-tiles-0-image.png`,
+  grass: `${BASE}/tilesets/grass/grass-tileset-tiles-0-image.png`,
+  'mud-pit': `${BASE}/tilesets/mud-pit/mud_tileset-tileset-tiles-0-image.png`,
+  stadium: `${BASE}/tilesets/stadium/gym_floor_tileset-tileset-tiles-0-image.png`,
+}
+
+// ── Object assets ──
+
+export const OBJECTS = {
+  'sky-background': `${BASE}/objects/marathon/sky_background.png`,
+  'school-building': `${BASE}/objects/tug/school_building.png`,
+}
+
+// ── Menu flying objects ──
+
+export const MENU_OBJECTS = [
+  `${BASE}/menu/airplane/airplane.png`,
+  `${BASE}/menu/ufo.png`,
+]
+
+// ── Public API ──
+
+/**
+ * Returns the idle (standing) sprite path for a character.
+ * Returns empty string if not available.
+ */
+export function getCharacterIdle(name: string): string {
+  return CHARACTERS[name]?.idle || ''
+}
+
+/**
+ * Returns the south-facing (portrait) sprite for a character.
+ */
+export function getCharacterPortrait(name: string): string {
+  return CHARACTERS[name]?.south || ''
+}
+
+/**
+ * Returns run animation frame paths for a character.
+ * Falls back to idle sprite if no run frames exist.
+ */
+export function getCharacterRunFrames(name: string): string[] {
+  const char = CHARACTERS[name]
+  if (!char) return []
+  if (char.run.length > 0) return char.run
+  if (char.idle) return [char.idle]
+  return []
+}
+
+/**
+ * Returns a single "run" image for a character — first run frame or idle.
+ * This is used by components that just need one sprite to show.
+ */
+export function getCharacterAsset(characterName: string, _animation: string): string {
+  const char = CHARACTERS[characterName]
+  if (!char) return ''
+  if (_animation === 'run' || _animation === 'pull') {
+    return char.run[0] || char.idle || ''
   }
-}
-
-export const PIXEL_ART_MANIFEST: PixelArtManifest = {
-  characters: {
-    kevin: charPaths('kevin'),
-    sally: charPaths('sally'),
-    benny: charPaths('benny'),
-    mia: charPaths('mia'),
-    'default-player': charPaths('default-player'),
-  },
-  tilesets: {
-    'dirt-track': 'tilesets/dirt-track.png',
-    grass: 'tilesets/grass.png',
-    mud: 'tilesets/mud.png',
-    'arena-floor': 'tilesets/arena-floor.png',
-  },
-  objects: {
-    'sky-mountains': 'objects/sky-mountains.png',
-    'finish-line': 'objects/finish-line.png',
-    'start-line': 'objects/start-line.png',
-    decorations: 'objects/decorations.png',
-    bleachers: 'objects/bleachers.png',
-    'lane-markers': 'objects/lane-markers.png',
-    rope: 'objects/rope.png',
-    'mud-splash': 'objects/mud-splash.png',
-    'field-banners': 'objects/field-banners.png',
-    'center-flag': 'objects/center-flag.png',
-    'stadium-stands': 'objects/stadium-stands.png',
-    'stadium-lights': 'objects/stadium-lights.png',
-    scoreboard: 'objects/scoreboard.png',
-    barrier: 'objects/barrier.png',
-    'school-building': 'objects/school-building.png',
-    'playground-markings': 'objects/playground-markings.png',
-    'traffic-cones': 'objects/traffic-cones.png',
-    trees: 'objects/trees.png',
-    'spectator-kids': 'objects/spectator-kids.png',
-  },
-  menuObjects: [
-    'menu/airplane.png',
-    'menu/ufo.png',
-    'menu/drone.png',
-    'menu/star.png',
-    'menu/rocket.png',
-    'menu/balloon.png',
-    'menu/bird.png',
-  ],
+  return char.idle || ''
 }
 
 /**
- * Preload images by creating Image objects and waiting for them to load.
- * Resolves even if some images fail (graceful degradation).
- */
-export function preloadImages(paths: string[]): Promise<void> {
-  const promises = paths.map(
-    (path) =>
-      new Promise<void>((resolve) => {
-        const img = new Image()
-        img.onload = () => resolve()
-        img.onerror = () => resolve() // resolve anyway — graceful
-        img.src = path
-      })
-  )
-  return Promise.all(promises).then(() => {})
-}
-
-/**
- * Returns the full path for a character's animation.
- * Returns empty string if the character or animation is not found.
- */
-export function getCharacterAsset(characterName: string, animation: string): string {
-  const character = PIXEL_ART_MANIFEST.characters[characterName]
-  if (!character) return ''
-  const path = (character as Record<string, string | undefined>)[animation]
-  if (!path) return ''
-  return `${BASE}/${path}`
-}
-
-/**
- * Returns a random menu object path from the manifest.
+ * Returns a random menu flying object path.
  */
 export function getRandomMenuObject(): string {
-  const objects = PIXEL_ART_MANIFEST.menuObjects
-  const index = Math.floor(Math.random() * objects.length)
-  return `${BASE}/${objects[index]}`
+  if (MENU_OBJECTS.length === 0) return ''
+  return MENU_OBJECTS[Math.floor(Math.random() * MENU_OBJECTS.length)]
 }
 
 const ARENA_TYPES: TugArenaType[] = ['mud-pit', 'stadium', 'schoolyard']
@@ -106,48 +115,47 @@ export function getRandomArena(): TugArenaType {
 }
 
 /**
- * Returns arena-specific asset paths based on arena type.
+ * Returns arena-specific asset paths.
  */
 export function getArenaAssets(type: TugArenaType): {
-  background: string
   ground: string
   decorations: string[]
 } {
-  const t = (name: string) => `${BASE}/tilesets/${name}.png`
-  const o = (name: string) => `${BASE}/objects/${name}.png`
-
   switch (type) {
     case 'mud-pit':
       return {
-        background: t('grass'),
-        ground: t('mud'),
-        decorations: [o('rope'), o('mud-splash'), o('field-banners'), o('center-flag')],
+        ground: TILESETS['mud-pit'],
+        decorations: [],
       }
     case 'stadium':
       return {
-        background: t('arena-floor'),
-        ground: t('arena-floor'),
-        decorations: [
-          o('stadium-stands'),
-          o('stadium-lights'),
-          o('scoreboard'),
-          o('barrier'),
-          o('rope'),
-        ],
+        ground: TILESETS.stadium,
+        decorations: [],
       }
     case 'schoolyard':
       return {
-        background: t('grass'),
-        ground: t('grass'),
-        decorations: [
-          o('school-building'),
-          o('playground-markings'),
-          o('traffic-cones'),
-          o('trees'),
-          o('spectator-kids'),
-        ],
+        ground: TILESETS.grass,
+        decorations: OBJECTS['school-building'] ? [OBJECTS['school-building']] : [],
       }
     default:
-      return { background: '', ground: '', decorations: [] }
+      return { ground: '', decorations: [] }
   }
+}
+
+/**
+ * Preload images — resolves even on failure for graceful degradation.
+ */
+export function preloadImages(paths: string[]): Promise<void> {
+  const promises = paths
+    .filter((p) => p) // skip empty strings
+    .map(
+      (path) =>
+        new Promise<void>((resolve) => {
+          const img = new Image()
+          img.onload = () => resolve()
+          img.onerror = () => resolve()
+          img.src = path
+        })
+    )
+  return Promise.all(promises).then(() => {})
 }

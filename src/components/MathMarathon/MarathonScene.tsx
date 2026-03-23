@@ -1,19 +1,12 @@
-import { useState, useEffect } from 'react'
-import { PixelScene } from '../shared/PixelScene'
-import type { PixelSceneLayer } from '../shared/PixelScene'
-import { PIXEL_ART_MANIFEST, getCharacterAsset } from '../../utils/pixelArt'
+import { getCharacterAsset, TILESETS, OBJECTS } from '../../utils/pixelArt'
 import type { Player } from '../../types'
-
-const BASE = '/pixelart'
 
 interface MarathonSceneProps {
   players: Player[]
   totalSpaces?: number
 }
 
-const SCENE_HEIGHT = 300
-const GROUND_Y = 65
-const SCENE_WIDTH = 1600 // virtual width for camera calculation
+const SCENE_HEIGHT = 200
 
 const CPU_NAME_MAP: Record<string, string> = {
   Kevin: 'kevin',
@@ -22,96 +15,143 @@ const CPU_NAME_MAP: Record<string, string> = {
   Mia: 'mia',
 }
 
+// Fallback colors for characters without sprites
+const FALLBACK_COLORS: Record<string, string> = {
+  kevin: '#ef4444',
+  sally: '#a855f7',
+  benny: '#22c55e',
+  mia: '#f97316',
+  'default-player': '#3b82f6',
+}
+
 export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps) {
-  const [assetsReady, setAssetsReady] = useState(false)
-
-  // Check if key assets exist on mount
-  useEffect(() => {
-    const skyPath = `${BASE}/${PIXEL_ART_MANIFEST.objects['sky-mountains']}`
-    const trackPath = `${BASE}/${PIXEL_ART_MANIFEST.tilesets['dirt-track']}`
-
-    let mounted = true
-    const img = new Image()
-    img.onload = () => { if (mounted) setAssetsReady(true) }
-    img.onerror = () => { if (mounted) setAssetsReady(false) }
-    img.src = skyPath
-
-    const img2 = new Image()
-    img2.onload = () => { if (mounted) setAssetsReady(true) }
-    img2.onerror = () => {} // only need one to succeed for basic check
-    img2.src = trackPath
-
-    return () => { mounted = false }
-  }, [])
-
-  if (!assetsReady) return null
-
-  // Camera follows leading player
-  const maxPosition = Math.max(...players.map(p => p.position), 0)
-  const cameraX = (maxPosition / totalSpaces) * SCENE_WIDTH
-
-  const layers: PixelSceneLayer[] = [
-    // Layer 0: Sky/mountains background
-    {
-      src: `${BASE}/${PIXEL_ART_MANIFEST.objects['sky-mountains']}`,
-      speed: 0,
-      y: 0,
-      height: SCENE_HEIGHT,
-      repeat: true,
-      scale: 1,
-    },
-    // Layer 1: Bleachers/crowd
-    {
-      src: `${BASE}/${PIXEL_ART_MANIFEST.objects['bleachers']}`,
-      speed: 0.3,
-      y: 20,
-      repeat: true,
-      scale: 1.5,
-    },
-    // Layer 2: Trees/decorations
-    {
-      src: `${BASE}/${PIXEL_ART_MANIFEST.objects['trees']}`,
-      speed: 0.5,
-      y: 30,
-      repeat: true,
-      scale: 1.5,
-    },
-    // Layer 3: Dirt track tileset
-    {
-      src: `${BASE}/${PIXEL_ART_MANIFEST.tilesets['dirt-track']}`,
-      speed: 1,
-      y: 55,
-      repeat: true,
-      scale: 2,
-    },
-    // Layer 4: Grass tileset on top edge of track
-    {
-      src: `${BASE}/${PIXEL_ART_MANIFEST.tilesets['grass']}`,
-      speed: 1,
-      y: 52,
-      repeat: true,
-      scale: 2,
-    },
-  ]
-
+  const hasSkyBg = !!OBJECTS['sky-background']
+  const hasDirtTrack = !!TILESETS['dirt-track']
+  const hasGrass = !!TILESETS.grass
   const laneCount = Math.max(players.length, 1)
+  const laneHeight = Math.min(50, (SCENE_HEIGHT * 0.35) / laneCount)
 
   return (
-    <PixelScene
-      layers={layers}
-      cameraX={cameraX}
-      height={SCENE_HEIGHT}
-      groundY={GROUND_Y}
-      className="rounded-lg overflow-hidden"
+    <div
+      className="rounded-lg overflow-hidden mb-4"
+      style={{
+        position: 'relative',
+        height: SCENE_HEIGHT,
+        width: '100%',
+        imageRendering: 'pixelated',
+      }}
     >
-      {players.map((player, i) => {
-        const laneOffset = ((i + 0.5) / laneCount) * 120 // spread across available space in px
-        const xPercent = (player.position / totalSpaces) * 100
+      {/* Sky background */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, #1a0533 0%, #2d1b69 30%, #e87d3e 70%, #f4a460 100%)',
+        }}
+      >
+        {hasSkyBg && (
+          <img
+            src={OBJECTS['sky-background']}
+            alt=""
+            style={{
+              width: '100%',
+              height: '70%',
+              objectFit: 'cover',
+              imageRendering: 'pixelated',
+              opacity: 0.8,
+            }}
+          />
+        )}
+      </div>
 
-        const charKey = CPU_NAME_MAP[player.name]
-        const characterSrc = player.type === 'cpu' && charKey
-          ? getCharacterAsset(charKey, 'run')
-          : getCharacterAsset('default-player', 'run')
+      {/* Grass edge */}
+      {hasGrass ? (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: '52%',
+            height: '20%',
+            backgroundImage: `url(${TILESETS.grass})`,
+            backgroundRepeat: 'repeat-x',
+            backgroundSize: '32px 32px',
+            imageRendering: 'pixelated',
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: '52%',
+            height: '20%',
+            background: 'linear-gradient(180deg, #4ade80 0%, #22c55e 100%)',
+          }}
+        />
+      )}
+
+      {/* Dirt track */}
+      {hasDirtTrack ? (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: '60%',
+            bottom: 0,
+            backgroundImage: `url(${TILESETS['dirt-track']})`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: '32px 32px',
+            imageRendering: 'pixelated',
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: '60%',
+            bottom: 0,
+            background: 'linear-gradient(180deg, #92400e 0%, #78350f 100%)',
+          }}
+        />
+      )}
+
+      {/* Lane dividers */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: '62%',
+          bottom: '5%',
+        }}
+      >
+        {Array.from({ length: laneCount + 1 }, (_, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: `${(i / laneCount) * 100}%`,
+              height: '1px',
+              background: 'rgba(255,255,255,0.15)',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Player sprites */}
+      {players.map((player, i) => {
+        const xPercent = Math.min((player.position / totalSpaces) * 85 + 5, 90)
+        const laneTop = 62 + (i / laneCount) * 33
+        const charKey = player.type === 'cpu' ? (CPU_NAME_MAP[player.name] || 'default-player') : 'default-player'
+        const characterSrc = getCharacterAsset(charKey, 'run')
+        const fallbackColor = FALLBACK_COLORS[charKey] || player.color
 
         return (
           <div
@@ -119,39 +159,90 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             style={{
               position: 'absolute',
               left: `${xPercent}%`,
-              top: `${laneOffset}px`,
+              top: `${laneTop}%`,
               transition: 'left 0.5s ease-out',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
+              transform: 'translate(-50%, -50%)',
             }}
           >
             {/* Player name label */}
             <div
               style={{
                 fontFamily: '"Press Start 2P", monospace',
-                fontSize: '8px',
+                fontSize: '7px',
                 color: player.color,
-                textShadow: '1px 1px 0 rgba(0,0,0,0.8)',
+                textShadow: '1px 1px 0 rgba(0,0,0,0.9)',
                 whiteSpace: 'nowrap',
                 marginBottom: '2px',
               }}
             >
               {player.name}
             </div>
-            {/* Character sprite */}
-            <img
-              src={characterSrc}
-              alt={player.name}
-              style={{
-                width: '64px',
-                height: '64px',
-                imageRendering: 'pixelated',
-              }}
-            />
+            {/* Character sprite or fallback */}
+            {characterSrc ? (
+              <img
+                src={characterSrc}
+                alt={player.name}
+                onError={(e) => {
+                  ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+                }}
+                style={{
+                  width: `${laneHeight}px`,
+                  height: `${laneHeight}px`,
+                  imageRendering: 'pixelated',
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: `${laneHeight - 8}px`,
+                  height: `${laneHeight - 8}px`,
+                  borderRadius: '6px',
+                  background: fallbackColor,
+                  border: '2px solid rgba(255,255,255,0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: '10px',
+                  color: 'white',
+                  textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
+                }}
+              >
+                {player.name[0]}
+              </div>
+            )}
           </div>
         )
       })}
-    </PixelScene>
+
+      {/* Start line */}
+      <div
+        style={{
+          position: 'absolute',
+          left: '4%',
+          top: '58%',
+          bottom: '2%',
+          width: '3px',
+          background: 'repeating-linear-gradient(180deg, white 0px, white 4px, transparent 4px, transparent 8px)',
+          opacity: 0.6,
+        }}
+      />
+
+      {/* Finish line */}
+      <div
+        style={{
+          position: 'absolute',
+          right: '4%',
+          top: '58%',
+          bottom: '2%',
+          width: '6px',
+          background: 'repeating-linear-gradient(180deg, white 0px, white 4px, #222 4px, #222 8px)',
+          opacity: 0.7,
+        }}
+      />
+    </div>
   )
 }

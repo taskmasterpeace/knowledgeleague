@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { getArenaAssets, getCharacterAsset } from '../../utils/pixelArt'
 import type { TugArenaType, Player } from '../../types'
 
@@ -16,12 +15,26 @@ const CPU_NAME_MAP: Record<string, string> = {
   Mia: 'mia',
 }
 
+const FALLBACK_COLORS: Record<string, string> = {
+  kevin: '#ef4444',
+  sally: '#a855f7',
+  benny: '#22c55e',
+  mia: '#f97316',
+}
+
 function getSpriteSrc(player: Player): string {
   if (player.type === 'cpu') {
     const charName = CPU_NAME_MAP[player.name] ?? 'default-player'
-    return getCharacterAsset(charName, 'run')
+    return getCharacterAsset(charName, 'pull')
   }
-  return getCharacterAsset('default-player', 'run')
+  return getCharacterAsset('default-player', 'pull')
+}
+
+function getPlayerColor(player: Player): string {
+  if (player.type === 'cpu') {
+    return FALLBACK_COLORS[CPU_NAME_MAP[player.name]] || player.color
+  }
+  return player.color
 }
 
 function CenterFeature({ arenaType }: { arenaType: TugArenaType }) {
@@ -58,7 +71,6 @@ function CenterFeature({ arenaType }: { arenaType: TugArenaType }) {
           className="absolute left-1/2 bottom-[56px] -translate-x-1/2"
           style={{ width: 24, height: 36 }}
         >
-          {/* Cone body */}
           <div style={{
             width: 0,
             height: 0,
@@ -67,7 +79,6 @@ function CenterFeature({ arenaType }: { arenaType: TugArenaType }) {
             borderBottom: '30px solid #f97316',
             margin: '0 auto',
           }} />
-          {/* Cone base */}
           <div style={{
             width: 28,
             height: 6,
@@ -101,28 +112,62 @@ function getArenaBackground(arenaType: TugArenaType): React.CSSProperties {
   }
 }
 
+function PlayerSprite({ player, flipped }: { player: Player; flipped?: boolean }) {
+  const src = getSpriteSrc(player)
+  const color = getPlayerColor(player)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div
+        className="font-pixel text-[6px] text-white text-center mb-0.5 whitespace-nowrap"
+        style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)', transform: flipped ? 'scaleX(-1)' : undefined }}
+      >
+        {player.name}
+      </div>
+      {src ? (
+        <img
+          src={src}
+          alt={player.name}
+          onError={(e) => { ;(e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          style={{
+            width: 56,
+            height: 56,
+            imageRendering: 'pixelated',
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: '8px',
+            background: color,
+            border: '3px solid rgba(255,255,255,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '12px',
+            color: 'white',
+            textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
+          }}
+        >
+          {player.name[0]}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugArenaProps) {
-  const [assetsLoaded, setAssetsLoaded] = useState(false)
-
   const assets = getArenaAssets(arenaType)
-
-  useEffect(() => {
-    if (!assets.background) return
-    // Attempt to load at least the background image to confirm assets exist
-    const img = new Image()
-    img.onload = () => setAssetsLoaded(true)
-    img.onerror = () => setAssetsLoaded(false)
-    img.src = assets.background
-  }, [assets.background])
-
-  if (!assetsLoaded) return null
 
   const leftX = 20 + ropePosition * 0.15
   const rightX = 80 + ropePosition * 0.15
 
   return (
     <div
-      className="pixel-card rounded-lg overflow-hidden relative"
+      className="rounded-lg overflow-hidden relative"
       style={{ height: 280, imageRendering: 'pixelated' }}
     >
       {/* Arena background */}
@@ -136,6 +181,7 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
             src={dec}
             alt=""
             className="absolute opacity-60"
+            onError={(e) => { ;(e.currentTarget as HTMLImageElement).style.display = 'none' }}
             style={{
               imageRendering: 'pixelated',
               bottom: 80 + i * 20,
@@ -152,7 +198,8 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
         className="absolute bottom-0 left-0 right-0"
         style={{
           height: 60,
-          backgroundImage: `url(${assets.ground})`,
+          backgroundImage: assets.ground ? `url(${assets.ground})` : undefined,
+          background: assets.ground ? undefined : 'linear-gradient(180deg, #6b4226 0%, #5a3520 100%)',
           backgroundRepeat: 'repeat-x',
           backgroundSize: '64px 64px',
           imageRendering: 'pixelated',
@@ -178,10 +225,7 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
             boxShadow: '0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)',
           }}
         />
-        {/* Center marker / flag */}
-        <div
-          className="absolute -top-6 left-1/2 -translate-x-1/2"
-        >
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2">
           <div className="w-0.5 h-10 bg-white/90 mx-auto" />
           <div
             className="absolute top-0.5 left-1"
@@ -196,9 +240,8 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
         </div>
       </div>
 
-      {/* Left team characters */}
+      {/* Left team */}
       {leftTeam.map((player, i) => {
-        const src = getSpriteSrc(player)
         const yOffset = leftTeam.length > 1 ? i * 16 - 8 : 0
         return (
           <div
@@ -210,29 +253,13 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
               transform: 'translateX(-50%)',
             }}
           >
-            <div className="font-pixel text-[6px] text-white text-center mb-0.5 whitespace-nowrap"
-              style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}
-            >
-              {player.name}
-            </div>
-            {src && (
-              <img
-                src={src}
-                alt={player.name}
-                style={{
-                  width: 64,
-                  height: 64,
-                  imageRendering: 'pixelated',
-                }}
-              />
-            )}
+            <PlayerSprite player={player} />
           </div>
         )
       })}
 
-      {/* Right team characters */}
+      {/* Right team (flipped) */}
       {rightTeam.map((player, i) => {
-        const src = getSpriteSrc(player)
         const yOffset = rightTeam.length > 1 ? i * 16 - 8 : 0
         return (
           <div
@@ -244,24 +271,7 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
               transform: 'translateX(-50%) scaleX(-1)',
             }}
           >
-            {/* Name needs to be un-flipped */}
-            <div
-              className="font-pixel text-[6px] text-white text-center mb-0.5 whitespace-nowrap"
-              style={{ transform: 'scaleX(-1)', textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}
-            >
-              {player.name}
-            </div>
-            {src && (
-              <img
-                src={src}
-                alt={player.name}
-                style={{
-                  width: 64,
-                  height: 64,
-                  imageRendering: 'pixelated',
-                }}
-              />
-            )}
+            <PlayerSprite player={player} flipped />
           </div>
         )
       })}

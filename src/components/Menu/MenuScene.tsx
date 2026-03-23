@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
-import { getCharacterAsset, getRandomMenuObject, PIXEL_ART_MANIFEST } from '../../utils/pixelArt'
+import { useState, useEffect } from 'react'
+import { getCharacterIdle, getRandomMenuObject, TILESETS, MENU_OBJECTS } from '../../utils/pixelArt'
 
 const CPU_NAMES = ['kevin', 'sally', 'benny', 'mia']
 
@@ -21,32 +21,29 @@ function generateFlyingObject(initialDelay?: number): FlyingObject {
     duration: randomBetween(15, 30),
     yPosition: randomBetween(5, 35),
     delay: initialDelay ?? randomBetween(0, 10),
-    size: Math.round(randomBetween(32, 48)),
+    size: Math.round(randomBetween(48, 80)),
   }
 }
 
+// Fallback colored squares for characters that don't have sprites yet
+const FALLBACK_COLORS: Record<string, string> = {
+  kevin: '#ef4444',
+  sally: '#a855f7',
+  benny: '#22c55e',
+  mia: '#f97316',
+}
+
 export function MenuScene() {
-  const [assetsReady, setAssetsReady] = useState(false)
   const [flyingObjects, setFlyingObjects] = useState<FlyingObject[]>([])
 
-  const characterSrcs = useMemo(
-    () => CPU_NAMES.map((name) => getCharacterAsset(name, 'idle')),
-    []
-  )
-
-  const grassSrc = useMemo(() => `/pixelart/${PIXEL_ART_MANIFEST.tilesets.grass}`, [])
-
-  // Check if assets are available (at least the manifest exists)
   useEffect(() => {
-    // We always render — individual images handle their own errors via onError
-    setAssetsReady(true)
-
-    // Generate initial flying objects with staggered delays
-    const objects = Array.from({ length: 3 }, (_, i) => generateFlyingObject(i * randomBetween(3, 8)))
-    setFlyingObjects(objects)
+    if (MENU_OBJECTS.length > 0) {
+      const objects = Array.from({ length: 3 }, (_, i) =>
+        generateFlyingObject(i * randomBetween(3, 8))
+      )
+      setFlyingObjects(objects)
+    }
   }, [])
-
-  if (!assetsReady) return null
 
   return (
     <div
@@ -70,26 +67,28 @@ export function MenuScene() {
       `}</style>
 
       {/* Flying objects in the sky */}
-      {flyingObjects.map((obj, i) => (
-        <img
-          key={i}
-          src={obj.src}
-          alt=""
-          onError={(e) => {
-            ;(e.currentTarget as HTMLImageElement).style.display = 'none'
-          }}
-          style={{
-            position: 'absolute',
-            top: `${obj.yPosition}%`,
-            left: 0,
-            width: `${obj.size}px`,
-            height: 'auto',
-            imageRendering: 'pixelated',
-            animation: `flyAcross ${obj.duration}s linear ${obj.delay}s infinite`,
-            opacity: 0.85,
-          }}
-        />
-      ))}
+      {flyingObjects.map((obj, i) =>
+        obj.src ? (
+          <img
+            key={i}
+            src={obj.src}
+            alt=""
+            onError={(e) => {
+              ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+            }}
+            style={{
+              position: 'absolute',
+              top: `${obj.yPosition}%`,
+              left: 0,
+              width: `${obj.size}px`,
+              height: 'auto',
+              imageRendering: 'pixelated',
+              animation: `flyAcross ${obj.duration}s linear ${obj.delay}s infinite`,
+              opacity: 0.85,
+            }}
+          />
+        ) : null
+      )}
 
       {/* Grass ground strip */}
       <div
@@ -102,23 +101,32 @@ export function MenuScene() {
           overflow: 'hidden',
         }}
       >
-        <img
-          src={grassSrc}
-          alt=""
-          onError={(e) => {
-            ;(e.currentTarget as HTMLImageElement).style.display = 'none'
-          }}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            imageRendering: 'pixelated',
-            opacity: 0.7,
-          }}
-        />
+        {TILESETS.grass ? (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundImage: `url(${TILESETS.grass})`,
+              backgroundRepeat: 'repeat-x',
+              backgroundSize: '64px 64px',
+              backgroundPosition: 'bottom',
+              imageRendering: 'pixelated',
+              opacity: 0.7,
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(180deg, #4ade80 0%, #22c55e 100%)',
+              opacity: 0.5,
+            }}
+          />
+        )}
       </div>
 
-      {/* CPU characters idling on the grass */}
+      {/* Characters idling on the grass */}
       <div
         style={{
           position: 'absolute',
@@ -131,23 +139,52 @@ export function MenuScene() {
           padding: '0 10%',
         }}
       >
-        {characterSrcs.map((src, i) => (
-          <img
-            key={CPU_NAMES[i]}
-            src={src}
-            alt={CPU_NAMES[i]}
-            onError={(e) => {
-              ;(e.currentTarget as HTMLImageElement).style.display = 'none'
-            }}
-            style={{
-              width: '64px',
-              height: '64px',
-              imageRendering: 'pixelated',
-              animation: `bobble ${2 + i * 0.3}s ease-in-out infinite`,
-              animationDelay: `${i * 0.4}s`,
-            }}
-          />
-        ))}
+        {CPU_NAMES.map((name, i) => {
+          const src = getCharacterIdle(name)
+          return (
+            <div
+              key={name}
+              style={{
+                animation: `bobble ${2 + i * 0.3}s ease-in-out infinite`,
+                animationDelay: `${i * 0.4}s`,
+              }}
+            >
+              {src ? (
+                <img
+                  src={src}
+                  alt={name}
+                  onError={(e) => {
+                    ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+                  }}
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    imageRendering: 'pixelated',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '8px',
+                    background: FALLBACK_COLORS[name] || '#6b7280',
+                    border: '3px solid rgba(255,255,255,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: '"Press Start 2P", monospace',
+                    fontSize: '14px',
+                    color: 'white',
+                    textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  {name[0].toUpperCase()}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
