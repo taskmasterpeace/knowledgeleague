@@ -20,10 +20,12 @@ import { createPlayerAnalytics, recordAnalyticsAnswer } from '../../utils/player
 import { gradeToStartingTier, adjustTier } from '../../utils/adaptiveDifficulty'
 import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
-import type { Badge, PlayerAnalytics, PlayerId } from '../../types'
+import type { Badge, PlayerAnalytics, PlayerId, TugArenaType } from '../../types'
 import { BadgeToast } from '../shared/BadgeToast'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
 import { usePeerContext } from '../../hooks/usePeerContext'
+import { TugArena } from './TugArena'
+import { getRandomArena } from '../../utils/pixelArt'
 
 export function TugOfWar() {
   const {
@@ -43,6 +45,7 @@ export function TugOfWar() {
   const [showBurst, setShowBurst] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
   const { announceCorrect, announceWrong } = useAnnouncer()
+  const [arenaType] = useState<TugArenaType>(() => getRandomArena())
 
   const { broadcastProblem, broadcastResult, broadcastSpectatorUpdate } = usePeerContext()
 
@@ -221,11 +224,11 @@ export function TugOfWar() {
 
   // Register handler for phone controller answers — map player to team side
   useEffect(() => {
-    (window as any).__remoteAnswerHandler = (playerId: number, choiceIndex: number) => {
+    window.__remoteAnswerHandler = (playerId: number, choiceIndex: number) => {
       const teamSide = getTeamSide(playerId)
       handleAnswer(teamSide, choiceIndex)
     }
-    return () => { delete (window as any).__remoteAnswerHandler }
+    return () => { delete window.__remoteAnswerHandler }
   }, [handleAnswer, getTeamSide])
 
   useKeyboardInput({
@@ -332,7 +335,15 @@ export function TugOfWar() {
         </div>
       </div>
 
-      {/* Rope / Tug area */}
+      {/* Pixel art arena (falls back to rope below if assets missing) */}
+      <TugArena
+        arenaType={arenaType}
+        ropePosition={ropePos}
+        leftTeam={team1}
+        rightTeam={team2}
+      />
+
+      {/* Rope / Tug area (fallback) */}
       <div className="pixel-card rounded-lg overflow-hidden relative h-20">
         {/* Grass top strip */}
         <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-green-700 to-green-800" />
@@ -388,7 +399,7 @@ export function TugOfWar() {
         <ParticleBurst active={showBurst} color="#4ade80" />
         <MathProblem
           problem={currentProblem}
-          onAnswer={() => {}}
+          onAnswer={(i) => handleAnswer(1, i)}
           lockedP1={usedShot[1]}
           lockedP2={usedShot[2]}
           p1Keys={['1', '2', '3', '4']}
