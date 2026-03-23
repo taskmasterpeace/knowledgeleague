@@ -6,7 +6,7 @@ interface MarathonSceneProps {
   totalSpaces?: number
 }
 
-const SCENE_HEIGHT = 200
+const SCENE_HEIGHT = 280
 
 const CPU_NAME_MAP: Record<string, string> = {
   Kevin: 'kevin',
@@ -29,7 +29,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
   const hasDirtTrack = !!TILESETS['dirt-track']
   const hasGrass = !!TILESETS.grass
   const laneCount = Math.max(players.length, 1)
-  const laneHeight = Math.min(50, (SCENE_HEIGHT * 0.35) / laneCount)
+  const laneHeight = Math.min(80, (SCENE_HEIGHT * 0.4) / laneCount)
 
   return (
     <div
@@ -197,18 +197,18 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             ) : (
               <div
                 style={{
-                  width: `${laneHeight - 8}px`,
-                  height: `${laneHeight - 8}px`,
-                  borderRadius: '6px',
+                  width: `${laneHeight}px`,
+                  height: `${laneHeight}px`,
+                  borderRadius: '8px',
                   background: fallbackColor,
-                  border: '2px solid rgba(255,255,255,0.4)',
+                  border: '3px solid rgba(255,255,255,0.4)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontFamily: '"Press Start 2P", monospace',
-                  fontSize: '10px',
+                  fontSize: '14px',
                   color: 'white',
-                  textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                 }}
               >
                 {player.name[0]}
