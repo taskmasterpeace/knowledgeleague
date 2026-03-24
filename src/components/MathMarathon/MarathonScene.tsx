@@ -1,4 +1,6 @@
-import { getCharacterAsset, TILESETS, OBJECTS } from '../../utils/pixelArt'
+import { getCharacterRunFrames, TILESETS, OBJECTS } from '../../utils/pixelArt'
+import { AnimatedSprite } from '../shared/AnimatedSprite'
+import { getCustomCharacterFrames } from '../../utils/customCharacters'
 import type { Player } from '../../types'
 
 interface MarathonSceneProps {
@@ -6,7 +8,7 @@ interface MarathonSceneProps {
   totalSpaces?: number
 }
 
-const SCENE_HEIGHT = 280
+const SCENE_HEIGHT = 320
 
 const CPU_NAME_MAP: Record<string, string> = {
   Kevin: 'kevin',
@@ -15,7 +17,6 @@ const CPU_NAME_MAP: Record<string, string> = {
   Mia: 'mia',
 }
 
-// Fallback colors for characters without sprites
 const FALLBACK_COLORS: Record<string, string> = {
   kevin: '#ef4444',
   sally: '#a855f7',
@@ -24,12 +25,25 @@ const FALLBACK_COLORS: Record<string, string> = {
   'default-player': '#3b82f6',
 }
 
+function getPlayerFrames(player: Player): string[] {
+  // Check for custom pixel art character first
+  const customFrames = getCustomCharacterFrames(player.name)
+  if (customFrames.length > 0) return customFrames
+
+  // Fall back to built-in CPU characters
+  if (player.type === 'cpu') {
+    const charKey = CPU_NAME_MAP[player.name] || 'default-player'
+    return getCharacterRunFrames(charKey)
+  }
+  return getCharacterRunFrames('default-player')
+}
+
 export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps) {
   const hasSkyBg = !!OBJECTS['sky-background']
   const hasDirtTrack = !!TILESETS['dirt-track']
   const hasGrass = !!TILESETS.grass
   const laneCount = Math.max(players.length, 1)
-  const laneHeight = Math.min(80, (SCENE_HEIGHT * 0.4) / laneCount)
+  const spriteSize = Math.min(96, Math.floor((SCENE_HEIGHT * 0.45) / laneCount))
 
   return (
     <div
@@ -71,7 +85,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             position: 'absolute',
             left: 0,
             right: 0,
-            top: '52%',
+            top: '48%',
             height: '20%',
             backgroundImage: `url(${TILESETS.grass})`,
             backgroundRepeat: 'repeat-x',
@@ -85,7 +99,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             position: 'absolute',
             left: 0,
             right: 0,
-            top: '52%',
+            top: '48%',
             height: '20%',
             background: 'linear-gradient(180deg, #4ade80 0%, #22c55e 100%)',
           }}
@@ -99,7 +113,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             position: 'absolute',
             left: 0,
             right: 0,
-            top: '60%',
+            top: '56%',
             bottom: 0,
             backgroundImage: `url(${TILESETS['dirt-track']})`,
             backgroundRepeat: 'repeat',
@@ -113,7 +127,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             position: 'absolute',
             left: 0,
             right: 0,
-            top: '60%',
+            top: '56%',
             bottom: 0,
             background: 'linear-gradient(180deg, #92400e 0%, #78350f 100%)',
           }}
@@ -126,7 +140,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
           position: 'absolute',
           left: 0,
           right: 0,
-          top: '62%',
+          top: '58%',
           bottom: '5%',
         }}
       >
@@ -148,9 +162,9 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
       {/* Player sprites */}
       {players.map((player, i) => {
         const xPercent = Math.min((player.position / totalSpaces) * 85 + 5, 90)
-        const laneTop = 62 + (i / laneCount) * 33
+        const laneTop = 58 + (i / laneCount) * 36
+        const frames = getPlayerFrames(player)
         const charKey = player.type === 'cpu' ? (CPU_NAME_MAP[player.name] || 'default-player') : 'default-player'
-        const characterSrc = getCharacterAsset(charKey, 'run')
         const fallbackColor = FALLBACK_COLORS[charKey] || player.color
 
         return (
@@ -171,7 +185,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             <div
               style={{
                 fontFamily: '"Press Start 2P", monospace',
-                fontSize: '7px',
+                fontSize: '8px',
                 color: player.color,
                 textShadow: '1px 1px 0 rgba(0,0,0,0.9)',
                 whiteSpace: 'nowrap',
@@ -180,33 +194,28 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             >
               {player.name}
             </div>
-            {/* Character sprite or fallback */}
-            {characterSrc ? (
-              <img
-                src={characterSrc}
+            {/* Animated character sprite or fallback */}
+            {frames.length > 0 ? (
+              <AnimatedSprite
+                frames={frames}
+                fps={8}
+                width={spriteSize}
+                height={spriteSize}
                 alt={player.name}
-                onError={(e) => {
-                  ;(e.currentTarget as HTMLImageElement).style.display = 'none'
-                }}
-                style={{
-                  width: `${laneHeight}px`,
-                  height: `${laneHeight}px`,
-                  imageRendering: 'pixelated',
-                }}
               />
             ) : (
               <div
                 style={{
-                  width: `${laneHeight}px`,
-                  height: `${laneHeight}px`,
-                  borderRadius: '8px',
+                  width: spriteSize,
+                  height: spriteSize,
+                  borderRadius: '10px',
                   background: fallbackColor,
                   border: '3px solid rgba(255,255,255,0.4)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontFamily: '"Press Start 2P", monospace',
-                  fontSize: '14px',
+                  fontSize: '18px',
                   color: 'white',
                   textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                 }}
@@ -223,7 +232,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
         style={{
           position: 'absolute',
           left: '4%',
-          top: '58%',
+          top: '54%',
           bottom: '2%',
           width: '3px',
           background: 'repeating-linear-gradient(180deg, white 0px, white 4px, transparent 4px, transparent 8px)',
@@ -236,7 +245,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
         style={{
           position: 'absolute',
           right: '4%',
-          top: '58%',
+          top: '54%',
           bottom: '2%',
           width: '6px',
           background: 'repeating-linear-gradient(180deg, white 0px, white 4px, #222 4px, #222 8px)',

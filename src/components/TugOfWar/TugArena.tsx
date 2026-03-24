@@ -1,9 +1,11 @@
-import { getArenaAssets, getCharacterAsset } from '../../utils/pixelArt'
+import { getArenaAssets, getCharacterRunFrames } from '../../utils/pixelArt'
+import { AnimatedSprite } from '../shared/AnimatedSprite'
+import { getCustomCharacterFrames } from '../../utils/customCharacters'
 import type { TugArenaType, Player } from '../../types'
 
 interface TugArenaProps {
   arenaType: TugArenaType
-  ropePosition: number       // -100 (left wins) to +100 (right wins), 0 = center
+  ropePosition: number
   leftTeam: Player[]
   rightTeam: Player[]
 }
@@ -22,12 +24,14 @@ const FALLBACK_COLORS: Record<string, string> = {
   mia: '#f97316',
 }
 
-function getSpriteSrc(player: Player): string {
+function getPlayerFrames(player: Player): string[] {
+  const customFrames = getCustomCharacterFrames(player.name)
+  if (customFrames.length > 0) return customFrames
   if (player.type === 'cpu') {
     const charName = CPU_NAME_MAP[player.name] ?? 'default-player'
-    return getCharacterAsset(charName, 'pull')
+    return getCharacterRunFrames(charName)
   }
-  return getCharacterAsset('default-player', 'pull')
+  return getCharacterRunFrames('default-player')
 }
 
 function getPlayerColor(player: Player): string {
@@ -36,6 +40,8 @@ function getPlayerColor(player: Player): string {
   }
   return player.color
 }
+
+const SPRITE_SIZE = 72
 
 function CenterFeature({ arenaType }: { arenaType: TugArenaType }) {
   switch (arenaType) {
@@ -113,41 +119,38 @@ function getArenaBackground(arenaType: TugArenaType): React.CSSProperties {
 }
 
 function PlayerSprite({ player, flipped }: { player: Player; flipped?: boolean }) {
-  const src = getSpriteSrc(player)
+  const frames = getPlayerFrames(player)
   const color = getPlayerColor(player)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div
-        className="font-pixel text-[6px] text-white text-center mb-0.5 whitespace-nowrap"
+        className="font-pixel text-[7px] text-white text-center mb-0.5 whitespace-nowrap"
         style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)', transform: flipped ? 'scaleX(-1)' : undefined }}
       >
         {player.name}
       </div>
-      {src ? (
-        <img
-          src={src}
+      {frames.length > 0 ? (
+        <AnimatedSprite
+          frames={frames}
+          fps={6}
+          width={SPRITE_SIZE}
+          height={SPRITE_SIZE}
           alt={player.name}
-          onError={(e) => { ;(e.currentTarget as HTMLImageElement).style.display = 'none' }}
-          style={{
-            width: 56,
-            height: 56,
-            imageRendering: 'pixelated',
-          }}
         />
       ) : (
         <div
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: '8px',
+            width: SPRITE_SIZE - 16,
+            height: SPRITE_SIZE - 16,
+            borderRadius: '10px',
             background: color,
             border: '3px solid rgba(255,255,255,0.3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '12px',
+            fontSize: '16px',
             color: 'white',
             textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
           }}
@@ -168,7 +171,7 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
   return (
     <div
       className="rounded-lg overflow-hidden relative"
-      style={{ height: 280, imageRendering: 'pixelated' }}
+      style={{ height: 320, imageRendering: 'pixelated' }}
     >
       {/* Arena background */}
       <div className="absolute inset-0" style={getArenaBackground(arenaType)} />
@@ -213,7 +216,7 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
       <div
         className="absolute left-[10%] right-[10%] transition-transform duration-300"
         style={{
-          top: 170,
+          top: 190,
           height: 8,
           transform: `translateX(${ropePosition * 1.5}px)`,
         }}

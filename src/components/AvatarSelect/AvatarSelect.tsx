@@ -2,31 +2,42 @@ import { useState, useRef, createRef } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { PLAYER_COLORS } from '../../utils/constants'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
-import { generateAvatar, fileToDataUrl } from '../../utils/replicate'
+import { AnimatedSprite } from '../shared/AnimatedSprite'
+import { fileToDataUrl } from '../../utils/replicate'
 import { loadPlayer, savePlayer, clearPlayer } from '../../utils/playerStorage'
+import { sounds } from '../../utils/sounds'
+import { useSettings } from '../../hooks/useSettings'
+import { generatePixelCharacter, hasPixelLabApiKey, setPixelLabApiKey, getPixelLabApiKey } from '../../utils/pixelLabClient'
+import { saveCustomCharacter, getCustomCharacter, deleteCustomCharacter } from '../../utils/customCharacters'
 import type { PlayerId } from '../../types'
+import type { GenerationProgress } from '../../utils/pixelLabClient'
 
-type AvatarMode = 'none' | 'upload' | 'describe'
+type AvatarMode = 'none' | 'describe'
 
 interface PlayerSetup {
   name: string
   mode: AvatarMode
   description: string
-  uploadedImage: string | null
   generating: boolean
+  progress: GenerationProgress | null
   error: string | null
+  previewFrames: string[]
 }
 
 export function AvatarSelect() {
-  const { players, setPlayerName, setPlayerColor, setPlayerAvatar, setPhase } = useGameState()
+  const { players, setPlayerName, setPlayerColor, setPlayerAvatar, setPhase, playerCount } = useGameState()
+  const { soundEnabled } = useSettings()
 
   const humanPlayers = players.filter(p => p.type === 'human')
-  const fileInputRefs = useRef(humanPlayers.map(() => createRef<HTMLInputElement>()))
+
+  const [apiKeyInput, setApiKeyInput] = useState(getPixelLabApiKey())
+  const [showApiKeyInput, setShowApiKeyInput] = useState(!hasPixelLabApiKey())
 
   const [setups, setSetups] = useState<PlayerSetup[]>(() => {
     return humanPlayers.map((p) => {
       const id = p.id as PlayerId
       const saved = loadPlayer(id)
+      const custom = getCustomCharacter(saved?.name || p.name)
       if (saved) {
         if (saved.name) setPlayerName(id, saved.name)
         if (saved.color) setPlayerColor(id, saved.color)
@@ -35,12 +46,21 @@ export function AvatarSelect() {
           name: saved.name || `Player ${id}`,
           mode: 'none' as AvatarMode,
           description: saved.description || '',
-          uploadedImage: null,
           generating: false,
+          progress: null,
           error: null,
+          previewFrames: custom?.runFrames || (custom?.idle ? [custom.idle] : []),
         }
       }
-      return { name: p.name, mode: 'none' as AvatarMode, description: '', uploadedImage: null, generating: false, error: null }
+      return {
+        name: p.name,
+        mode: 'none' as AvatarMode,
+        description: '',
+        generating: false,
+        progress: null,
+        error: null,
+        previewFrames: [],
+      }
     })
   })
 
@@ -54,48 +74,72 @@ export function AvatarSelect() {
     setSetups(prev => prev.map((s, i) => i === idx ? { ...s, ...patch } : s))
   }
 
-  const handleFileUpload = async (idx: number, file: File) => {
-    const dataUrl = await fileToDataUrl(file)
-    updateSetup(idx, { uploadedImage: dataUrl, mode: 'upload' })
-  }
-
   const handleGenerate = async (idx: number) => {
     const setup = setups[idx]
     const playerId = humanPlayers[idx]?.id as PlayerId
     if (!playerId) return
 
-    updateSetup(idx, { generating: true, error: null })
+    if (!hasPixelLabApiKey()) {
+      updateSetup(idx, { error: 'Please enter your PixelLab API key first' })
+      setShowApiKeyInput(true)
+      return
+    }
+
+    const description = setup.description.trim()
+    if (!description) {
+      updateSetup(idx, { error: 'Please describe your character first' })
+      return
+    }
+
+    updateSetup(idx, { generating: true, error: null, progress: { step: 'starting', detail: 'Starting...' } })
 
     try {
-      let prompt = ''
-      let inputImage: string | undefined
+      const result = await generatePixelCharacter(description, (progress) => {
+        updateSetup(idx, { progress })
+      })
 
-      if (setup.mode === 'upload' && setup.uploadedImage) {
-        prompt = setup.name || `Player ${playerId}`
-        inputImage = setup.uploadedImage
-      } else if (setup.mode === 'describe' && setup.description.trim()) {
-        prompt = setup.description.trim()
-      } else {
-        prompt = `${setup.name || `Player ${playerId}`}, game character`
-      }
+      // Save the custom character
+      saveCustomCharacter({
+        name: setup.name || `Player ${playerId}`,
+        description,
+        idle: result.idle,
+        runFrames: result.runFrames,
+        south: result.south,
+        createdAt: new Date().toISOString(),
+      })
 
-      const url = await generateAvatar({ prompt, inputImage })
-      setPlayerAvatar(playerId, url)
-      updateSetup(idx, { generating: false })
+      // Set the portrait as avatar for non-pixel-art contexts
+      setPlayerAvatar(playerId, result.south || result.idle)
+
+      updateSetup(idx, {
+        generating: false,
+        progress: null,
+        previewFrames: result.runFrames.length > 0 ? result.runFrames : (result.idle ? [result.idle] : []),
+      })
+
+      if (soundEnabled) sounds.correct()
     } catch (err) {
       updateSetup(idx, {
         generating: false,
+        progress: null,
         error: err instanceof Error ? err.message : 'Generation failed',
       })
     }
   }
 
   const handleClearPlayer = (idx: number, id: PlayerId) => {
+    const setup = setups[idx]
     clearPlayer(id)
+    deleteCustomCharacter(setup.name)
     setWelcomeBack(prev => ({ ...prev, [id]: false }))
     setPlayerAvatar(id, '')
-    updateSetup(idx, { name: `Player ${id}`, description: '', uploadedImage: null })
+    updateSetup(idx, { name: `Player ${id}`, description: '', previewFrames: [] })
     setPlayerName(id, `Player ${id}`)
+  }
+
+  const handleSaveApiKey = () => {
+    setPixelLabApiKey(apiKeyInput.trim())
+    setShowApiKeyInput(false)
   }
 
   const handleContinue = () => {
@@ -116,8 +160,43 @@ export function AvatarSelect() {
   const anyGenerating = setups.some(s => s.generating)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-500 to-blue-700 flex flex-col items-center justify-center gap-6 p-8">
-      <h2 className="text-5xl font-black text-white tracking-tight">CREATE YOUR PLAYER{humanPlayers.length > 1 ? 'S' : ''}</h2>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col items-center justify-center gap-6 p-8 relative">
+      {/* Back button */}
+      <button
+        onClick={() => { if (soundEnabled) sounds.navigate(); setPhase('menu') }}
+        className="absolute top-6 left-6 pixel-card px-4 py-2 rounded-lg font-pixel text-[8px] text-white/70 hover:text-white hover:scale-105 transition-all"
+      >
+        BACK
+      </button>
+
+      <div className="text-center">
+        <h2 className="font-pixel text-2xl text-white text-glow leading-relaxed">CREATE YOUR</h2>
+        <h2 className="font-pixel text-2xl text-cyan-300 text-glow leading-relaxed">CHARACTER{humanPlayers.length > 1 ? 'S' : ''}</h2>
+      </div>
+
+      {/* API Key Setup */}
+      {showApiKeyInput && (
+        <div className="pixel-card rounded-lg p-4 max-w-md w-full">
+          <p className="text-white/70 text-sm mb-2">Enter your PixelLab API key to generate custom pixel art characters:</p>
+          <div className="flex gap-2">
+            <input
+              type="password"
+              value={apiKeyInput}
+              onChange={(e) => setApiKeyInput(e.target.value)}
+              placeholder="PixelLab API Key"
+              className="flex-1 text-sm bg-white/10 text-white placeholder-white/30 border border-white/20 rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-400/50"
+            />
+            <button
+              onClick={handleSaveApiKey}
+              disabled={!apiKeyInput.trim()}
+              className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:bg-gray-500/50 text-white rounded-lg text-sm font-bold transition-all"
+            >
+              Save
+            </button>
+          </div>
+          <p className="text-white/40 text-xs mt-2">Get a key at pixellab.ai — each character costs ~2 generations</p>
+        </div>
+      )}
 
       <div className="flex gap-6 flex-wrap justify-center">
         {humanPlayers.map((player, idx) => {
@@ -125,22 +204,35 @@ export function AvatarSelect() {
           if (!setup) return null
           const pid = player.id as PlayerId
           return (
-            <div key={player.id} className="flex flex-col items-center gap-3 bg-white/10 backdrop-blur rounded-2xl p-6 border-2 border-white/20 w-72">
-              {/* Avatar preview */}
+            <div key={player.id} className="flex flex-col items-center gap-3 pixel-card rounded-lg p-6 w-80">
+              {/* Character preview */}
               <div className="relative">
-                {player.avatarUrl ? (
+                {setup.previewFrames.length > 0 ? (
+                  <div className="rounded-xl border-2 border-white/40 bg-black/30 p-2 flex items-center justify-center" style={{ width: 120, height: 120 }}>
+                    <AnimatedSprite
+                      frames={setup.previewFrames}
+                      fps={8}
+                      width={96}
+                      height={96}
+                      alt={setup.name}
+                    />
+                  </div>
+                ) : player.avatarUrl ? (
                   <img
                     src={player.avatarUrl}
                     alt={`${player.name} avatar`}
-                    className="w-24 h-24 rounded-xl border-2 border-white/40 object-cover"
+                    className="w-28 h-28 rounded-xl border-2 border-white/40 object-cover"
                     style={{ imageRendering: 'pixelated' }}
                   />
                 ) : (
-                  <PlayerAvatar name={setup.name || `P${player.id}`} color={player.color} size={70} />
+                  <PlayerAvatar name={setup.name || `P${player.id}`} color={player.color} size={80} />
                 )}
                 {setup.generating && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-xl gap-2">
                     <div className="w-8 h-8 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                    {setup.progress && (
+                      <span className="text-white/80 text-[10px] font-pixel text-center px-2">{setup.progress.detail}</span>
+                    )}
                   </div>
                 )}
               </div>
@@ -165,83 +257,53 @@ export function AvatarSelect() {
                 onChange={(e) => updateSetup(idx, { name: e.target.value })}
                 placeholder={`Player ${player.id} name`}
                 maxLength={10}
-                className="text-center text-xl font-bold bg-white/20 text-white placeholder-white/40 border-2 border-white/30 rounded-xl px-3 py-2 w-full focus:outline-none focus:border-white/60"
+                className="text-center font-pixel text-sm bg-white/10 text-white placeholder-white/30 border border-white/20 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-cyan-400/50"
               />
 
               {/* Color picker */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap justify-center">
                 {PLAYER_COLORS.map((color) => (
                   <button
                     key={color}
                     onClick={() => setPlayerColor(pid, color)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${player.color === color ? 'border-white scale-125' : 'border-transparent hover:scale-110'}`}
-                    style={{ backgroundColor: color }}
+                    className={`w-6 h-6 rounded-full border-2 transition-all ${player.color === color ? 'border-white scale-125' : 'border-white/20 hover:scale-110'}`}
+                    style={{ backgroundColor: color, opacity: player.color === color ? 1 : 0.6 }}
                   />
                 ))}
               </div>
 
-              {/* Avatar mode selector */}
-              <div className="flex gap-2 w-full">
-                <button
-                  onClick={() => updateSetup(idx, { mode: 'upload' })}
-                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold transition-all ${setup.mode === 'upload' ? 'bg-white/30 text-white' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
-                >
-                  Upload Photo
-                </button>
-                <button
-                  onClick={() => updateSetup(idx, { mode: 'describe' })}
-                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold transition-all ${setup.mode === 'describe' ? 'bg-white/30 text-white' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
-                >
-                  Describe Me
-                </button>
-              </div>
+              {/* Describe your character */}
+              <button
+                onClick={() => updateSetup(idx, { mode: setup.mode === 'describe' ? 'none' : 'describe' })}
+                className={`w-full py-2.5 px-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+                  setup.mode === 'describe'
+                    ? 'bg-purple-500/30 text-purple-200 border border-purple-400/30'
+                    : 'bg-white/10 text-white/70 hover:bg-white/20 border border-white/10'
+                }`}
+              >
+                <span style={{ fontSize: '16px' }}>&#x1F3A8;</span>
+                Create Pixel Art Character
+              </button>
 
-              {/* Upload mode */}
-              {setup.mode === 'upload' && (
-                <div className="w-full flex flex-col gap-2">
-                  <input
-                    ref={fileInputRefs.current[idx]}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) handleFileUpload(idx, file)
-                    }}
-                  />
-                  <button
-                    onClick={() => fileInputRefs.current[idx]?.current?.click()}
-                    className="w-full py-2 bg-white/15 hover:bg-white/25 text-white rounded-lg text-sm font-medium transition-all border border-dashed border-white/30"
-                  >
-                    {setup.uploadedImage ? 'Change Photo' : 'Choose Photo'}
-                  </button>
-                  {setup.uploadedImage && (
-                    <img src={setup.uploadedImage} alt="Upload preview" className="w-16 h-16 rounded-lg object-cover mx-auto border border-white/30" />
-                  )}
-                </div>
-              )}
-
-              {/* Describe mode */}
               {setup.mode === 'describe' && (
-                <textarea
-                  value={setup.description}
-                  onChange={(e) => updateSetup(idx, { description: e.target.value })}
-                  placeholder="Describe how you look... e.g. 'A girl with curly brown hair and glasses wearing a blue hoodie'"
-                  maxLength={200}
-                  rows={3}
-                  className="w-full text-sm bg-white/20 text-white placeholder-white/40 border-2 border-white/30 rounded-xl px-3 py-2 focus:outline-none focus:border-white/60 resize-none"
-                />
-              )}
+                <div className="w-full flex flex-col gap-3">
+                  <textarea
+                    value={setup.description}
+                    onChange={(e) => updateSetup(idx, { description: e.target.value })}
+                    placeholder="Describe how you want to look...&#10;&#10;Examples:&#10;- A pink furry monster with big eyes&#10;- A girl with colorful hair beads and a pink shirt&#10;- A blue robot with a jetpack&#10;- A ninja cat with a sword"
+                    maxLength={200}
+                    rows={4}
+                    className="w-full text-sm bg-white/10 text-white placeholder-white/40 border border-white/20 rounded-lg px-3 py-2 focus:outline-none focus:border-purple-400/50 resize-none"
+                  />
 
-              {/* Generate button */}
-              {setup.mode !== 'none' && (
-                <button
-                  onClick={() => handleGenerate(idx)}
-                  disabled={setup.generating || (setup.mode === 'upload' && !setup.uploadedImage) || (setup.mode === 'describe' && !setup.description.trim())}
-                  className="w-full py-2 bg-purple-500 hover:bg-purple-400 disabled:bg-gray-500/50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-bold transition-all"
-                >
-                  {setup.generating ? 'Generating...' : 'Generate Character'}
-                </button>
+                  <button
+                    onClick={() => handleGenerate(idx)}
+                    disabled={setup.generating || !setup.description.trim()}
+                    className="w-full py-2.5 bg-purple-500 hover:bg-purple-400 disabled:bg-gray-500/50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-bold transition-all"
+                  >
+                    {setup.generating ? 'Generating...' : setup.previewFrames.length > 0 ? 'Regenerate Character' : 'Generate Character'}
+                  </button>
+                </div>
               )}
 
               {/* Error */}
@@ -253,10 +315,20 @@ export function AvatarSelect() {
         })}
       </div>
 
+      {/* API key toggle */}
+      {!showApiKeyInput && (
+        <button
+          onClick={() => setShowApiKeyInput(true)}
+          className="text-white/30 hover:text-white/60 text-xs transition-colors"
+        >
+          {hasPixelLabApiKey() ? 'Change API Key' : 'Set PixelLab API Key'}
+        </button>
+      )}
+
       <button
-        onClick={handleContinue}
+        onClick={() => { if (soundEnabled) sounds.select(); handleContinue() }}
         disabled={anyGenerating}
-        className="py-4 px-14 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-500/50 text-gray-900 text-3xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg mt-2"
+        className="pixel-btn font-pixel py-4 px-14 bg-yellow-500 hover:bg-yellow-400 disabled:bg-gray-500/50 text-gray-900 text-sm rounded-lg transition-all hover:scale-105 active:scale-95 mt-2"
       >
         {anyGenerating ? 'GENERATING...' : 'NEXT'}
       </button>
