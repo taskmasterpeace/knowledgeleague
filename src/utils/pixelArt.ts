@@ -23,7 +23,12 @@ const CHARACTERS: Record<string, CharacterAssets> = {
   },
   sally: {
     idle: `${BASE}/characters/sally/sally-east.png`,
-    run: [`${BASE}/characters/sally/sally-east.png`], // no animation yet — use static
+    run: [
+      `${BASE}/characters/sally/sally_run-east-frame0.png`,
+      `${BASE}/characters/sally/sally_run-east-frame1.png`,
+      `${BASE}/characters/sally/sally_run-east-frame2.png`,
+      `${BASE}/characters/sally/sally_run-east-frame3.png`,
+    ],
     south: `${BASE}/characters/sally/sally-south.png`,
   },
   benny: {
