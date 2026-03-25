@@ -26,9 +26,26 @@ const CHARACTERS: Record<string, CharacterAssets> = {
     run: [`${BASE}/characters/sally/sally-east.png`], // no animation yet — use static
     south: `${BASE}/characters/sally/sally-south.png`,
   },
-  // Characters not yet generated — will use fallback colored squares
-  benny: { idle: '', run: [], south: '' },
-  mia: { idle: '', run: [], south: '' },
+  benny: {
+    idle: `${BASE}/characters/benny/benny-east.png`,
+    run: [
+      `${BASE}/characters/benny/benny_run-east-frame0.png`,
+      `${BASE}/characters/benny/benny_run-east-frame1.png`,
+      `${BASE}/characters/benny/benny_run-east-frame2.png`,
+      `${BASE}/characters/benny/benny_run-east-frame3.png`,
+    ],
+    south: `${BASE}/characters/benny/benny-south.png`,
+  },
+  mia: {
+    idle: `${BASE}/characters/mia/mia-east.png`,
+    run: [
+      `${BASE}/characters/mia/mia_run-east-frame0.png`,
+      `${BASE}/characters/mia/mia_run-east-frame1.png`,
+      `${BASE}/characters/mia/mia_run-east-frame2.png`,
+      `${BASE}/characters/mia/mia_run-east-frame3.png`,
+    ],
+    south: `${BASE}/characters/mia/mia-south.png`,
+  },
   'default-player': { idle: '', run: [], south: '' },
 }
 
