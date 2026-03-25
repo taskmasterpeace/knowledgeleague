@@ -18,7 +18,7 @@ export interface Settings {
   behaviorTags: 'spectators-only' | 'post-game' | 'always'
 }
 
-const STORAGE_KEY = 'brainGames:settings'
+const STORAGE_KEY = 'knowledgeLeagueKids:settings'
 const LEGACY_KEY = 'mathMuscle:settings'
 
 const defaults: Settings = {
@@ -42,7 +42,7 @@ function loadSettings(): Settings {
   try {
     const stored = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_KEY)
     if (stored) return { ...defaults, ...JSON.parse(stored) }
-  } catch {}
+  } catch { /* ignored */ }
   return defaults
 }
 
@@ -56,7 +56,7 @@ export const useSettings = create<SettingsStore>((set) => ({
 
   update: (patch) => set((s) => {
     const next = { ...s, ...patch }
-    const { update: _, reset: __, ...data } = next
+    const { update: _update, reset: _reset, ...data } = next // eslint-disable-line @typescript-eslint/no-unused-vars
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
     return patch
   }),

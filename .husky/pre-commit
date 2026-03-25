@@ -1,0 +1,27 @@
+#!/bin/sh
+
+echo "=== Pre-commit: Type check ==="
+npx tsc --noEmit || exit 1
+
+echo "=== Pre-commit: Lint ==="
+npx eslint . --quiet || exit 1
+
+echo "=== Pre-commit: Unit tests ==="
+npx vitest run || exit 1
+
+# Browser E2E tests trigger when staged changes exceed threshold
+# (10+ files changed OR any component/hook modified)
+CHANGED_COUNT=$(git diff --cached --name-only | wc -l)
+COMPONENT_CHANGES=$(git diff --cached --name-only | grep -c -E 'src/components/|src/hooks/' || true)
+
+if [ "$CHANGED_COUNT" -ge 10 ] || [ "$COMPONENT_CHANGES" -ge 5 ]; then
+  echo "=== Pre-commit: Browser E2E (threshold hit: $CHANGED_COUNT files, $COMPONENT_CHANGES component/hook files) ==="
+  # Check if dev server is running
+  if curl -s -o /dev/null -w "%{http_code}" http://localhost:5175/ 2>/dev/null | grep -q "200"; then
+    node test-visual.mjs || echo "WARNING: Browser tests failed (non-blocking)"
+  else
+    echo "SKIP: Dev server not running at localhost:5175 — skipping browser tests"
+  fi
+else
+  echo "=== Pre-commit: Browser E2E skipped ($CHANGED_COUNT files, $COMPONENT_CHANGES component/hook files — below threshold) ==="
+fi

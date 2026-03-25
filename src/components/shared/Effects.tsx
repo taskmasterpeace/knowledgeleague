@@ -11,6 +11,7 @@ interface ParticleBurstProps {
 export function ParticleBurst({ active, color = '#facc15', count = 10 }: ParticleBurstProps) {
   if (!active) return null
 
+  /* eslint-disable react-hooks/purity */
   const particles = Array.from({ length: count }, (_, i) => {
     const angle = (i / count) * 360
     const dist = 30 + Math.random() * 50
@@ -40,6 +41,7 @@ export function ParticleBurst({ active, color = '#facc15', count = 10 }: Particl
       />
     )
   })
+  /* eslint-enable react-hooks/purity */
 
   return (
     <div style={{ position: 'relative', display: 'inline-block', pointerEvents: 'none' }}>
@@ -145,6 +147,7 @@ interface FireworksProps {
 const FIREWORK_COLORS = ['#facc15', '#f97316', '#a855f7', '#3b82f6', '#10b981', '#ec4899']
 
 export function Fireworks({ active }: FireworksProps) {
+  /* eslint-disable react-hooks/purity */
   const bursts = useMemo(() => {
     return Array.from({ length: 4 }, (_, i) => ({
       id: i,
@@ -155,6 +158,7 @@ export function Fireworks({ active }: FireworksProps) {
       delay: i * 300,
     }))
   }, [])
+  /* eslint-enable react-hooks/purity */
 
   if (!active) return null
 

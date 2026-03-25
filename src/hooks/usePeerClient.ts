@@ -22,6 +22,7 @@ interface HostMessage {
 
 export function usePeerClient() {
   const [connected, setConnected] = useState(false)
+  const [connectionError, setConnectionError] = useState<string | null>(null)
   const [playerId, setPlayerId] = useState<number | null>(null)
   const [role, setRole] = useState<'player' | 'spectator'>('player')
   const [question, setQuestion] = useState<string | null>(null)
@@ -31,9 +32,9 @@ export function usePeerClient() {
   const [correctIndex, setCorrectIndex] = useState<number | null>(null)
   const [myChoiceIndex, setMyChoiceIndex] = useState<number | null>(null)
   const [gameOver, setGameOver] = useState<GameOverData | null>(null)
-  const [spectatorData, setSpectatorData] = useState<any>(null)
-  const [personalStats, setPersonalStats] = useState<any>(null)
-  const [superlatives, setSuperlatives] = useState<any>(null)
+  const [spectatorData, setSpectatorData] = useState<Record<string, unknown> | null>(null)
+  const [personalStats, setPersonalStats] = useState<Record<string, unknown> | null>(null)
+  const [superlatives, setSuperlatives] = useState<Record<string, unknown>[] | null>(null)
   const connRef = useRef<DataConnection | null>(null)
   const peerRef = useRef<Peer | null>(null)
 
@@ -47,16 +48,36 @@ export function usePeerClient() {
 
   const connect = useCallback((roomId: string, name: string, connectRole: 'player' | 'spectator' = 'player') => {
     setRole(connectRole)
+    setConnectionError(null)
     const peer = new Peer()
     peerRef.current = peer
 
+    peer.on('error', (err) => {
+      console.error('PeerJS error:', err)
+      setConnectionError(`Connection failed: ${err.type}`)
+    })
+
+    // Timeout if connection doesn't establish within 10 seconds
+    const timeout = setTimeout(() => {
+      if (!connRef.current || connRef.current.open !== true) {
+        setConnectionError('Connection timed out — make sure the game is running on the TV/computer')
+      }
+    }, 10000)
+
     peer.on('open', () => {
-      const conn = peer.connect(`braingames-${roomId}`)
+      const conn = peer.connect(`klkids-${roomId}`)
       connRef.current = conn
 
       conn.on('open', () => {
+        clearTimeout(timeout)
         setConnected(true)
         conn.send({ type: 'join', name, role: connectRole })
+      })
+
+      conn.on('error', (err) => {
+        clearTimeout(timeout)
+        console.error('Connection error:', err)
+        setConnectionError('Could not connect to game room')
       })
 
       conn.on('data', (raw) => {
@@ -80,13 +101,13 @@ export function usePeerClient() {
         } else if (data.type === 'spectatorInit') {
           setSpectatorData({ players: data.players ?? [] })
         } else if (data.type === 'spectatorUpdate') {
-          setSpectatorData((prev: any) => ({ ...(prev ?? {}), ...data }))
+          setSpectatorData((prev) => ({ ...(prev ?? {}), ...data }))
         } else if (data.type === 'statsUpdate') {
-          const { type: _type, ...stats } = data as any
+          const { type: _type, ...stats } = data as Record<string, unknown> // eslint-disable-line @typescript-eslint/no-unused-vars
           if (stats.superlatives !== undefined) {
-            setSuperlatives(stats.superlatives)
+            setSuperlatives(stats.superlatives as Record<string, unknown>[])
           }
-          setPersonalStats((prev: any) => ({ ...(prev ?? {}), ...stats }))
+          setPersonalStats((prev) => ({ ...(prev ?? {}), ...stats }))
         } else if (data.type === 'lobbyFull') {
           setConnected(false)
           conn.close()
@@ -107,7 +128,7 @@ export function usePeerClient() {
   }, [])
 
   return {
-    connected, playerId, role, question, choices, subject,
+    connected, connectionError, playerId, role, question, choices, subject,
     lockedIn, correctIndex, myChoiceIndex, gameOver,
     spectatorData, personalStats, superlatives,
     sendAnswer, connect,

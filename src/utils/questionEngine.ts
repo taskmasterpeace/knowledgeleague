@@ -1,5 +1,4 @@
-import type { GameQuestion, Subject, GradeLevel, Difficulty, QuestionCategory, AdaptiveTier } from '../types'
-import { tierToGradeLevel, tierToDifficulty } from './adaptiveDifficulty'
+import type { GameQuestion, Subject, GradeLevel, Difficulty, QuestionCategory } from '../types'
 import { generateProblem, getDifficulty, GRADE_MATH_CATEGORIES } from './mathProblems'
 import { getStandard } from './standardsMap'
 
@@ -17,25 +16,29 @@ let readingBanks: Record<GradeLevel, BankQuestion[]> | null = null
 
 async function loadBanks() {
   if (!scienceBanks) {
-    const [s1, s3, sa] = await Promise.all([
+    const [s1, s2, s3, sa] = await Promise.all([
       import('../data/science/grade-1.json'),
+      import('../data/science/grade-2.json'),
       import('../data/science/grade-3.json'),
       import('../data/science/adult.json'),
     ])
     scienceBanks = {
       'grade-1': s1.default as BankQuestion[],
+      'grade-2': s2.default as BankQuestion[],
       'grade-3': s3.default as BankQuestion[],
       'adult': sa.default as BankQuestion[],
     }
   }
   if (!readingBanks) {
-    const [r1, r3, ra] = await Promise.all([
+    const [r1, r2, r3, ra] = await Promise.all([
       import('../data/reading/grade-1.json'),
+      import('../data/reading/grade-2.json'),
       import('../data/reading/grade-3.json'),
       import('../data/reading/adult.json'),
     ])
     readingBanks = {
       'grade-1': r1.default as BankQuestion[],
+      'grade-2': r2.default as BankQuestion[],
       'grade-3': r3.default as BankQuestion[],
       'adult': ra.default as BankQuestion[],
     }
@@ -47,7 +50,7 @@ loadBanks()
 
 // Track recently shown questions to avoid repeats
 const recentlyShown = new Set<string>()
-const MAX_RECENT = 30
+const MAX_RECENT = 100
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -120,7 +123,7 @@ function mathToGameQuestion(
     if (filtered.length > 0) mathCats = filtered
   }
 
-  const problem = generateProblem(difficulty, mathCats as any)
+  const problem = generateProblem(difficulty, mathCats as ProblemType[])
 
   return {
     question: problem.question,
@@ -180,12 +183,3 @@ export function resetQuestionEngine(): void {
 
 export { getDifficulty }
 
-export function generateQuestionForTier(
-  tier: AdaptiveTier,
-  enabledSubjects: Subject[],
-  enabledCategories?: QuestionCategory[],
-): GameQuestion {
-  const gradeLevel = tierToGradeLevel(tier)
-  const difficulty = tierToDifficulty(tier)
-  return generateQuestion({ enabledSubjects, gradeLevel, difficulty, enabledCategories })
-}

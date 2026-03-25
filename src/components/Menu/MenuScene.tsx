@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { getCharacterIdle, getRandomMenuObject, TILESETS, MENU_OBJECTS } from '../../utils/pixelArt'
 
 const CPU_NAMES = ['kevin', 'sally', 'benny', 'mia']
@@ -34,16 +34,14 @@ const FALLBACK_COLORS: Record<string, string> = {
 }
 
 export function MenuScene() {
-  const [flyingObjects, setFlyingObjects] = useState<FlyingObject[]>([])
-
-  useEffect(() => {
+  const [flyingObjects] = useState<FlyingObject[]>(() => {
     if (MENU_OBJECTS.length > 0) {
-      const objects = Array.from({ length: 3 }, (_, i) =>
+      return Array.from({ length: 3 }, (_, i) =>
         generateFlyingObject(i * randomBetween(3, 8))
       )
-      setFlyingObjects(objects)
     }
-  }, [])
+    return []
+  })
 
   return (
     <div

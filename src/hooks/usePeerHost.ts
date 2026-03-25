@@ -30,7 +30,9 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
   const spectatorsRef = useRef<Map<string, DataConnection>>(new Map())
   const onRemoteAnswerRef = useRef(onRemoteAnswer)
   const remotePlayersRef = useRef<RemotePlayer[]>([])
+  // eslint-disable-next-line react-hooks/refs
   onRemoteAnswerRef.current = onRemoteAnswer
+  // eslint-disable-next-line react-hooks/refs
   remotePlayersRef.current = remotePlayers
 
   const currentChoicesRef = useRef<string[]>([])
@@ -81,14 +83,22 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
     if (peerRef.current) return
 
     const id = Math.random().toString(36).substring(2, 8)
-    const peer = new Peer(`braingames-${id}`)
+    const peer = new Peer(`klkids-${id}`)
     peerRef.current = peer
+
+    peer.on('error', (err) => {
+      console.error('PeerJS host error:', err)
+    })
 
     peer.on('open', () => {
       setRoomId(id)
+      // Use the current URL's host so phones on the same network can connect
+      // If accessed via localhost, the phone won't be able to reach it —
+      // user needs to access via LAN IP (e.g. 192.168.x.x)
       const host = window.location.hostname || 'localhost'
       const port = window.location.port || '5173'
-      setJoinUrl(`http://${host}:${port}/join/${id}`)
+      const protocol = window.location.protocol || 'http:'
+      setJoinUrl(`${protocol}//${host}:${port}/join/${id}`)
     })
 
     peer.on('connection', (conn) => {

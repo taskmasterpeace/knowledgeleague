@@ -4,7 +4,14 @@ import { usePeerContext } from '../../hooks/usePeerContext'
 import { getLastGameAnalytics } from '../../utils/gameAnalyticsStore'
 import { computeSuperlatives } from '../../utils/playerAnalytics'
 import { sounds } from '../../utils/sounds'
-import type { PlayerAnalytics, BehaviorTag, Superlative } from '../../types'
+import type { BehaviorTag, Superlative } from '../../types'
+
+function tierLabel(tier: number | undefined): string {
+  if (tier === 1) return 'EASY'
+  if (tier === 2) return 'MEDIUM'
+  if (tier === 3) return 'HARD'
+  return `TIER ${tier}`
+}
 
 const TAG_EMOJI: Record<BehaviorTag, string> = {
   'on-fire': '🔥',
@@ -17,8 +24,8 @@ const TAG_EMOJI: Record<BehaviorTag, string> = {
 }
 
 export function PostGameStats() {
-  const { setPhase, rematch, players } = useGameState()
-  const { } = usePeerContext()
+  const { setPhase, rematch } = useGameState()
+  usePeerContext()
 
   const { analytics, playerNames } = useMemo(() => getLastGameAnalytics(), [])
 
@@ -28,13 +35,13 @@ export function PostGameStats() {
   }, [analytics, playerNames])
 
   useEffect(() => {
-    sounds.menuSelect?.()
+    sounds.navigate()
   }, [])
 
   // Empty state
   if (!analytics || analytics.size === 0) {
     return (
-      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-6 p-8">
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col items-center justify-center gap-6 p-8">
         <div className="font-pixel text-white/60 text-sm">NO STATS AVAILABLE</div>
         <button
           onClick={() => setPhase('trophies')}
@@ -49,7 +56,7 @@ export function PostGameStats() {
   const playerEntries = [...analytics.entries()]
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center gap-8 p-6 overflow-y-auto">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col items-center gap-8 p-6 overflow-y-auto">
       {/* Header */}
       <div className="text-center mt-4">
         <h1 className="font-pixel text-xl text-cyan-300 tracking-wide">GAME STATS</h1>
@@ -63,8 +70,11 @@ export function PostGameStats() {
           const accuracy = stat.answersTotal > 0
             ? Math.round((stat.answersCorrect / stat.answersTotal) * 100)
             : 0
+          const avgTimeMs = stat.responseTimes.length > 0
+            ? stat.responseTimes.reduce((s, t) => s + t, 0) / stat.responseTimes.length
+            : 0
           const avgTime = stat.responseTimes.length > 0
-            ? (stat.responseTimes.reduce((s, t) => s + t, 0) / stat.responseTimes.length / 1000).toFixed(1)
+            ? `${(avgTimeMs / 1000).toFixed(1)}s`
             : '—'
           const tagEmoji = TAG_EMOJI[stat.behaviorTag] ?? '🎮'
 
@@ -109,14 +119,14 @@ export function PostGameStats() {
               {/* Avg response time */}
               <div className="flex flex-col items-center gap-0.5">
                 <div className="font-pixel text-[8px] text-white/50 uppercase">Avg Time</div>
-                <div className="font-pixel text-sm text-green-300">{avgTime}s</div>
+                <div className="font-pixel text-sm text-green-300">{avgTime}</div>
               </div>
 
               {/* Adaptive tier progression */}
               {tierChanged && (
                 <div className="flex items-center justify-center gap-1 bg-purple-900/30 rounded px-2 py-1">
                   <span className="font-pixel text-[7px] text-purple-300">
-                    TIER {firstTier} → {lastTier}
+                    {tierLabel(firstTier)} → {tierLabel(lastTier)}
                     {(lastTier ?? 0) > (firstTier ?? 0) ? ' ▲' : ' ▼'}
                   </span>
                 </div>

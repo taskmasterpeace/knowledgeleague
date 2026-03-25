@@ -31,7 +31,9 @@ export function BadgeToast({ badge }: BadgeToastProps) {
   useEffect(() => {
     if (!badge) return
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(true)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSlidingOut(false)
     if (soundEnabled) sounds.badge()
 

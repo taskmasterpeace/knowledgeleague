@@ -17,7 +17,7 @@ export function loadPlayer(id: PlayerId): SavedPlayer | null {
   try {
     const stored = localStorage.getItem(`${KEY_PREFIX}${id}`)
     if (stored) return JSON.parse(stored)
-  } catch {}
+  } catch { /* ignored */ }
   return null
 }
 

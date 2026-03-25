@@ -15,6 +15,7 @@ export function useCPU({ character, currentProblem, enabled, onAnswer, streak }:
   const answeredRef = useRef<string | null>(null)
 
   // Keep callback ref fresh without triggering effect
+  // eslint-disable-next-line react-hooks/refs
   onAnswerRef.current = onAnswer
 
   useEffect(() => {

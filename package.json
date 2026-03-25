@@ -1,5 +1,5 @@
 {
-  "name": "braingames",
+  "name": "knowledge-league-kids",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,17 +7,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:browser": "node test-visual.mjs",
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
-    "@react-three/cannon": "^6.6.0",
-    "@react-three/fiber": "^9.5.0",
-    "@types/three": "^0.183.1",
     "peerjs": "^1.5.5",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-qr-code": "^2.0.18",
-    "three": "^0.183.2",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
@@ -33,7 +33,9 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "jsdom": "^28.1.0",
+    "playwright": "^1.58.2",
     "tailwindcss": "^4.2.1",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0",

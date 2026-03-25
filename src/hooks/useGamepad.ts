@@ -2,12 +2,8 @@ import { useEffect, useRef, useCallback } from 'react'
 
 export type ControllerType = 'xbox' | 'playstation' | 'generic' | null
 
-interface GamepadState {
-  controllerType: ControllerType
-  // Face buttons mapped to answer indices 0-3
-  // Xbox: A=0, B=1, X=2, Y=3
-  // PS: Cross=0, Circle=1, Square=2, Triangle=3
-}
+// GamepadState: controllerType with face buttons mapped to answer indices 0-3
+// Xbox: A=0, B=1, X=2, Y=3  |  PS: Cross=0, Circle=1, Square=2, Triangle=3
 
 function detectControllerType(gamepad: Gamepad): ControllerType {
   const id = gamepad.id.toLowerCase()
@@ -61,6 +57,7 @@ export function useGamepad({ onP1Answer, onP2Answer, enabled, onControllerChange
   onControllerRef.current = onControllerChange
   onPauseRef.current = onPause
 
+  /* eslint-disable react-hooks/immutability */
   const poll = useCallback(() => {
     if (!enabled) {
       rafRef.current = requestAnimationFrame(poll)
@@ -106,6 +103,7 @@ export function useGamepad({ onP1Answer, onP2Answer, enabled, onControllerChange
 
     rafRef.current = requestAnimationFrame(poll)
   }, [enabled])
+  /* eslint-enable react-hooks/immutability */
 
   useEffect(() => {
     rafRef.current = requestAnimationFrame(poll)
@@ -113,17 +111,6 @@ export function useGamepad({ onP1Answer, onP2Answer, enabled, onControllerChange
   }, [poll])
 }
 
-export function vibrateController(durationMs = 200, intensity = 0.5) {
-  const gamepads = navigator.getGamepads()
-  for (const gp of gamepads) {
-    if (!gp?.vibrationActuator) continue
-    gp.vibrationActuator.playEffect('dual-rumble', {
-      duration: durationMs,
-      strongMagnitude: intensity,
-      weakMagnitude: intensity * 0.5,
-    }).catch(() => {})
-  }
-}
 
 // Button label configs for different controller types
 export const BUTTON_LABELS: Record<Exclude<ControllerType, null>, { labels: string[]; colors: string[] }> = {

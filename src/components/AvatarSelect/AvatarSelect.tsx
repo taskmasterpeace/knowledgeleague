@@ -1,9 +1,8 @@
-import { useState, useRef, createRef } from 'react'
+import { useState } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { PLAYER_COLORS } from '../../utils/constants'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { AnimatedSprite } from '../shared/AnimatedSprite'
-import { fileToDataUrl } from '../../utils/replicate'
 import { loadPlayer, savePlayer, clearPlayer } from '../../utils/playerStorage'
 import { sounds } from '../../utils/sounds'
 import { useSettings } from '../../hooks/useSettings'
@@ -25,7 +24,7 @@ interface PlayerSetup {
 }
 
 export function AvatarSelect() {
-  const { players, setPlayerName, setPlayerColor, setPlayerAvatar, setPhase, playerCount } = useGameState()
+  const { players, setPlayerName, setPlayerColor, setPlayerAvatar, setPhase } = useGameState()
   const { soundEnabled } = useSettings()
 
   const humanPlayers = players.filter(p => p.type === 'human')

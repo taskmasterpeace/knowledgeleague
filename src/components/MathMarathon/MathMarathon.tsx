@@ -6,10 +6,9 @@ import { useGamepad } from '../../hooks/useGamepad'
 import { useCPU } from '../../hooks/useCPU'
 import { MathProblem } from '../shared/MathProblem'
 import { Timer } from '../shared/Timer'
-import { ScoreBar } from '../shared/ScoreBar'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
 import { ControllerHint } from '../shared/ControllerButtons'
-import { ScreenShake, FlashOverlay, StreakFlame, ParticleBurst } from '../shared/Effects'
+import { ScreenShake, FlashOverlay, ParticleBurst } from '../shared/Effects'
 import {
   MARATHON_FIRST_CORRECT,
   MARATHON_SECOND_CORRECT, MARATHON_WRONG_ANSWER,
@@ -17,7 +16,7 @@ import {
 } from '../../utils/constants'
 import { useSettings } from '../../hooks/useSettings'
 import { sounds } from '../../utils/sounds'
-import type { PlayerId, Badge, QuestionCategory, PlayerAnalytics } from '../../types'
+import type { PlayerId, Badge, PlayerAnalytics } from '../../types'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import { BadgeToast } from '../shared/BadgeToast'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
@@ -61,7 +60,7 @@ export function MathMarathon() {
   const [shaking, setShaking] = useState(false)
   const [showBurst, setShowBurst] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
-  const [hoppingPlayers, setHoppingPlayers] = useState<Set<PlayerId>>(new Set())
+  const [, setHoppingPlayers] = useState<Set<PlayerId>>(new Set())
   const { announceCorrect, announceWrong } = useAnnouncer()
 
   const { broadcastProblem, broadcastResult, broadcastSpectatorUpdate } = usePeerContext()
@@ -69,6 +68,7 @@ export function MathMarathon() {
   const answersRef = useRef<Map<PlayerId, RoundAnswer>>(new Map())
   const roundResolvedRef = useRef(false)
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
+  // eslint-disable-next-line react-hooks/purity
   const timerStartRef = useRef(Date.now())
   const analyticsRef = useRef<Map<PlayerId, PlayerAnalytics>>(new Map())
 

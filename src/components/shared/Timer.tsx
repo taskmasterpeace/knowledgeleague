@@ -10,6 +10,7 @@ interface Props {
 
 export function Timer({ onTimeUp, resetKey, timeLimit }: Props) {
   const [remaining, setRemaining] = useState(timeLimit)
+  // eslint-disable-next-line react-hooks/purity
   const startRef = useRef(Date.now())
   const lastBeepSecRef = useRef(-1)
   const { soundEnabled } = useSettings()

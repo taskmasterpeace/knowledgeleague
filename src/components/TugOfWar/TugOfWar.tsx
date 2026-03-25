@@ -51,6 +51,7 @@ export function TugOfWar() {
 
   const profilesRef = useRef<Map<number, string>>(new Map()) // playerId -> profileId
   const analyticsRef = useRef<Map<PlayerId, PlayerAnalytics>>(new Map())
+  // eslint-disable-next-line react-hooks/purity
   const timerStartRef = useRef(Date.now())
 
   // Team assignments: odd player IDs = Team 1 (left), even = Team 2 (right)

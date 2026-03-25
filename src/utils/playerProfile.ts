@@ -20,8 +20,8 @@ export interface PlayerProfile {
   lastPlayedAt: string
 }
 
-const PROFILES_INDEX_KEY = 'brainGames:profiles'
-const PROFILE_KEY_PREFIX = 'brainGames:profile:'
+const PROFILES_INDEX_KEY = 'knowledgeLeagueKids:profiles'
+const PROFILE_KEY_PREFIX = 'knowledgeLeagueKids:profile:'
 const BADGE_THRESHOLDS: { tier: Badge['tier']; required: number }[] = [
   { tier: 'master', required: 100 },
   { tier: 'gold', required: 50 },
@@ -35,7 +35,7 @@ function emptyStats(): CategoryStats {
 
 function createProfile(name: string): PlayerProfile {
   return {
-    id: crypto.randomUUID(),
+    id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
     name,
     stats: {},
     gamesPlayed: 0,
@@ -50,7 +50,7 @@ function getProfilesIndex(): Record<string, string> {
   try {
     const stored = localStorage.getItem(PROFILES_INDEX_KEY)
     if (stored) return JSON.parse(stored)
-  } catch {}
+  } catch { /* ignored */ }
   return {}
 }
 
@@ -62,7 +62,7 @@ function loadProfile(id: string): PlayerProfile | null {
   try {
     const stored = localStorage.getItem(PROFILE_KEY_PREFIX + id)
     if (stored) return JSON.parse(stored)
-  } catch {}
+  } catch { /* ignored */ }
   return null
 }
 
@@ -129,13 +129,6 @@ export function recordAnswer(
   return newBadge
 }
 
-export function recordGameComplete(profileId: string): void {
-  const profile = loadProfile(profileId)
-  if (!profile) return
-  profile.gamesPlayed++
-  profile.lastPlayedAt = new Date().toISOString()
-  saveProfile(profile)
-}
 
 export function getAllProfiles(): PlayerProfile[] {
   const index = getProfilesIndex()
