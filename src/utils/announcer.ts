@@ -21,7 +21,6 @@ const RATE_LIMITS: Record<string, number> = {
 }
 
 let lastSpoken = 0
-let currentAudio: HTMLAudioElement | null = null
 const recentLines = new Set<string>()
 
 export function speak(line: AnnouncerLine, config: AnnouncerConfig): void {
@@ -41,11 +40,7 @@ export function speak(line: AnnouncerLine, config: AnnouncerConfig): void {
   recentLines.add(line.text)
   setTimeout(() => recentLines.delete(line.text), 30000)
 
-  // Stop current audio
-  if (currentAudio) {
-    currentAudio.pause()
-    currentAudio = null
-  }
+  // Stop any currently playing TTS audio
   stopTTS()
 
   lastSpoken = now
@@ -65,11 +60,8 @@ export function speak(line: AnnouncerLine, config: AnnouncerConfig): void {
 
 
 export function stopAnnouncer(): void {
-  if (currentAudio) {
-    currentAudio.pause()
-    currentAudio = null
-  }
   stopTTS()
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel()
   recentLines.clear()
 }
 

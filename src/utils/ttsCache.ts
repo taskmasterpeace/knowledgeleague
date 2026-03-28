@@ -1,11 +1,10 @@
 /**
- * TTS Audio Cache — 3-tier caching for Qwen3 TTS
+ * TTS Audio Cache — 2-tier caching for Qwen3 TTS
  *
- * Tier 1: Pre-generated static MP3s shipped with the app (/sounds/announcer/)
- * Tier 2: Name-based lines cached in IndexedDB (generated once per player name)
- * Tier 3: Dynamic lines generated on-demand via Replicate API
+ * Tier 1: Lines cached in IndexedDB (persists across sessions)
+ * Tier 2: Dynamic lines generated on-demand via Replicate Qwen3 TTS API
  *
- * Flow: check Tier 1 → check Tier 2 → generate Tier 3 → cache to Tier 2
+ * Flow: check IndexedDB → generate via API → cache to IndexedDB
  */
 
 import { duckMusic, unduckMusic } from './backgroundMusic'
@@ -67,107 +66,7 @@ function cacheKey(text: string, voice: string): string {
   return `${voice}:${text.toLowerCase().trim()}`
 }
 
-// ─── Tier 1: Static Pre-generated Lines ─────────────────────
-
-/** All lines that can be pre-generated as static MP3 files */
-export const STATIC_LINES: Record<string, string[]> = {
-  // Correct answers
-  correct: [
-    'Nice one!', "That's right!", 'Brilliant!', 'Correct!',
-    'You got it!', 'Nailed it!', 'Perfect!', 'Way to go!',
-  ],
-  // Wrong answers
-  wrong: [
-    'Not quite!', 'Ooh, so close!', 'Almost!', 'Try again next time!',
-  ],
-  // Game flow
-  flow: [
-    "It's neck and neck!",
-    "Let's do this! Game on!",
-    "All answers are in! Let's see the results!",
-    'What a game!',
-    'Time for some math!',
-    'Time for some science!',
-    'Time for some reading!',
-    'Time for some spelling!',
-    'Time for some images!',
-  ],
-  // Welcome / time of day
-  greetings: [
-    'Welcome to Knowledge League Kids! Are you ready to play?',
-    "Knowledge League Kids! Let's get those brains fired up!",
-    "Welcome back to Knowledge League Kids! Who's ready to learn?",
-    'Good morning! Rise and shine, brain time!',
-    'Morning champion! Ready to learn?',
-    "Top of the morning! Let's get those neurons firing!",
-    'Good afternoon! Perfect time for a brain workout!',
-    "Afternoon brain boost! Let's go!",
-    'Hey there! Afternoon knowledge time!',
-    "Good evening! Winding down with some brain games?",
-    'Evening scholar! One more round?',
-    'Good evening! Late night learning is the best!',
-    'Burning the midnight oil! Respect!',
-    "Night owl mode activated! Let's do this!",
-    "Up late learning? That's dedication!",
-    'Weekend gaming! No homework, just fun!',
-    "It's the weekend! Extra brain power mode!",
-    "Weekend warrior! Let's rack up some points!",
-  ],
-  // Holidays
-  holidays: [
-    "Happy New Year! Let's start the year smart!",
-    "Happy Martin Luther King Jr. Day! Let's dream big today!",
-    "Happy Valentine's Day! We love learning!",
-    'Happy Presidents Day! Did you know there have been 46 presidents?',
-    'Happy Pi Day! 3.14159... How many digits can you remember?',
-    "Happy St. Patrick's Day! Feeling lucky today?",
-    "Happy April Fools! Don't trust any tricky answers today!",
-    "Happy Earth Day! Let's learn about our planet!",
-    "Happy Cinco de Mayo! Let's celebrate learning!",
-    'Happy Memorial Day! We honor those who served.',
-    'Happy Juneteenth! Freedom and knowledge go hand in hand!',
-    'Happy 4th of July! Time for some fireworks and brainpower!',
-    "Welcome back to school! Let's sharpen those skills!",
-    'Happy Labor Day! Hard work pays off — in games too!',
-    "Happy Halloween! Don't be scared of these questions!",
-    'Happy Veterans Day! Thank you to all who served!',
-    "Happy Thanksgiving! We're thankful for big brains!",
-    'Happy Hanukkah! Eight nights of learning!',
-    'Merry Christmas! The best gift is knowledge!',
-    "Happy Kwanzaa! Let's celebrate unity and learning!",
-    "Happy New Year's Eve! One last brain workout this year!",
-  ],
-  // Season facts
-  seasons: [
-    'Spring is here! Did you know plants grow faster in spring because of more sunlight?',
-    'Fun spring fact: baby animals are born in spring because there is more food!',
-    'Summer vibes! Did you know the longest day of the year is in June?',
-    'Summer fun fact: ice cream was invented in China around 200 BC!',
-    'Fall is here! Did you know leaves change color because they stop making chlorophyll?',
-    'Autumn fact: squirrels bury thousands of acorns but forget where most of them are!',
-    'Winter wonderland! Did you know no two snowflakes are exactly alike?',
-    'Winter fact: the coldest temperature ever recorded was minus 128.6 degrees in Antarctica!',
-  ],
-}
-
-/** Check if a line exists as a pre-generated static file */
-function getStaticPath(text: string, voice: string): string | null {
-  // Normalize text for matching
-  const normalized = text.toLowerCase().trim()
-
-  // Check all static categories
-  for (const [_category, lines] of Object.entries(STATIC_LINES)) {
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].toLowerCase().trim() === normalized) {
-        // Static file path: /sounds/tts/{voice}/{category}-{index}.mp3
-        return `/sounds/tts/${voice}/${_category}-${i}.mp3`
-      }
-    }
-  }
-  return null
-}
-
-// ─── Tier 3: Qwen3 TTS via Replicate ────────────────────────
+// ─── Qwen3 TTS via Replicate ────────────────────────────────
 
 interface TTSConfig {
   voice: string
@@ -182,7 +81,6 @@ const VOICE_MAP: Record<string, string> = {
   ryan: 'Ryan',
   serena: 'Serena',
   vivian: 'Vivian',
-  sohee: 'Sohee',
   // Legacy names → map to closest Qwen3 speaker
   alex: 'Aiden',
   ashley: 'Serena',
@@ -234,7 +132,10 @@ async function generateWithQwen3(text: string, config: TTSConfig): Promise<Blob 
       const status = await statusRes.json()
 
       if (status.status === 'succeeded' && status.output) {
-        const audioUrl = typeof status.output === 'string' ? status.output : status.output[0]
+        const audioUrl = typeof status.output === 'string'
+          ? status.output
+          : Array.isArray(status.output) ? status.output[0] : null
+        if (!audioUrl || typeof audioUrl !== 'string') return null
         const audioRes = await fetch(audioUrl)
         if (audioRes.ok) return audioRes.blob()
       }
@@ -261,19 +162,13 @@ export async function speakTTS(text: string, voice: string, style?: string): Pro
 
   const key = cacheKey(text, voice)
 
-  // Tier 1: Check static pre-generated files
-  const staticPath = getStaticPath(text, voice)
-  if (staticPath) {
-    return playAudioFile(staticPath)
-  }
-
-  // Tier 2: Check IndexedDB cache
+  // Tier 1: Check IndexedDB cache
   const cached = await getCached(key)
   if (cached) {
     return playBlob(cached)
   }
 
-  // Tier 3: Generate with Qwen3 TTS, then cache
+  // Tier 2: Generate with Qwen3 TTS, then cache
   const blob = await generateWithQwen3(text, { voice, style })
   if (blob) {
     // Cache for next time (Tier 2)
@@ -282,18 +177,6 @@ export async function speakTTS(text: string, voice: string, style?: string): Pro
   }
 
   return false
-}
-
-function playAudioFile(path: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    const audio = new Audio(path)
-    audio.volume = 0.75
-    currentAudio = audio
-    audio.onplay = () => duckMusic()
-    audio.onended = () => { unduckMusic(); currentAudio = null; resolve(true) }
-    audio.onerror = () => { unduckMusic(); currentAudio = null; resolve(false) }
-    audio.play().catch(() => { resolve(false) })
-  })
 }
 
 function playBlob(blob: Blob): Promise<boolean> {
@@ -364,41 +247,3 @@ export async function prewarmPlayerCache(playerName: string, voice: string): Pro
   }
 }
 
-// ─── Stats ──────────────────────────────────────────────────
-
-export async function getCacheStats(): Promise<{ totalEntries: number; totalSizeBytes: number }> {
-  try {
-    const db = await openDB()
-    return new Promise((resolve) => {
-      const tx = db.transaction(STORE_NAME, 'readonly')
-      const store = tx.objectStore(STORE_NAME)
-      const request = store.getAllKeys()
-      request.onsuccess = () => {
-        const keys = request.result
-        let totalSize = 0
-        let processed = 0
-        if (keys.length === 0) { resolve({ totalEntries: 0, totalSizeBytes: 0 }); return }
-
-        for (const key of keys) {
-          const getReq = store.get(key)
-          getReq.onsuccess = () => {
-            if (getReq.result instanceof Blob) totalSize += getReq.result.size
-            processed++
-            if (processed === keys.length) {
-              resolve({ totalEntries: keys.length, totalSizeBytes: totalSize })
-            }
-          }
-          getReq.onerror = () => {
-            processed++
-            if (processed === keys.length) {
-              resolve({ totalEntries: keys.length, totalSizeBytes: totalSize })
-            }
-          }
-        }
-      }
-      request.onerror = () => resolve({ totalEntries: 0, totalSizeBytes: 0 })
-    })
-  } catch {
-    return { totalEntries: 0, totalSizeBytes: 0 }
-  }
-}
