@@ -2,8 +2,44 @@
 
 /* ===== PIXEL ART GAME STYLING SYSTEM ===== */
 
+/* Standard game screen wrapper — eliminates repeated background classes */
+.game-screen {
+  min-height: 100vh;
+  background-color: #0c0c2a;
+  background-image:
+    linear-gradient(to bottom, #111827, #1e1b4b, #111827),
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.8) 50%, transparent 50%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.6) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,255,255,0.9) 50%, transparent 50%),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.5) 50%, transparent 50%),
+    radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.7) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 20% 90%, rgba(255,255,255,0.4) 50%, transparent 50%),
+    radial-gradient(1px 1px at 80% 50%, rgba(255,255,255,0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 40% 40%, rgba(255,255,255,0.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 60% 70%, rgba(255,255,255,0.8) 50%, transparent 50%),
+    radial-gradient(1px 1px at 15% 45%, rgba(255,255,255,0.3) 50%, transparent 50%),
+    radial-gradient(1px 1px at 85% 15%, rgba(255,255,255,0.7) 50%, transparent 50%),
+    radial-gradient(1px 1px at 55% 85%, rgba(255,255,255,0.4) 50%, transparent 50%);
+  animation: twinkle 4s ease-in-out infinite alternate;
+  animation: screen-enter 0.3s ease-out;
+}
+
+/* ── Two-Font Pixel System ──
+   font-pixel       = Press Start 2P  → headings, titles, logos (chunky NES look)
+   font-pixel-body  = Pixelify Sans   → body, labels, questions, answers (readable)
+   Body default is Pixelify Sans so everything is readable by default.
+   Apply font-pixel explicitly to headings/titles that need the retro punch. */
+
+body {
+  font-family: 'Pixelify Sans', 'Press Start 2P', monospace;
+}
+
 .font-pixel {
   font-family: 'Press Start 2P', monospace;
+}
+
+.font-pixel-body {
+  font-family: 'Pixelify Sans', monospace;
 }
 
 /* Pixel-style button with 3D press effect */
@@ -35,7 +71,9 @@
 
 /* Animated starfield background */
 .stars-bg {
-  background:
+  background-color: #0c0c2a;
+  background-image:
+    linear-gradient(to bottom, #111827, #1e1b4b, #111827),
     radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.8) 50%, transparent 50%),
     radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.6) 50%, transparent 50%),
     radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,255,255,0.9) 50%, transparent 50%),
@@ -89,12 +127,6 @@
 }
 .rainbow-shimmer {
   animation: rainbow-shimmer 3s linear infinite;
-}
-
-/* Correct answer pulse */
-@keyframes choice-correct-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(74,222,128,0.4); }
-  50% { box-shadow: 0 0 25px rgba(74,222,128,0.8), 0 0 50px rgba(74,222,128,0.3); }
 }
 
 /* Timer urgent flash */
@@ -181,4 +213,17 @@
 @keyframes confetti-fall {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== GAMEPAD NAV FOCUS ===== */
+@keyframes nav-focus-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(250,204,21,0.6), 0 0 12px rgba(250,204,21,0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(250,204,21,0.9), 0 0 20px rgba(250,204,21,0.5); }
+}
+
+.gamepad-focus {
+  animation: nav-focus-pulse 1.2s ease-in-out infinite;
+  outline: none;
+  position: relative;
+  z-index: 2;
 }

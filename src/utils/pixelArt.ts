@@ -51,6 +51,16 @@ const CHARACTERS: Record<string, CharacterAssets> = {
     ],
     south: `${BASE}/characters/mia/mia-south.png`,
   },
+  jayden: {
+    idle: `${BASE}/characters/jayden/jayden-east.png`,
+    run: [
+      `${BASE}/characters/jayden/jayden_run-east-frame0.png`,
+      `${BASE}/characters/jayden/jayden_run-east-frame1.png`,
+      `${BASE}/characters/jayden/jayden_run-east-frame2.png`,
+      `${BASE}/characters/jayden/jayden_run-east-frame3.png`,
+    ],
+    south: `${BASE}/characters/jayden/jayden-south.png`,
+  },
   'default-player': { idle: '', run: [], south: '' },
 }
 
@@ -65,9 +75,19 @@ export const TILESETS = {
 
 // ── Object assets ──
 
-export const OBJECTS = {
+export const OBJECTS: Record<string, string> = {
   'sky-background': `${BASE}/objects/marathon/sky_background.png`,
   'school-building': `${BASE}/objects/tug/school_building.png`,
+  'hurdle': `${BASE}/objects/hurdle.png`,
+  'finish-flag': `${BASE}/objects/finish-flag.png`,
+  'trophy': `${BASE}/objects/trophy.png`,
+  'tug-rope': `${BASE}/objects/tug-rope.png`,
+  'takeoff-board': `${BASE}/objects/takeoff-board.png`,
+  'podium': `${BASE}/objects/podium.png`,
+  'crowd': `${BASE}/objects/crowd.png`,
+  'sand-pit': `${BASE}/objects/sand-pit.png`,
+  'bush': `${BASE}/objects/bush.png`,
+  'tree': `${BASE}/objects/tree.png`,
 }
 
 // ── Menu flying objects ──
@@ -76,6 +96,18 @@ export const MENU_OBJECTS = [
   `${BASE}/menu/airplane/airplane.png`,
   `${BASE}/menu/ufo.png`,
 ]
+
+// ── Menu background elements ──
+
+export const MENU_BG = {
+  cloudLarge: `${BASE}/menu/bg/cloud-large.png`,
+  cloudSmall: `${BASE}/menu/bg/cloud-small.png`,
+  tree: `${BASE}/menu/bg/tree.png`,
+  schoolhouse: `${BASE}/menu/bg/schoolhouse.png`,
+  book: `${BASE}/menu/bg/book.png`,
+  pencil: `${BASE}/menu/bg/pencil.png`,
+  trophy: `${BASE}/menu/bg/trophy.png`,
+}
 
 // ── Public API ──
 
@@ -147,7 +179,7 @@ export function getArenaAssets(type: TugArenaType): {
     case 'mud-pit':
       return {
         ground: TILESETS['mud-pit'],
-        decorations: [],
+        decorations: [OBJECTS['tree'], OBJECTS['bush']].filter(Boolean),
       }
     case 'stadium':
       return {
@@ -157,7 +189,7 @@ export function getArenaAssets(type: TugArenaType): {
     case 'schoolyard':
       return {
         ground: TILESETS.grass,
-        decorations: OBJECTS['school-building'] ? [OBJECTS['school-building']] : [],
+        decorations: [OBJECTS['school-building'], OBJECTS['tree'], OBJECTS['bush']].filter(Boolean),
       }
     default:
       return { ground: '', decorations: [] }

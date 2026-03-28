@@ -6,6 +6,7 @@ import { AnimatedSprite } from '../shared/AnimatedSprite'
 import { loadPlayer, savePlayer, clearPlayer } from '../../utils/playerStorage'
 import { sounds } from '../../utils/sounds'
 import { useSettings } from '../../hooks/useSettings'
+import { prewarmPlayerCache } from '../../utils/ttsCache'
 import { generatePixelCharacter, hasPixelLabApiKey, setPixelLabApiKey, getPixelLabApiKey } from '../../utils/pixelLabClient'
 import { saveCustomCharacter, getCustomCharacter, deleteCustomCharacter } from '../../utils/customCharacters'
 import type { PlayerId } from '../../types'
@@ -25,7 +26,7 @@ interface PlayerSetup {
 
 export function AvatarSelect() {
   const { players, setPlayerName, setPlayerColor, setPlayerAvatar, setPhase } = useGameState()
-  const { soundEnabled } = useSettings()
+  const { soundEnabled, announcerVoice } = useSettings()
 
   const humanPlayers = players.filter(p => p.type === 'human')
 
@@ -154,6 +155,12 @@ export function AvatarSelect() {
       })
     })
     setPhase('event-select')
+
+    // Pre-warm TTS cache for all player names (runs in background)
+    humanPlayers.forEach((_, idx) => {
+      const name = setups[idx].name
+      if (name) prewarmPlayerCache(name, announcerVoice)
+    })
   }
 
   const anyGenerating = setups.some(s => s.generating)

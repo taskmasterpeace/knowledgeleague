@@ -344,7 +344,7 @@
   },
   {
     "question": "Which word is spelled correctly?",
-    "choices": ["Idiosyncracy", "Idiosyncrasy", "Idiosynchrasy", "Idiosyncracy"],
+    "choices": ["Idiosyncracy", "Idiosyncrasy", "Idiosynchrasy", "Idiosyncrascy"],
     "correctIndex": 1,
     "category": "spelling",
     "difficulty": "hard"

@@ -1,137 +1,216 @@
+import { useCallback } from 'react'
 import { useGameState } from '../../hooks/useGameState'
+import { sounds } from '../../utils/sounds'
+import { useSettings } from '../../hooks/useSettings'
+import { useGamepadNav } from '../../hooks/useGamepadNav'
+
+const EVENTS = ['marathon', 'tug-of-war', 'hurdle-dash', 'long-jump', 'spelling-bee'] as const
 
 export function EventSelect() {
   const { setEvent, setPhase, playerCount } = useGameState()
+  const { soundEnabled } = useSettings()
 
-  const selectEvent = (event: 'marathon' | 'tug-of-war' | 'tower-climb') => {
+  const selectEvent = useCallback((event: typeof EVENTS[number]) => {
+    if (soundEnabled) sounds.select()
     setEvent(event)
     setPhase('playing')
-  }
+  }, [soundEnabled, setEvent, setPhase])
+
+  const handleBack = useCallback(() => {
+    if (soundEnabled) sounds.navigate()
+    setPhase('avatar-select')
+  }, [soundEnabled, setPhase])
+
+  const { focusIndex } = useGamepadNav({
+    itemCount: EVENTS.length,
+    columns: 3,
+    onSelect: (i) => selectEvent(EVENTS[i]),
+    onBack: handleBack,
+    enabled: true,
+  })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col items-center justify-center gap-10 p-8">
-      <div className="text-center">
+    <div className="min-h-screen screen-enter flex flex-col items-center justify-center gap-10 p-8 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0520] via-[#121040] to-[#0a0520]" />
+
+      {/* Slow-scrolling star field layer 1 (far) */}
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          backgroundImage: 'radial-gradient(1px 1px at 10% 20%, white 50%, transparent 100%), radial-gradient(1px 1px at 30% 60%, white 50%, transparent 100%), radial-gradient(1.5px 1.5px at 50% 10%, white 50%, transparent 100%), radial-gradient(1px 1px at 70% 40%, white 50%, transparent 100%), radial-gradient(1px 1px at 90% 70%, white 50%, transparent 100%), radial-gradient(1.5px 1.5px at 15% 80%, white 50%, transparent 100%), radial-gradient(1px 1px at 55% 45%, white 50%, transparent 100%), radial-gradient(1px 1px at 85% 15%, white 50%, transparent 100%)',
+          backgroundSize: '200px 200px',
+          animation: 'starDrift 60s linear infinite',
+        }}
+      />
+
+      {/* Star field layer 2 (near, brighter, faster) */}
+      <div
+        className="absolute inset-0 opacity-25"
+        style={{
+          backgroundImage: 'radial-gradient(2px 2px at 20% 30%, #facc15 50%, transparent 100%), radial-gradient(2px 2px at 60% 70%, #67e8f9 50%, transparent 100%), radial-gradient(2px 2px at 80% 20%, #facc15 50%, transparent 100%), radial-gradient(1.5px 1.5px at 40% 90%, #c084fc 50%, transparent 100%), radial-gradient(2px 2px at 10% 50%, #67e8f9 50%, transparent 100%)',
+          backgroundSize: '300px 300px',
+          animation: 'starDrift 35s linear infinite reverse',
+        }}
+      />
+
+      {/* Floating sparkle particles */}
+      {Array.from({ length: 12 }, (_, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: 2 + (i % 3),
+            height: 2 + (i % 3),
+            left: `${8 + (i * 7.5) % 90}%`,
+            top: `${5 + (i * 13) % 85}%`,
+            background: i % 3 === 0 ? '#facc15' : i % 3 === 1 ? '#67e8f9' : '#c084fc',
+            animation: `sparkleFloat ${3 + (i % 4)}s ease-in-out ${i * 0.3}s infinite alternate`,
+            opacity: 0.6,
+          }}
+        />
+      ))}
+
+      {/* Subtle radial glow behind cards */}
+      <div
+        className="absolute"
+        style={{
+          width: '80%',
+          height: '60%',
+          left: '10%',
+          top: '25%',
+          background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.12) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Back button */}
+      <button
+        onClick={handleBack}
+        className="absolute top-6 left-6 pixel-card px-4 py-2 rounded-lg font-pixel text-[8px] text-white/70 hover:text-white hover:scale-105 transition-all z-10"
+      >
+        BACK
+      </button>
+
+      <div className="text-center relative z-10">
         <h2 className="font-pixel text-3xl text-white text-glow leading-relaxed">PICK YOUR</h2>
         <h2 className="font-pixel text-3xl text-cyan-300 text-glow leading-relaxed">EVENT</h2>
       </div>
 
-      <div className="flex gap-6 flex-wrap justify-center">
+      <div className="flex gap-6 flex-wrap justify-center relative z-10 max-w-6xl">
         {/* Math Marathon card */}
         <button
           onClick={() => selectEvent('marathon')}
-          className="pixel-card rounded-lg flex flex-col items-center gap-4 p-8 hover:scale-105 transition-all active:scale-95 w-64 group"
+          className={`pixel-card rounded-lg flex flex-col items-center gap-3 p-4 hover:scale-105 transition-all active:scale-95 w-56 group hover:shadow-[0_0_24px_rgba(250,204,21,0.3)] ${focusIndex === 0 ? 'gamepad-focus' : ''}`}
         >
-          {/* Marathon SVG: running figure on track with checkered flag */}
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            {/* Track oval */}
-            <ellipse cx="50" cy="72" rx="40" ry="14" fill="none" stroke="rgba(100,200,100,0.5)" strokeWidth="3" strokeDasharray="8 4" />
-            {/* Track surface */}
-            <ellipse cx="50" cy="72" rx="38" ry="12" fill="rgba(180,120,60,0.15)" />
-
-            {/* Runner figure (blue) */}
-            <circle cx="28" cy="45" r="7" fill="#3b82f6" />
-            {/* Body */}
-            <line x1="28" y1="52" x2="28" y2="68" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
-            {/* Arms pumping */}
-            <line x1="28" y1="56" x2="20" y2="60" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
-            <line x1="28" y1="56" x2="36" y2="53" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
-            {/* Legs running */}
-            <line x1="28" y1="68" x2="22" y2="78" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
-            <line x1="28" y1="68" x2="34" y2="75" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
-
-            {/* Runner figure (red) */}
-            <circle cx="55" cy="42" r="7" fill="#ef4444" />
-            {/* Body */}
-            <line x1="55" y1="49" x2="55" y2="65" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" />
-            {/* Arms */}
-            <line x1="55" y1="53" x2="47" y2="50" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
-            <line x1="55" y1="53" x2="63" y2="57" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
-            {/* Legs */}
-            <line x1="55" y1="65" x2="49" y2="75" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
-            <line x1="55" y1="65" x2="61" y2="72" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
-
-            {/* Checkered flag */}
-            <line x1="82" y1="20" x2="82" y2="55" stroke="white" strokeWidth="2" />
-            <rect x="82" y="20" width="8" height="5" fill="white" />
-            <rect x="86" y="20" width="4" height="5" fill="#222" />
-            <rect x="82" y="25" width="4" height="5" fill="#222" />
-            <rect x="86" y="25" width="4" height="5" fill="white" />
-          </svg>
-
-          <span className="font-pixel text-xs text-white group-hover:text-cyan-300 transition-colors text-center leading-relaxed">
-            MATH<br />MARATHON
-          </span>
-          <span className="font-pixel text-[7px] text-white/50 text-center">Race to the finish!</span>
+          <img
+            src="/pixelart/events/marathon.png"
+            alt="Math Marathon"
+            className="w-full rounded-lg"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          <span className="font-pixel-body font-semibold text-xs text-white/50 text-center">Race to the finish!</span>
         </button>
 
         {/* Tug of War card */}
         <button
           onClick={() => selectEvent('tug-of-war')}
-          className="pixel-card rounded-lg flex flex-col items-center gap-4 p-8 hover:scale-105 transition-all active:scale-95 w-64 group"
+          className={`pixel-card rounded-lg flex flex-col items-center gap-3 p-4 hover:scale-105 transition-all active:scale-95 w-56 group hover:shadow-[0_0_24px_rgba(250,204,21,0.3)] ${focusIndex === 1 ? 'gamepad-focus' : ''}`}
         >
-          {/* Tug of War SVG: two figures pulling a rope */}
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            {/* Rope */}
-            <line x1="18" y1="50" x2="82" y2="50" stroke="#b45309" strokeWidth="5" strokeLinecap="round" />
-            {/* Rope texture */}
-            <line x1="18" y1="50" x2="82" y2="50" stroke="#f59e0b" strokeWidth="2"
-              strokeDasharray="6 6" strokeLinecap="round" />
-
-            {/* Flag on rope */}
-            <line x1="50" y1="36" x2="50" y2="56" stroke="white" strokeWidth="2" />
-            <polygon points="50,36 62,42 50,48" fill="#facc15" />
-
-            {/* Left figure (blue) - leaning back */}
-            <circle cx="14" cy="30" r="7" fill="#3b82f6" />
-            <line x1="14" y1="37" x2="12" y2="55" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
-            <line x1="12" y1="43" x2="20" y2="48" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
-            <line x1="12" y1="55" x2="6" y2="65" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
-            <line x1="12" y1="55" x2="18" y2="63" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
-
-            {/* Right figure (red) - leaning back other direction */}
-            <circle cx="86" cy="30" r="7" fill="#ef4444" />
-            <line x1="86" y1="37" x2="88" y2="55" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" />
-            <line x1="88" y1="43" x2="80" y2="48" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
-            <line x1="88" y1="55" x2="94" y2="65" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
-            <line x1="88" y1="55" x2="82" y2="63" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
-
-            {/* Tension arrows */}
-            <polygon points="32,47 26,50 32,53" fill="rgba(59,130,246,0.7)" />
-            <polygon points="68,47 74,50 68,53" fill="rgba(239,68,68,0.7)" />
-          </svg>
-
-          <span className="font-pixel text-xs text-white group-hover:text-cyan-300 transition-colors text-center leading-relaxed">
-            TUG OF<br />WAR
-          </span>
-          <span className="font-pixel text-[7px] text-white/50 text-center">Pull them to your side!</span>
+          <img
+            src="/pixelart/events/tug-of-war.png"
+            alt="Tug of War"
+            className="w-full rounded-lg"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          <span className="font-pixel-body font-semibold text-xs text-white/50 text-center">Pull them to your side!</span>
           {playerCount > 2 && (
-            <span className="font-pixel text-[6px] text-yellow-300/70 text-center mt-1">Teams mode!</span>
+            <span className="font-pixel-body font-semibold text-xs text-yellow-300/70 text-center mt-1">Teams mode!</span>
           )}
         </button>
 
-        {/* Tower Climb card */}
+        {/* Hurdle Dash card */}
         <button
-          onClick={() => selectEvent('tower-climb')}
-          className="pixel-card rounded-lg flex flex-col items-center gap-4 p-8 hover:scale-105 transition-all active:scale-95 w-64 group"
+          onClick={() => selectEvent('hurdle-dash')}
+          className={`pixel-card rounded-lg flex flex-col items-center gap-3 p-4 hover:scale-105 transition-all active:scale-95 w-56 group hover:shadow-[0_0_24px_rgba(250,204,21,0.3)] ${focusIndex === 2 ? 'gamepad-focus' : ''}`}
         >
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            <rect x="35" y="70" width="30" height="12" fill="#3b82f6" stroke="#2563eb" strokeWidth="1" rx="1" />
-            <rect x="35" y="56" width="30" height="12" fill="#22c55e" stroke="#16a34a" strokeWidth="1" rx="1" />
-            <rect x="35" y="42" width="30" height="12" fill="#f59e0b" stroke="#d97706" strokeWidth="1" rx="1" />
-            <rect x="35" y="28" width="30" height="12" fill="#ef4444" stroke="#dc2626" strokeWidth="1" rx="1" />
-            <rect x="37" y="10" width="26" height="10" fill="#a855f7" stroke="#9333ea" strokeWidth="1" rx="1" opacity="0.7" />
-            <line x1="42" y1="22" x2="42" y2="18" stroke="white" strokeWidth="1" opacity="0.4" />
-            <line x1="50" y1="22" x2="50" y2="16" stroke="white" strokeWidth="1" opacity="0.4" />
-            <line x1="58" y1="22" x2="58" y2="18" stroke="white" strokeWidth="1" opacity="0.4" />
-            <polygon points="82,40 84,36 88,38 86,34 90,32 86,30 88,26 84,28 82,24 80,28 76,26 78,30 74,32 78,34 76,38 80,36" fill="#f59e0b" opacity="0.8" />
-          </svg>
-
-          <span className="font-pixel text-xs text-white group-hover:text-cyan-300 transition-colors text-center leading-relaxed">
-            TOWER CLIMB
-          </span>
-          <span className="font-pixel text-[7px] text-white/50 text-center">Build fast, attack faster!</span>
+          <img
+            src="/pixelart/events/hurdle-dash.png"
+            alt="Hurdle Dash"
+            className="w-full rounded-lg"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          <span className="font-pixel-body font-semibold text-xs text-white/50 text-center">Clear hurdles with knowledge!</span>
         </button>
+
+        {/* Long Jump card */}
+        <button
+          onClick={() => selectEvent('long-jump')}
+          className={`pixel-card rounded-lg flex flex-col items-center gap-3 p-4 hover:scale-105 transition-all active:scale-95 w-56 group hover:shadow-[0_0_24px_rgba(250,204,21,0.3)] ${focusIndex === 3 ? 'gamepad-focus' : ''}`}
+        >
+          <img
+            src="/pixelart/events/long-jump.png"
+            alt="Long Jump"
+            className="w-full rounded-lg"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          <span className="font-pixel-body font-semibold text-xs text-white/50 text-center">Build momentum & leap!</span>
+        </button>
+
+        {/* Spelling Bee card */}
+        <button
+          onClick={() => selectEvent('spelling-bee')}
+          className={`pixel-card rounded-lg flex flex-col items-center gap-3 p-4 hover:scale-105 transition-all active:scale-95 w-56 group hover:shadow-[0_0_24px_rgba(250,204,21,0.3)] ${focusIndex === 4 ? 'gamepad-focus' : ''}`}
+        >
+          <img
+            src="/pixelart/events/spelling-bee.png"
+            alt="Spelling Bee"
+            className="w-full rounded-lg"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          <span className="font-pixel-body font-semibold text-xs text-white/50 text-center">Last speller standing!</span>
+        </button>
+
+        {/* Stories card — Coming Soon */}
+        <div
+          className="pixel-card rounded-lg flex flex-col items-center gap-3 p-4 w-56 relative cursor-not-allowed"
+          style={{ opacity: 0.7 }}
+        >
+          <div className="relative w-full">
+            <img
+              src="/pixelart/events/stories.png"
+              alt="Stories"
+              className="w-full rounded-lg grayscale-[30%]"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            {/* Coming Soon overlay */}
+            <div className="absolute inset-0 rounded-lg flex items-center justify-center bg-black/40">
+              <span
+                className="font-pixel text-xs text-yellow-300 tracking-wider"
+                style={{
+                  textShadow: '0 0 12px rgba(250,204,21,0.6), 2px 2px 0 #000',
+                  transform: 'rotate(-6deg)',
+                }}
+              >
+                COMING SOON
+              </span>
+            </div>
+          </div>
+          <span className="font-pixel-body font-semibold text-xs text-white/50 text-center">Adventure awaits!</span>
+        </div>
       </div>
+
+      {/* CSS animations */}
+      <style>{`
+        @keyframes starDrift {
+          from { background-position: 0 0; }
+          to { background-position: 200px 200px; }
+        }
+        @keyframes sparkleFloat {
+          from { transform: translateY(0) scale(1); opacity: 0.4; }
+          to { transform: translateY(-12px) scale(1.3); opacity: 0.8; }
+        }
+      `}</style>
     </div>
   )
 }

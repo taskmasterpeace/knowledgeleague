@@ -1,73 +1,110 @@
-# React + TypeScript + Vite
+# Knowledge League Kids
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A multiplayer educational game where kids answer math, science, reading, and spelling questions to compete in retro pixel art game events. Built with React, TypeScript, and WebRTC for real-time multiplayer on any device.
 
-Currently, two official plugins are available:
+![Menu](public/screenshots/menu.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Game Events
 
-## React Compiler
+| Event | Description |
+|-------|-------------|
+| ![Marathon](public/screenshots/marathon.png) | **Math Marathon** — Race to the finish line. Correct answers move you forward. |
+| ![Tug of War](public/screenshots/tug-of-war.png) | **Tug of War** — Teams pull a rope. Right answers pull your side closer to victory. |
+| ![Hurdle Dash](public/screenshots/hurdle-dash.png) | **Hurdle Dash** — Sprint and jump hurdles by answering quickly and correctly. |
+| ![Long Jump](public/screenshots/long-jump.png) | **Long Jump** — Build speed with correct answers, then launch for distance. |
+| ![Spelling Bee](public/screenshots/spelling-bee.png) | **Spelling Bee** — Listen to words and spell them correctly to score points. |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- **Multiplayer** — Host a game and players join from their phones via QR code (WebRTC, no server needed)
+- **CPU opponents** — Play solo against AI with adjustable difficulty
+- **Adaptive difficulty** — Questions get harder or easier based on how the player is doing
+- **Multiple subjects** — Math (procedural generation), science, reading comprehension, spelling
+- **Grade levels** — Grade 1 through Grade 3, plus an Adult mode
+- **AI announcer** — Qwen3 TTS voice commentary with 6 selectable voices
+- **Custom characters** — Describe a character and generate pixel art via PixelLab API
+- **Retro pixel art** — 16-bit style characters, tilesets, and animations
+- **Post-game stats** — Player analytics, superlatives, and trophy shelf
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Quick Start
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Install dependencies
+npm install
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Copy environment file and add your API keys
+cp .env.example .env
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Start the dev server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open `http://localhost:5175` in your browser.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Environment Variables
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Copy `.env.example` to `.env` and fill in your keys:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `REPLICATE_API_TOKEN` | For TTS voices | Powers the Qwen3 AI announcer. Get a token at [replicate.com](https://replicate.com/account/api-tokens) |
+| `PIXELLAB_API_KEY` | For custom characters | Generates pixel art from text descriptions. Get a key at [pixellab.ai](https://pixellab.ai) |
+| `VITE_PIXELLAB_API_KEY` | For custom characters | Same key as above, prefixed for client-side access |
+
+The game works without any API keys — you just won't have AI voices or custom character generation.
+
+## Multiplayer
+
+1. Click **2 Players** or **4 Players** on the main menu
+2. A QR code appears — players scan it on their phones
+3. Phone controllers connect via WebRTC (peer-to-peer, no server)
+4. Host screen shows the game, phones show answer buttons
+
+## Scripts
+
+```bash
+npm run dev          # Vite dev server
+npm run build        # TypeScript check + production build
+npm run lint         # ESLint
+npm test             # Unit tests (Vitest)
+npm run test:browser # Playwright E2E tests
 ```
+
+## Tech Stack
+
+- **React 19** + **TypeScript** + **Vite**
+- **Tailwind CSS v4** for styling
+- **Zustand** for state management
+- **PeerJS** (WebRTC) for multiplayer
+- **Vitest** + **Playwright** for testing
+- **Qwen3 TTS** via Replicate for AI announcer voices
+- **PixelLab API** for AI-generated pixel art
+
+## Project Structure
+
+```
+src/
+  components/
+    Menu/              # Main menu and pixel art menu scene
+    MathMarathon/      # Marathon race event
+    TugOfWar/          # Tug of war event
+    HurdleDash/        # Hurdle dash event
+    LongJump/          # Long jump event
+    SpellingBee/       # Spelling bee event
+    Victory/           # Victory screen
+    PostGameStats/     # End-of-game analytics
+    PhoneController/   # Mobile player controls
+    shared/            # Reusable components (MathProblem, Timer, etc.)
+  hooks/               # React hooks (useGameState, useSettings, useCPU, etc.)
+  utils/               # Game logic (questionEngine, mathProblems, sounds, etc.)
+  data/                # Question banks (JSON) for science, reading, spelling
+public/
+  pixelart/            # Sprite sheets, tilesets, menu art
+  music/               # Background music tracks
+  sounds/              # Sound effects
+  screenshots/         # Game screenshots
+```
+
+## License
+
+MIT

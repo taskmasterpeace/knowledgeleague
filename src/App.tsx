@@ -1,6 +1,4 @@
-import { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react'
-
-const TowerClimb = lazy(() => import('./components/TowerClimb/TowerClimb').then(m => ({ default: m.TowerClimb })))
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useGameState } from './hooks/useGameState'
 import { usePeerHost } from './hooks/usePeerHost'
 import { PeerContext } from './hooks/usePeerContext'
@@ -12,10 +10,14 @@ import { AvatarSelect } from './components/AvatarSelect/AvatarSelect'
 import { EventSelect } from './components/EventSelect/EventSelect'
 import { MathMarathon } from './components/MathMarathon/MathMarathon'
 import { TugOfWar } from './components/TugOfWar/TugOfWar'
+import { HurdleDash } from './components/HurdleDash/HurdleDash'
+import { LongJump } from './components/LongJump/LongJump'
+import { SpellingBee } from './components/SpellingBee/SpellingBee'
 import { Victory } from './components/Victory/Victory'
 import { PostGameStats } from './components/PostGameStats/PostGameStats'
 import { TrophyShelf } from './components/TrophyShelf/TrophyShelf'
 import { Leaderboards } from './components/Leaderboards/Leaderboards'
+import { DailyChallenge } from './components/DailyChallenge/DailyChallenge'
 import { PhoneController } from './components/PhoneController/PhoneController'
 import { PhoneLobby } from './components/PhoneLobby/PhoneLobby'
 import { PLAYER_COLORS } from './utils/constants'
@@ -34,7 +36,7 @@ function App() {
   }, [])
 
   // Phone controller route: /join/:roomId
-  const joinMatch = route.match(/^\/join\/([a-z0-9]+)$/i)
+  const joinMatch = route.match(/^\/join\/([a-z0-9_-]+)$/i)
   if (joinMatch) {
     return <PhoneController roomId={joinMatch[1]} />
   }
@@ -103,8 +105,7 @@ function HostApp({ peerEnabled, setPeerEnabled, phase, event }: {
   event: string | null
 }) {
   const handleRemoteAnswer = useCallback((playerId: number, choiceIndex: number) => {
-    const handler = (window as any).__remoteAnswerHandler as ((pid: number, ci: number) => void) | undefined
-    if (handler) handler(playerId, choiceIndex)
+    window.__remoteAnswerHandler?.(playerId, choiceIndex)
   }, [])
 
   const peer = usePeerHost({
@@ -117,10 +118,13 @@ function HostApp({ peerEnabled, setPeerEnabled, phase, event }: {
     roomId: peer.roomId,
     joinUrl: peer.joinUrl,
     remotePlayers: peer.remotePlayers,
+    spectators: peer.spectators,
     broadcastProblem: peer.broadcastProblem,
     broadcastResult: peer.broadcastResult,
     broadcastLockIn: peer.broadcastLockIn,
     broadcastGameOver: peer.broadcastGameOver,
+    broadcastSpectatorUpdate: peer.broadcastSpectatorUpdate,
+    broadcastStats: peer.broadcastStats,
     setEnabled: setPeerEnabled,
   }
 
@@ -139,19 +143,14 @@ function HostApp({ peerEnabled, setPeerEnabled, phase, event }: {
       )}
       {phase === 'playing' && event === 'marathon' && <MathMarathon />}
       {phase === 'playing' && event === 'tug-of-war' && <TugOfWar />}
-      {phase === 'playing' && event === 'tower-climb' && (
-        <Suspense fallback={
-          <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-            <p className="font-pixel text-white animate-pulse">Loading Tower Climb...</p>
-          </div>
-        }>
-          <TowerClimb />
-        </Suspense>
-      )}
+      {phase === 'playing' && event === 'hurdle-dash' && <HurdleDash />}
+      {phase === 'playing' && event === 'long-jump' && <LongJump />}
+      {phase === 'playing' && event === 'spelling-bee' && <SpellingBee />}
       {phase === 'stats' && <PostGameStats />}
       {phase === 'victory' && <Victory />}
       {phase === 'trophies' && <TrophyShelf />}
       {phase === 'leaderboards' && <Leaderboards />}
+      {phase === 'daily-challenge' && <DailyChallenge />}
     </PeerContext.Provider>
   )
 }

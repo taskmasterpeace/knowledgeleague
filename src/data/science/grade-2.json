@@ -1,0 +1,422 @@
+[
+  {
+    "question": "Where do polar bears live?",
+    "choices": ["In the desert", "In the Arctic", "In the jungle", "In a swimming pool"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is a baby frog called?",
+    "choices": ["A kitten", "A tadpole", "A cub", "A french fry"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which of these is a mammal?",
+    "choices": ["A snake", "A goldfish", "A dog", "A birthday cake"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What do butterflies start life as?",
+    "choices": ["A caterpillar", "A tadpole", "A baby bird", "A tiny superhero"],
+    "correctIndex": 0,
+    "category": "animals",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which animal group has feathers?",
+    "choices": ["Mammals", "Fish", "Birds", "Robots"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do fish use to breathe underwater?",
+    "choices": ["Lungs", "Gills", "Noses", "Tiny snorkels"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which animal goes through metamorphosis?",
+    "choices": ["A dog", "A cat", "A butterfly", "A sandwich"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "hard"
+  },
+  {
+    "question": "How many legs does an insect have?",
+    "choices": ["Four", "Eight", "Six", "A million"],
+    "correctIndex": 2,
+    "category": "animals",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which of these is a reptile?",
+    "choices": ["A frog", "A lizard", "A whale", "A pineapple"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What do all animals need to survive?",
+    "choices": ["Television", "Water, food, and air", "Toys", "Homework"],
+    "correctIndex": 1,
+    "category": "animals",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What part of the plant takes in water from the soil?",
+    "choices": ["The flower", "The leaves", "The roots", "The sprinkles"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do plants make using sunlight?",
+    "choices": ["Music", "Their own food", "Rainbows", "Cookies"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which part of the plant holds it up straight?",
+    "choices": ["The roots", "The stem", "The petals", "Invisible hands"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "How do dandelion seeds travel?",
+    "choices": ["By car", "By wind", "By swimming", "By skateboard"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the colorful part of a plant that attracts bees?",
+    "choices": ["The roots", "The stem", "The flower", "A disco ball"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What comes out of a seed first when it starts to grow?",
+    "choices": ["A flower", "A leaf", "A root", "A tiny tree"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which of these do plants NOT need to grow?",
+    "choices": ["Water", "Sunlight", "Music", "Soil"],
+    "correctIndex": 2,
+    "category": "plants",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What do leaves do for a plant?",
+    "choices": ["Keep it warm at night", "Catch sunlight to make food", "Help it walk around", "Tell jokes"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Some seeds travel by sticking to animal fur. What helps them stick?",
+    "choices": ["Glue", "Tiny hooks", "Magnets", "Bubblegum"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the correct order of a plant's life cycle?",
+    "choices": ["Flower, seed, sprout, plant", "Seed, sprout, plant, flower", "Plant, flower, sprout, seed", "Sprout, seed, flower, nap"],
+    "correctIndex": 1,
+    "category": "plants",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which sense do you use to hear a fire truck?",
+    "choices": ["Sight", "Hearing", "Smell", "X-ray vision"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What do your bones do for your body?",
+    "choices": ["Help you taste food", "Give your body shape and support", "Help you smell flowers", "Make you invisible"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which body part lets you smell cookies baking?",
+    "choices": ["Your ears", "Your nose", "Your knees", "Your elbows"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What are muscles attached to?",
+    "choices": ["Your hair", "Your bones", "Your eyelashes", "Your backpack"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which food group gives you strong bones?",
+    "choices": ["Candy", "Dairy like milk and cheese", "Soda", "Gummy bears"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which sense helps you tell if something is rough or smooth?",
+    "choices": ["Sight", "Hearing", "Touch", "Telepathy"],
+    "correctIndex": 2,
+    "category": "body-senses",
+    "difficulty": "easy"
+  },
+  {
+    "question": "How many senses do humans have?",
+    "choices": ["Three", "Five", "Ten", "A hundred"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What healthy habit helps your body fight germs?",
+    "choices": ["Watching TV", "Washing your hands", "Staying up late", "Eating only candy"],
+    "correctIndex": 1,
+    "category": "body-senses",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which part of your body pumps blood?",
+    "choices": ["Your brain", "Your stomach", "Your heart", "Your funny bone"],
+    "correctIndex": 2,
+    "category": "body-senses",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What part of your tongue helps you taste food?",
+    "choices": ["Taste buds", "Tiny teeth", "Tongue bones", "Flavor antennas"],
+    "correctIndex": 0,
+    "category": "body-senses",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What kind of cloud is big, white, and fluffy?",
+    "choices": ["Stratus", "Cumulus", "Fog", "A cotton candy cloud"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What season comes after winter?",
+    "choices": ["Fall", "Summer", "Spring", "Snack time"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does a thermometer measure?",
+    "choices": ["Wind speed", "Temperature", "Rainfall", "How hungry you are"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What causes rain?",
+    "choices": ["Someone crying", "Water falling from clouds", "Trees shaking", "Giants splashing"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "During which season do most trees lose their leaves?",
+    "choices": ["Spring", "Summer", "Fall", "Bedtime"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is frozen rain called?",
+    "choices": ["Fog", "Snow", "Hail", "Ice cream"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What tool measures how much rain has fallen?",
+    "choices": ["A thermometer", "A rain gauge", "A compass", "A bucket of wishes"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which season is the hottest?",
+    "choices": ["Winter", "Spring", "Summer", "Nap season"],
+    "correctIndex": 2,
+    "category": "weather",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What type of weather includes thunder and lightning?",
+    "choices": ["A blizzard", "A thunderstorm", "A hurricane", "A dance party"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What happens to water when it gets very cold?",
+    "choices": ["It disappears", "It turns into ice", "It turns into juice", "It runs away"],
+    "correctIndex": 1,
+    "category": "weather",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the closest star to Earth?",
+    "choices": ["The Moon", "The Sun", "Mars", "A nightlight"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Why do we have day and night?",
+    "choices": ["The Sun turns on and off", "Earth spins around", "The Moon blocks the Sun", "Someone flips a light switch"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What shape is the Earth?",
+    "choices": ["Flat like a pancake", "A cube", "A sphere (round like a ball)", "Shaped like a banana"],
+    "correctIndex": 2,
+    "category": "space",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "choices": ["Venus", "Jupiter", "Mars", "Planet Pizza"],
+    "correctIndex": 2,
+    "category": "space",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What lights up the Moon at night?",
+    "choices": ["Batteries", "The Sun's light reflecting off it", "Moon bugs", "A giant flashlight"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "hard"
+  },
+  {
+    "question": "How long does it take Earth to go around the Sun once?",
+    "choices": ["One day", "One week", "One year", "One recess"],
+    "correctIndex": 2,
+    "category": "space",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What do we call the group of stars that make a pattern in the sky?",
+    "choices": ["A planet", "A constellation", "A galaxy", "Star stickers"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which is the biggest planet in our solar system?",
+    "choices": ["Earth", "Saturn", "Jupiter", "Pluto the puppy"],
+    "correctIndex": 2,
+    "category": "space",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the Moon do every night?",
+    "choices": ["It changes color", "It appears to change shape over time", "It goes to sleep", "It plays hide and seek"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "medium"
+  },
+  {
+    "question": "How long does it take for Earth to spin around once?",
+    "choices": ["One hour", "One day", "One month", "Five minutes"],
+    "correctIndex": 1,
+    "category": "space",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which of these is a solid?",
+    "choices": ["Milk", "Air", "A rock", "A burp"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What state of matter is water when you drink it?",
+    "choices": ["Solid", "Liquid", "Gas", "Invisible"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What happens to an ice cube when you leave it in the sun?",
+    "choices": ["It gets bigger", "It melts into water", "It stays the same", "It turns into a snowman"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which of these is man-made?",
+    "choices": ["A tree", "A river", "A plastic bottle", "A cloud"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Steam from boiling water is an example of what?",
+    "choices": ["A solid", "A liquid", "A gas", "Magic"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which material is smooth?",
+    "choices": ["Sandpaper", "Glass", "A pinecone", "A cactus"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which of these is a natural material?",
+    "choices": ["Plastic", "Glass", "Wood", "A video game"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What property describes how something feels when you touch it?",
+    "choices": ["Color", "Texture", "Weight", "Flavor"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which material would be best for building a strong bridge?",
+    "choices": ["Paper", "Cotton", "Steel", "Marshmallows"],
+    "correctIndex": 2,
+    "category": "materials",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What happens when you heat butter in a pan?",
+    "choices": ["It freezes", "It melts from solid to liquid", "It turns into gas", "It turns into popcorn"],
+    "correctIndex": 1,
+    "category": "materials",
+    "difficulty": "hard"
+  }
+]

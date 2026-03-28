@@ -1,6 +1,9 @@
 const API_BASE = 'https://api.pixellab.ai/v2'
 
-let apiKey = localStorage.getItem('knowledgeLeagueKids:pixelLabApiKey') || ''
+// Try localStorage first, then Vite env variable
+let apiKey = localStorage.getItem('knowledgeLeagueKids:pixelLabApiKey')
+  || import.meta.env.VITE_PIXELLAB_API_KEY
+  || ''
 
 export function setPixelLabApiKey(key: string): void {
   apiKey = key

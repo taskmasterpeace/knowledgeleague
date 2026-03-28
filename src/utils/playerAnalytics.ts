@@ -17,11 +17,6 @@ export function createPlayerAnalytics(startingTier: AdaptiveTier): PlayerAnalyti
     behaviorTag: 'playing',
     adaptiveTier: startingTier,
     adaptiveHistory: [startingTier],
-    blocksPlaced: 0,
-    blocksLost: 0,
-    missilesLaunched: 0,
-    missilesTaken: 0,
-    splashHitsTaken: 0,
   }
 }
 
@@ -115,7 +110,7 @@ export function computeSuperlatives(
     superlatives.push({
       award: 'Speed Demon',
       playerName: playerNames.get(fastestId) ?? 'Unknown',
-      value: `${(fastestAvg / 1000).toFixed(1)}s avg`,
+      value: `${(fastestAvg / 1000).toFixed(1)}s avg speed`,
     })
   }
 

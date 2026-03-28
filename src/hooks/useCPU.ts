@@ -28,8 +28,16 @@ export function useCPU({ character, currentProblem, enabled, onAnswer, streak }:
     // Clear any existing timer
     if (timerRef.current) clearTimeout(timerRef.current)
 
-    const [minSpeed, maxSpeed] = character.speedRange
-    const delay = (minSpeed + Math.random() * (maxSpeed - minSpeed)) * 1000
+    // Counting questions: CPU counts at ~1 per second + small variance
+    let delay: number
+    if (currentProblem.imageCount) {
+      const countTime = currentProblem.imageCount * 1000
+      const variance = (Math.random() - 0.5) * 1500 // ±0.75s jitter
+      delay = Math.max(1500, countTime + variance)
+    } else {
+      const [minSpeed, maxSpeed] = character.speedRange
+      delay = (minSpeed + Math.random() * (maxSpeed - minSpeed)) * 1000
+    }
 
     // After 2 correct in a row, slightly higher chance of getting wrong
     let effectiveAccuracy = character.accuracy

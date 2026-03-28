@@ -1,0 +1,422 @@
+[
+  {
+    "question": "Which word rhymes with bright?",
+    "choices": ["Bring", "Light", "Brick", "Banana"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word rhymes with crown?",
+    "choices": ["Brown", "Crowd", "Cream", "Pickle"],
+    "correctIndex": 0,
+    "category": "rhyming",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word rhymes with speak?",
+    "choices": ["Spark", "Speed", "Week", "Spaghetti"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word rhymes with block?",
+    "choices": ["Black", "Blank", "Clock", "Balloon"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with dream?",
+    "choices": ["Drum", "Stream", "Dress", "Dinosaur"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with ground?",
+    "choices": ["Grand", "Green", "Found", "Giraffe"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with snail?",
+    "choices": ["Trail", "Snow", "Snap", "Sandwich"],
+    "correctIndex": 0,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with bloom?",
+    "choices": ["Blast", "Blaze", "Room", "Broccoli"],
+    "correctIndex": 2,
+    "category": "rhyming",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word rhymes with stare?",
+    "choices": ["Store", "Chair", "Stir", "Octopus"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word rhymes with rough?",
+    "choices": ["Roof", "Stuff", "Rouge", "Unicorn"],
+    "correctIndex": 1,
+    "category": "rhyming",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the opposite of empty?",
+    "choices": ["Hollow", "Full", "Flat", "Silly"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of brave?",
+    "choices": ["Strong", "Scared", "Bold", "Sparkly"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of whisper?",
+    "choices": ["Talk", "Shout", "Hum", "Giggle"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of young?",
+    "choices": ["Small", "Tiny", "Old", "Funny"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What is the opposite of smooth?",
+    "choices": ["Soft", "Rough", "Flat", "Squishy"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of borrow?",
+    "choices": ["Take", "Lend", "Keep", "Juggle"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of narrow?",
+    "choices": ["Thin", "Short", "Wide", "Wiggly"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What is the opposite of polite?",
+    "choices": ["Nice", "Rude", "Quiet", "Purple"],
+    "correctIndex": 1,
+    "category": "opposites",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the opposite of ancient?",
+    "choices": ["Old", "Dusty", "Modern", "Crunchy"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What is the opposite of destroy?",
+    "choices": ["Break", "Smash", "Build", "Sneeze"],
+    "correctIndex": 2,
+    "category": "opposites",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word starts with the same sound as planet?",
+    "choices": ["Blanket", "Please", "Tiger", "Muffin"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word starts with the same sound as dragon?",
+    "choices": ["Dress", "Grape", "Brick", "Noodle"],
+    "correctIndex": 0,
+    "category": "beginning-sounds",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word starts with the same sound as flamingo?",
+    "choices": ["Garden", "Flower", "Bridge", "Pickle"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word starts with the same sound as thumb?",
+    "choices": ["Think", "Sing", "Drum", "Waffle"],
+    "correctIndex": 0,
+    "category": "beginning-sounds",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word starts with the same sound as giraffe?",
+    "choices": ["Goat", "Garden", "Jump", "Ketchup"],
+    "correctIndex": 2,
+    "category": "beginning-sounds",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word starts with the same sound as wrinkle?",
+    "choices": ["Wander", "Ring", "Whistle", "Penguin"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word starts with the same sound as knight?",
+    "choices": ["Kite", "Nice", "Might", "Donut"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word starts with the same sound as whale?",
+    "choices": ["Vine", "Wheel", "Hall", "Jellyfish"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word starts with the same sound as phrase?",
+    "choices": ["Prize", "Free", "Phase", "Taco"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word starts with the same sound as science?",
+    "choices": ["Skill", "City", "Shine", "Pumpkin"],
+    "correctIndex": 1,
+    "category": "beginning-sounds",
+    "difficulty": "hard"
+  },
+  {
+    "question": "The dog ___ over the fence.",
+    "choices": ["Jumped", "Ate", "Slept", "Melted"],
+    "correctIndex": 0,
+    "category": "fill-in-blank",
+    "difficulty": "easy"
+  },
+  {
+    "question": "We ___ our hands before eating lunch.",
+    "choices": ["Comb", "Wash", "Throw", "Tickle"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "easy"
+  },
+  {
+    "question": "The children ___ in the swimming pool.",
+    "choices": ["Flew", "Planted", "Swam", "Painted"],
+    "correctIndex": 2,
+    "category": "fill-in-blank",
+    "difficulty": "easy"
+  },
+  {
+    "question": "She ___ the book from the library.",
+    "choices": ["Cooked", "Borrowed", "Planted", "Juggled"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The farmer ___ seeds in the garden.",
+    "choices": ["Drove", "Planted", "Washed", "Surfed"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The wind ___ the leaves off the trees.",
+    "choices": ["Painted", "Blew", "Cooked", "Hugged"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Mom ___ a cake for my birthday party.",
+    "choices": ["Drove", "Baked", "Swept", "Invented"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "medium"
+  },
+  {
+    "question": "The scientist ___ a new type of bug under the rock.",
+    "choices": ["Discovered", "Painted", "Baked", "Tickled"],
+    "correctIndex": 0,
+    "category": "fill-in-blank",
+    "difficulty": "hard"
+  },
+  {
+    "question": "The class ___ quietly while the teacher read the story.",
+    "choices": ["Shouted", "Listened", "Danced", "Snored"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "hard"
+  },
+  {
+    "question": "After the storm, a beautiful ___ appeared in the sky.",
+    "choices": ["Snowman", "Rainbow", "Sandwich", "Blanket"],
+    "correctIndex": 1,
+    "category": "fill-in-blank",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word enormous mean?",
+    "choices": ["Very small", "Very old", "Very big", "Very purple"],
+    "correctIndex": 2,
+    "category": "word-meaning",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word vanish mean?",
+    "choices": ["To appear", "To disappear", "To grow", "To do a cartwheel"],
+    "correctIndex": 1,
+    "category": "word-meaning",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word feast mean?",
+    "choices": ["A short nap", "A big meal", "A loud noise", "A rubber duck"],
+    "correctIndex": 1,
+    "category": "word-meaning",
+    "difficulty": "easy"
+  },
+  {
+    "question": "What does the word shiver mean?",
+    "choices": ["To shake from cold", "To sing loudly", "To run fast", "To eat a taco"],
+    "correctIndex": 0,
+    "category": "word-meaning",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word curious mean?",
+    "choices": ["Very tired", "Wanting to learn more", "Feeling sad", "Wearing a silly hat"],
+    "correctIndex": 1,
+    "category": "word-meaning",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word clumsy mean?",
+    "choices": ["Very smart", "Very neat", "Often tripping or dropping things", "Riding a unicycle"],
+    "correctIndex": 2,
+    "category": "word-meaning",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word patient mean?",
+    "choices": ["Able to wait without getting upset", "Moving very fast", "Feeling angry", "Bouncing on a trampoline"],
+    "correctIndex": 0,
+    "category": "word-meaning",
+    "difficulty": "medium"
+  },
+  {
+    "question": "What does the word brilliant mean?",
+    "choices": ["Very dark", "Very dull", "Very bright or very smart", "Very slimy"],
+    "correctIndex": 2,
+    "category": "word-meaning",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word exhausted mean?",
+    "choices": ["Very excited", "Very hungry", "Very tired", "Very bubbly"],
+    "correctIndex": 2,
+    "category": "word-meaning",
+    "difficulty": "hard"
+  },
+  {
+    "question": "What does the word fragile mean?",
+    "choices": ["Very strong", "Easy to break", "Very heavy", "Covered in glitter"],
+    "correctIndex": 1,
+    "category": "word-meaning",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word completes the sentence? I like to read ___ it is fun.",
+    "choices": ["because", "before", "under", "banana"],
+    "correctIndex": 0,
+    "category": "sight-words",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word completes the sentence? We will eat lunch ___ we play outside.",
+    "choices": ["always", "before", "around", "upside-down"],
+    "correctIndex": 1,
+    "category": "sight-words",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word completes the sentence? She ___ brushes her teeth in the morning.",
+    "choices": ["around", "together", "always", "underwater"],
+    "correctIndex": 2,
+    "category": "sight-words",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word completes the sentence? The kids ran ___ the playground.",
+    "choices": ["because", "around", "together", "spaghetti"],
+    "correctIndex": 1,
+    "category": "sight-words",
+    "difficulty": "easy"
+  },
+  {
+    "question": "Which word completes the sentence? Let's walk to school ___.",
+    "choices": ["because", "before", "together", "upside-down"],
+    "correctIndex": 2,
+    "category": "sight-words",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word completes the sentence? I ___ my homework was in my backpack.",
+    "choices": ["thought", "through", "though", "tickle"],
+    "correctIndex": 0,
+    "category": "sight-words",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which word completes the sentence? We played outside ___ it stopped raining.",
+    "choices": ["because", "before", "until", "under"],
+    "correctIndex": 2,
+    "category": "sight-words",
+    "difficulty": "medium"
+  },
+  {
+    "question": "Which is the correct spelling?",
+    "choices": ["becuz", "becuse", "because", "becaws"],
+    "correctIndex": 2,
+    "category": "sight-words",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which is the correct spelling?",
+    "choices": ["togehter", "togather", "together", "togethr"],
+    "correctIndex": 2,
+    "category": "sight-words",
+    "difficulty": "hard"
+  },
+  {
+    "question": "Which word completes the sentence? The teacher asked us to ___ our pencils down.",
+    "choices": ["right", "write", "ride", "wiggle"],
+    "correctIndex": 0,
+    "category": "sight-words",
+    "difficulty": "hard"
+  }
+]

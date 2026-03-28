@@ -14,16 +14,18 @@ export const TUG_WRONG_PULL = 10                // % opponent pulls on wrong
 export const TUG_STREAK_THRESHOLD = 3           // streak needed for super pull
 export const TUG_WIN_THRESHOLD = 80             // % past center to win
 
-// CPU Characters
+// CPU Characters — speedRange is [min, max] seconds before answering
 export const CPU_CHARACTERS: CPUCharacter[] = [
-  { name: 'Kevin', speedRange: [0, 3], accuracy: 0.85, tagline: 'Fast but sloppy!', color: '#ef4444',
+  { name: 'Kevin', speedRange: [4, 8], accuracy: 0.75, tagline: 'Fast but sloppy!', color: '#ef4444',
     avatarUrl: '/avatars/cpu/kevin-portrait.png', animatedUrl: '/avatars/cpu/kevin-walk.gif' },
-  { name: 'Sally', speedRange: [4, 8], accuracy: 0.90, tagline: 'Slow and steady', color: '#a855f7',
+  { name: 'Sally', speedRange: [6, 12], accuracy: 0.85, tagline: 'Slow and steady', color: '#a855f7',
     avatarUrl: '/avatars/cpu/sally-portrait.png', animatedUrl: '/avatars/cpu/sally-walk.gif' },
-  { name: 'Benny', speedRange: [2, 6], accuracy: 0.60, tagline: 'Still learning', color: '#22c55e',
+  { name: 'Benny', speedRange: [5, 10], accuracy: 0.55, tagline: 'Still learning', color: '#22c55e',
     avatarUrl: '/avatars/cpu/benny-portrait.png', animatedUrl: '/avatars/cpu/benny-walk.gif' },
-  { name: 'Mia',   speedRange: [0, 6], accuracy: 0.75, tagline: 'Wildcard!',       color: '#f59e0b',
+  { name: 'Mia',   speedRange: [4, 10], accuracy: 0.65, tagline: 'Wildcard!',       color: '#f59e0b',
     avatarUrl: '/avatars/cpu/mia-portrait.png', animatedUrl: '/avatars/cpu/mia-walk.gif' },
+  { name: 'Jayden', speedRange: [5, 9], accuracy: 0.70, tagline: 'Cool and clever!', color: '#06b6d4',
+    avatarUrl: '/avatars/cpu/jayden-portrait.png', animatedUrl: '/avatars/cpu/jayden-walk.gif' },
 ]
 
 // Player colors (supports up to 16 players, then cycles)

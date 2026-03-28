@@ -1,4 +1,4 @@
-import { getArenaAssets, getCharacterRunFrames } from '../../utils/pixelArt'
+import { getArenaAssets, getCharacterRunFrames, OBJECTS } from '../../utils/pixelArt'
 import { AnimatedSprite } from '../shared/AnimatedSprite'
 import { getCustomCharacterFrames } from '../../utils/customCharacters'
 import type { TugArenaType, Player } from '../../types'
@@ -15,6 +15,7 @@ const CPU_NAME_MAP: Record<string, string> = {
   Sally: 'sally',
   Benny: 'benny',
   Mia: 'mia',
+  Jayden: 'jayden',
 }
 
 const FALLBACK_COLORS: Record<string, string> = {
@@ -22,6 +23,7 @@ const FALLBACK_COLORS: Record<string, string> = {
   sally: '#a855f7',
   benny: '#22c55e',
   mia: '#f97316',
+  jayden: '#06b6d4',
 }
 
 function getPlayerFrames(player: Player): string[] {
@@ -41,7 +43,7 @@ function getPlayerColor(player: Player): string {
   return player.color
 }
 
-const SPRITE_SIZE = 72
+const SPRITE_SIZE = 112
 
 function CenterFeature({ arenaType }: { arenaType: TugArenaType }) {
   switch (arenaType) {
@@ -125,7 +127,7 @@ function PlayerSprite({ player, flipped }: { player: Player; flipped?: boolean }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div
-        className="font-pixel text-[7px] text-white text-center mb-0.5 whitespace-nowrap"
+        className="font-pixel-body text-[11px] text-white text-center mb-0.5 whitespace-nowrap"
         style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)', transform: flipped ? 'scaleX(-1)' : undefined }}
       >
         {player.name}
@@ -194,6 +196,25 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
             }}
           />
         ))}
+        {/* Crowd bleachers for stadium */}
+        {arenaType === 'stadium' && OBJECTS['crowd'] && (
+          <>
+            <img
+              src={OBJECTS['crowd']}
+              alt=""
+              className="absolute opacity-70"
+              onError={(e) => { ;(e.currentTarget as HTMLImageElement).style.display = 'none' }}
+              style={{ imageRendering: 'pixelated', top: 4, left: '2%', height: 80, width: 'auto' }}
+            />
+            <img
+              src={OBJECTS['crowd']}
+              alt=""
+              className="absolute opacity-70"
+              onError={(e) => { ;(e.currentTarget as HTMLImageElement).style.display = 'none' }}
+              style={{ imageRendering: 'pixelated', top: 4, right: '2%', height: 80, width: 'auto', transform: 'scaleX(-1)' }}
+            />
+          </>
+        )}
       </div>
 
       {/* Ground surface */}
@@ -216,18 +237,32 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
       <div
         className="absolute left-[10%] right-[10%] transition-transform duration-300"
         style={{
-          top: 190,
-          height: 8,
+          top: 186,
+          height: 16,
           transform: `translateX(${ropePosition * 1.5}px)`,
         }}
       >
-        <div
-          className="w-full h-full rounded"
-          style={{
-            background: 'repeating-linear-gradient(90deg, #92400e 0px, #b45309 4px, #78350f 8px)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)',
-          }}
-        />
+        {OBJECTS['tug-rope'] ? (
+          <img
+            src={OBJECTS['tug-rope']}
+            alt=""
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'fill',
+              imageRendering: 'pixelated',
+            }}
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          />
+        ) : (
+          <div
+            className="w-full h-full rounded"
+            style={{
+              background: 'repeating-linear-gradient(90deg, #92400e 0px, #b45309 4px, #78350f 8px)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)',
+            }}
+          />
+        )}
         <div className="absolute -top-6 left-1/2 -translate-x-1/2">
           <div className="w-0.5 h-10 bg-white/90 mx-auto" />
           <div
@@ -281,10 +316,10 @@ export function TugArena({ arenaType, ropePosition, leftTeam, rightTeam }: TugAr
 
       {/* Win zone indicators */}
       <div className="absolute left-0 top-0 bottom-0 w-[8%] bg-blue-500/15 border-r border-blue-400/30 flex items-end justify-center pb-2">
-        <span className="font-pixel text-[6px] text-blue-300/70">WIN</span>
+        <span className="font-pixel-body text-[10px] text-blue-300/70">WIN</span>
       </div>
       <div className="absolute right-0 top-0 bottom-0 w-[8%] bg-red-500/15 border-l border-red-400/30 flex items-end justify-center pb-2">
-        <span className="font-pixel text-[6px] text-red-300/70">WIN</span>
+        <span className="font-pixel-body text-[10px] text-red-300/70">WIN</span>
       </div>
     </div>
   )

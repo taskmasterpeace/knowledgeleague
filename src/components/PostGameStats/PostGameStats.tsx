@@ -4,6 +4,7 @@ import { usePeerContext } from '../../hooks/usePeerContext'
 import { getLastGameAnalytics } from '../../utils/gameAnalyticsStore'
 import { computeSuperlatives } from '../../utils/playerAnalytics'
 import { sounds } from '../../utils/sounds'
+import { playMusic } from '../../utils/backgroundMusic'
 import type { BehaviorTag, Superlative } from '../../types'
 
 function tierLabel(tier: number | undefined): string {
@@ -36,6 +37,7 @@ export function PostGameStats() {
 
   useEffect(() => {
     sounds.navigate()
+    playMusic('stats')
   }, [])
 
   // Empty state
@@ -92,19 +94,19 @@ export function PostGameStats() {
           return (
             <div key={playerId} className="pixel-card rounded-lg p-4 flex flex-col gap-3 border border-white/10">
               {/* Name */}
-              <div className="font-pixel text-sm text-white text-center truncate">{name}</div>
+              <div className="font-pixel-body font-bold text-base text-white text-center truncate">{name}</div>
 
               {/* Behavior tag */}
               <div className="flex items-center justify-center gap-2">
                 <span className="text-lg">{tagEmoji}</span>
-                <span className="font-pixel text-[9px] text-cyan-400 uppercase">{stat.behaviorTag}</span>
+                <span className="font-pixel-body font-bold text-sm text-cyan-400 uppercase">{stat.behaviorTag}</span>
               </div>
 
               {/* Accuracy */}
               <div className="flex flex-col items-center gap-1">
-                <div className="font-pixel text-[8px] text-white/50 uppercase">Accuracy</div>
-                <div className="font-pixel text-base text-yellow-300">{accuracy}%</div>
-                <div className="font-pixel text-[7px] text-white/40">
+                <div className="font-pixel-body font-semibold text-sm text-white/50 uppercase">Accuracy</div>
+                <div className="font-pixel-body font-bold text-lg text-yellow-300">{accuracy}%</div>
+                <div className="font-pixel-body font-semibold text-xs text-white/40">
                   {stat.answersCorrect}/{stat.answersTotal}
                 </div>
                 {/* Accuracy bar */}
@@ -118,14 +120,14 @@ export function PostGameStats() {
 
               {/* Avg response time */}
               <div className="flex flex-col items-center gap-0.5">
-                <div className="font-pixel text-[8px] text-white/50 uppercase">Avg Time</div>
-                <div className="font-pixel text-sm text-green-300">{avgTime}</div>
+                <div className="font-pixel-body font-semibold text-sm text-white/50 uppercase">Avg Time</div>
+                <div className="font-pixel-body font-bold text-base text-green-300">{avgTime}</div>
               </div>
 
               {/* Adaptive tier progression */}
               {tierChanged && (
                 <div className="flex items-center justify-center gap-1 bg-purple-900/30 rounded px-2 py-1">
-                  <span className="font-pixel text-[7px] text-purple-300">
+                  <span className="font-pixel-body font-semibold text-xs text-purple-300">
                     {tierLabel(firstTier)} → {tierLabel(lastTier)}
                     {(lastTier ?? 0) > (firstTier ?? 0) ? ' ▲' : ' ▼'}
                   </span>
@@ -135,14 +137,14 @@ export function PostGameStats() {
               {/* Category accuracy breakdown */}
               {catEntries.length > 0 && (
                 <div className="flex flex-col gap-1.5 border-t border-white/10 pt-2">
-                  <div className="font-pixel text-[7px] text-white/40 uppercase text-center">Categories</div>
+                  <div className="font-pixel-body font-semibold text-xs text-white/40 uppercase text-center">Categories</div>
                   {catEntries.map(([cat, { correct, total }]) => {
                     const catPct = Math.round((correct / total) * 100)
                     return (
                       <div key={cat} className="flex flex-col gap-0.5">
                         <div className="flex justify-between">
-                          <span className="font-pixel text-[7px] text-white/60 capitalize truncate">{cat}</span>
-                          <span className="font-pixel text-[7px] text-white/60">{catPct}%</span>
+                          <span className="font-pixel-body font-semibold text-xs text-white/60 capitalize truncate">{cat}</span>
+                          <span className="font-pixel-body font-semibold text-xs text-white/60">{catPct}%</span>
                         </div>
                         <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
                           <div
@@ -179,9 +181,9 @@ export function PostGameStats() {
                   </svg>
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <div className="font-pixel text-[9px] text-yellow-300 uppercase">{sup.award}</div>
-                  <div className="font-pixel text-[8px] text-white truncate">{sup.playerName}</div>
-                  <div className="font-pixel text-[7px] text-white/50">{sup.value}</div>
+                  <div className="font-pixel-body font-bold text-sm text-yellow-300 uppercase">{sup.award}</div>
+                  <div className="font-pixel-body font-semibold text-sm text-white truncate">{sup.playerName}</div>
+                  <div className="font-pixel-body font-semibold text-xs text-white/50">{sup.value}</div>
                 </div>
               </div>
             ))}

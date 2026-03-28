@@ -1,5 +1,6 @@
 import type { Subject } from '../types'
 import { speakLocal, isAvailable as isSpeechAvailable } from './speechSynthesis'
+import { speakTTS, stopTTS } from './ttsCache'
 
 export interface AnnouncerLine {
   text: string
@@ -23,7 +24,7 @@ let lastSpoken = 0
 let currentAudio: HTMLAudioElement | null = null
 const recentLines = new Set<string>()
 
-export function speak(line: AnnouncerLine, config: AnnouncerConfig, useSpeechSynthesis = false): void {
+export function speak(line: AnnouncerLine, config: AnnouncerConfig): void {
   if (!config.enabled) return
 
   const now = Date.now()
@@ -45,81 +46,30 @@ export function speak(line: AnnouncerLine, config: AnnouncerConfig, useSpeechSyn
     currentAudio.pause()
     currentAudio = null
   }
+  stopTTS()
 
   lastSpoken = now
 
-  // Use browser SpeechSynthesis if requested and available (faster, no network)
-  if (useSpeechSynthesis && isSpeechAvailable()) {
-    speakLocal(line.text)
-    return
-  }
-
-  // Try pre-generated file first
-  if (line.pregenId) {
-    const audio = new Audio(`/sounds/announcer/${config.voice}/${line.pregenId}.mp3`)
-    audio.volume = 0.7
-    currentAudio = audio
-    audio.play().catch(() => {
-      // Pre-generated file not found, try dynamic TTS
-      generateAndSpeak(line.text, config.voice)
-    })
-    return
-  }
-
-  // Dynamic TTS via Replicate
-  generateAndSpeak(line.text, config.voice)
-}
-
-async function generateAndSpeak(text: string, voice: string): Promise<void> {
-  try {
-    // Strip emotion tags for the API call
-    const cleanText = text.replace(/\[.*?\]\s*/g, '')
-
-    const response = await fetch('/api/replicate/v1/predictions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        version: 'inworld/tts-1.5-mini',
-        input: {
-          text: cleanText,
-          speaker: voice,
-          output_format: 'mp3',
-        },
-      }),
-    })
-
-    if (!response.ok) return
-
-    const prediction = await response.json()
-    const id = prediction.id
-
-    // Poll for result
-    for (let i = 0; i < 20; i++) {
-      await new Promise(r => setTimeout(r, 300))
-      const statusRes = await fetch(`/api/replicate/v1/predictions/${id}`)
-      const status = await statusRes.json()
-
-      if (status.status === 'succeeded' && status.output) {
-        const audioUrl = typeof status.output === 'string' ? status.output : status.output[0]
-        const audio = new Audio(audioUrl)
-        audio.volume = 0.7
-        currentAudio = audio
-        audio.play().catch(() => {})
-        return
-      }
-
-      if (status.status === 'failed') return
+  // Primary path: Qwen3 TTS with 3-tier cache (static → IndexedDB → API)
+  // Falls back to browser SpeechSynthesis if TTS fails or is unavailable
+  speakTTS(line.text, config.voice).then((played) => {
+    if (!played && isSpeechAvailable()) {
+      speakLocal(line.text)
     }
-  } catch {
-    // Silently fail — announcer is non-critical
-  }
+  }).catch(() => {
+    if (isSpeechAvailable()) {
+      speakLocal(line.text)
+    }
+  })
 }
+
 
 export function stopAnnouncer(): void {
   if (currentAudio) {
     currentAudio.pause()
     currentAudio = null
   }
+  stopTTS()
   recentLines.clear()
 }
 
@@ -152,7 +102,7 @@ export function closeRaceLine(): AnnouncerLine {
 }
 
 export function subjectChangeLine(subject: Subject): AnnouncerLine {
-  const labels = { math: 'math', science: 'science', reading: 'reading' }
+  const labels: Record<string, string> = { math: 'math', science: 'science', reading: 'reading', spelling: 'spelling' }
   return { text: `Time for some ${labels[subject]}!`, priority: 'low' }
 }
 
@@ -168,6 +118,21 @@ export function playerJoinLine(playerName: string): AnnouncerLine {
     `Look who showed up! It's ${playerName}!`,
   ]
   return { text: lines[Math.floor(Math.random() * lines.length)], priority: 'normal' }
+}
+
+export function lockInLine(playerName: string, answeredCount: number, totalPlayers: number): AnnouncerLine {
+  if (answeredCount === 1) {
+    const lines = [
+      `${playerName} locks it in first!`,
+      `First answer is in from ${playerName}!`,
+      `${playerName} is quick!`,
+    ]
+    return { text: lines[Math.floor(Math.random() * lines.length)], priority: 'low' }
+  }
+  if (answeredCount >= totalPlayers) {
+    return { text: "All answers are in! Let's see the results!", priority: 'low' }
+  }
+  return { text: `${playerName} locks in!`, priority: 'low' }
 }
 
 export function gameStartLine(playerCount: number): AnnouncerLine {

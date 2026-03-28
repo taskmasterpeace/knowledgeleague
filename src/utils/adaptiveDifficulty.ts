@@ -3,6 +3,7 @@ import type { AdaptiveTier, GradeLevel, Difficulty } from '../types'
 export function gradeToStartingTier(grade: GradeLevel): AdaptiveTier {
   switch (grade) {
     case 'grade-1': return 1
+    case 'grade-2': return 1
     case 'grade-3': return 2
     case 'adult': return 3
   }

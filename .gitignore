@@ -1,5 +1,8 @@
-# Environment
+# Environment & secrets
 .env
+.env.*
+.env.local
+.env.production
 
 # Logs
 logs
@@ -29,3 +32,10 @@ dist-ssr
 # Worktrees
 .worktrees
 .superpowers/
+
+# Claude Code — keep settings.json but ignore conversations, memory, JSONL logs
+.claude/*
+!.claude/settings.json
+
+# Test artifacts
+test-screenshots/

@@ -11,6 +11,32 @@ function playSound(file: string, volume = 0.5): void {
   audio.play().catch(() => {})
 }
 
+/** Synthesized "ding" lock-in confirmation sound via Web Audio API */
+function playLockInDing(volume = 0.4): void {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+    const gain = ctx.createGain()
+    gain.connect(ctx.destination)
+    gain.gain.setValueAtTime(volume, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
+
+    // Two-tone ding: quick rising pitch
+    const osc1 = ctx.createOscillator()
+    osc1.type = 'sine'
+    osc1.frequency.setValueAtTime(880, ctx.currentTime)
+    osc1.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08)
+    osc1.connect(gain)
+    osc1.start(ctx.currentTime)
+    osc1.stop(ctx.currentTime + 0.3)
+
+    // Cleanup
+    osc1.onended = () => ctx.close()
+  } catch {
+    // Fallback to select sound
+    playSound('select.wav', 0.35)
+  }
+}
+
 // Preload all sounds on first user interaction
 let preloaded = false
 export function preloadSounds(): void {
@@ -39,6 +65,7 @@ export const sounds = {
   badge: () => playSound('badge.wav', 0.7),
   victory: () => playSound('victory.wav', 0.7),
   gameStart: () => playSound('game-start.wav', 0.6),
+  lockIn: () => playLockInDing(),
 }
 
 // Mode-specific sounds
@@ -51,15 +78,4 @@ export const tugSounds = {
   ropePull: () => playSound('tug/rope-pull.wav', 0.5),
   superPull: () => playSound('tug/super-pull.wav', 0.6),
   ropeSnap: () => playSound('tug/rope-snap.wav', 0.7),
-}
-
-export const towerSounds = {
-  blockPlace: () => playSound('tower/block-place.wav', 0.5),
-  blockCrumble: () => playSound('tower/block-crumble.wav', 0.5),
-  towerCreak: () => playSound('tower/tower-creak.wav', 0.5),
-  towerCollapse: () => playSound('tower/tower-collapse.wav', 0.6),
-  missileLaunch: () => playSound('tower/missile-launch.wav', 0.6),
-  missileHit: () => playSound('tower/missile-hit.wav', 0.6),
-  splashHit: () => playSound('tower/splash-hit.wav', 0.3),
-  towerComplete: () => playSound('tower/tower-complete.wav', 0.7),
 }

@@ -11,7 +11,7 @@ export function ScoreBar({ position, trackLength, color, label }: Props) {
     <div className="flex items-center gap-3 w-full">
       <div className="flex items-center gap-2 min-w-[100px]">
         <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }} />
-        <span className="font-pixel text-[10px] text-white/90 truncate">{label}</span>
+        <span className="font-pixel-body text-sm font-semibold text-white/90 truncate">{label}</span>
       </div>
       <div className="flex-1 h-5 bg-gray-900/80 rounded-sm border border-gray-600/50 overflow-hidden relative">
         {/* Tick marks at 25/50/75% */}
@@ -34,7 +34,7 @@ export function ScoreBar({ position, trackLength, color, label }: Props) {
         {/* Finish star */}
         <div className="absolute right-1 top-1/2 -translate-y-1/2 text-yellow-400/60 text-xs">★</div>
       </div>
-      <span className="font-pixel text-[9px] text-yellow-300/80 min-w-[50px] text-right">
+      <span className="font-pixel-body text-sm font-bold text-yellow-300/80 min-w-[50px] text-right">
         {Math.round(position)}/{trackLength}
       </span>
     </div>

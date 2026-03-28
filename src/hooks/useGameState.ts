@@ -3,6 +3,12 @@ import type { GamePhase, GameEvent, Player, PlayerId, CPUCharacter } from '../ty
 import type { ControllerType } from './useGamepad'
 import { PLAYER_COLORS } from '../utils/constants'
 
+const SITE_CODE_KEY = 'klk-site-code'
+
+function getSiteCode(): string | null {
+  try { return localStorage.getItem(SITE_CODE_KEY) || null } catch { return null }
+}
+
 interface GameState {
   phase: GamePhase
   event: GameEvent | null
@@ -11,6 +17,7 @@ interface GameState {
   cpuCharacter: CPUCharacter | null
   winner: PlayerId | null
   controllerType: ControllerType
+  siteCode: string | null
 
   setPhase: (phase: GamePhase) => void
   setEvent: (event: GameEvent) => void
@@ -27,6 +34,7 @@ interface GameState {
   incrementScore: (id: PlayerId) => void
   setWinner: (id: PlayerId) => void
   setControllerType: (type: ControllerType) => void
+  setSiteCode: (code: string | null) => void
   resetGame: () => void
   rematch: () => void
   startSinglePlayer: () => void
@@ -56,6 +64,7 @@ export const useGameState = create<GameState>((set) => ({
   cpuCharacter: null,
   winner: null,
   controllerType: null,
+  siteCode: getSiteCode(),
 
   setPhase: (phase) => set({ phase }),
   setEvent: (event) => set({ event }),
@@ -95,6 +104,13 @@ export const useGameState = create<GameState>((set) => ({
   })),
   setWinner: (id) => set({ winner: id, phase: 'victory' }),
   setControllerType: (controllerType) => set({ controllerType }),
+  setSiteCode: (code) => {
+    try {
+      if (code) localStorage.setItem(SITE_CODE_KEY, code)
+      else localStorage.removeItem(SITE_CODE_KEY)
+    } catch { /* noop */ }
+    set({ siteCode: code })
+  },
   resetGame: () => set({
     phase: 'menu',
     event: null,

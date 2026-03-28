@@ -1,8 +1,9 @@
 export type GamePhase =
   | 'menu' | 'cpu-select' | 'avatar-select' | 'event-select'
   | 'phone-lobby' | 'playing' | 'victory' | 'stats' | 'trophies' | 'leaderboards'
+  | 'daily-challenge'
 
-export type GameEvent = 'marathon' | 'tug-of-war'
+export type GameEvent = 'marathon' | 'tug-of-war' | 'hurdle-dash' | 'long-jump' | 'spelling-bee'
 
 export type PlayerType = 'human' | 'cpu'
 
@@ -32,7 +33,7 @@ export interface CPUCharacter {
 
 export type Difficulty = 'easy' | 'medium' | 'hard'
 
-export type Subject = 'math' | 'science' | 'reading'
+export type Subject = 'math' | 'science' | 'reading' | 'spelling' | 'images'
 export type GradeLevel = 'grade-1' | 'grade-2' | 'grade-3' | 'adult'
 
 export type ProblemType = 'addition' | 'subtraction' | 'missing' | 'comparison' | 'skip-counting'
@@ -55,6 +56,10 @@ export type QuestionCategory =
   | 'word-meaning' | 'sight-words' | 'vocabulary' | 'grammar'
   | 'figurative-language' | 'parts-of-speech' | 'sentence-correction'
   | 'etymology' | 'analogies' | 'spelling'
+  // Images
+  | 'visual-id'
+  | 'counting'
+  | 'pattern'
 
 export interface Badge {
   category: QuestionCategory
@@ -71,6 +76,9 @@ export interface GameQuestion {
   category: QuestionCategory
   difficulty: Difficulty
   standard?: string
+  imageUrl?: string        // optional image shown in question area
+  imageCount?: number      // if set, render this many copies of imageUrl (counting questions)
+  patternSequence?: string[] // sequence of image URLs or color tokens for pattern questions
 }
 
 export type BehaviorTag = 'on-fire' | 'mashing' | 'guessing' | 'thinking' | 'struggling' | 'warming-up' | 'playing'

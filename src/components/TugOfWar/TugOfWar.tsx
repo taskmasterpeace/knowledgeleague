@@ -22,10 +22,14 @@ import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
 import type { Badge, PlayerAnalytics, PlayerId, TugArenaType } from '../../types'
 import { BadgeToast } from '../shared/BadgeToast'
+import { QuitButton } from '../shared/QuitButton'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
+import { useLockIn } from '../../hooks/useLockIn'
 import { usePeerContext } from '../../hooks/usePeerContext'
 import { TugArena } from './TugArena'
+import { LockInIndicator } from '../shared/LockInIndicator'
 import { getRandomArena } from '../../utils/pixelArt'
+import Countdown from '../shared/Countdown'
 
 export function TugOfWar() {
   const {
@@ -45,7 +49,12 @@ export function TugOfWar() {
   const [showBurst, setShowBurst] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
   const { announceCorrect, announceWrong } = useAnnouncer()
+  const { lockedIn, onLockIn, resetLockIn } = useLockIn(players)
   const [arenaType] = useState<TugArenaType>(() => getRandomArena())
+  const [countdownDone, setCountdownDone] = useState(false)
+  useEffect(() => {
+    if (countdownDone) timerStartRef.current = Date.now()
+  }, [countdownDone])
 
   const { broadcastProblem, broadcastResult, broadcastSpectatorUpdate } = usePeerContext()
 
@@ -108,7 +117,8 @@ export function TugOfWar() {
     setFeedback({ 1: null, 2: null })
     setUsedShot({ 1: false, 2: false })
     setEarnedBadge(null)
-  }, [nextProblem])
+    resetLockIn()
+  }, [nextProblem, resetLockIn])
 
   const handleAnswer = useCallback((playerId: 1 | 2, choiceIndex: number) => {
     if (usedShot[playerId]) return
@@ -117,6 +127,7 @@ export function TugOfWar() {
     const direction = playerId === 1 ? -1 : 1
 
     setUsedShot(prev => ({ ...prev, [playerId]: true }))
+    onLockIn(playerId as PlayerId)
 
     const profileId = profilesRef.current.get(playerId)
     if (profileId && players[playerId - 1].type === 'human') {
@@ -237,21 +248,21 @@ export function TugOfWar() {
       if (playerId === 1) handleP1Answer(choiceIndex)
       else if (playerId === 2 && players[1]?.type === 'human') handleP2Answer(choiceIndex)
     },
-    enabled: true,
+    enabled: countdownDone,
     playerCount: 2,
   })
 
   useGamepad({
     onP1Answer: handleP1Answer,
     onP2Answer: players[1]?.type === 'cpu' ? () => {} : handleP2Answer,
-    enabled: true,
+    enabled: countdownDone,
     onControllerChange: setControllerType,
   })
 
   useCPU({
     character: cpuCharacter,
     currentProblem,
-    enabled: players[1]?.type === 'cpu' && !usedShot[2],
+    enabled: players[1]?.type === 'cpu' && countdownDone && !usedShot[2],
     onAnswer: handleP2Answer,
     streak: players[1]?.streak ?? 0,
   })
@@ -265,6 +276,14 @@ export function TugOfWar() {
   return (
     <ScreenShake trigger={shaking}>
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col p-4 gap-4">
+      {!countdownDone && (
+        <Countdown
+          playerNames={players.map(p => p.name)}
+          eventName="Tug of War"
+          onComplete={() => setCountdownDone(true)}
+        />
+      )}
+      <QuitButton />
       <BadgeToast badge={earnedBadge} />
       <FlashOverlay type={flashType} />
 
@@ -393,7 +412,10 @@ export function TugOfWar() {
       </div>
 
       {/* Timer */}
-      <Timer onTimeUp={handleTimeUp} resetKey={timerKey} timeLimit={timePerQuestion} />
+      {countdownDone && <Timer onTimeUp={handleTimeUp} resetKey={timerKey} timeLimit={timePerQuestion} />}
+
+      {/* Lock-in indicators — hide when showing feedback */}
+      {!feedback[1] && !feedback[2] && <LockInIndicator players={players} lockedIn={lockedIn} />}
 
       {/* Problem */}
       <div className="flex-1 flex items-center justify-center relative">

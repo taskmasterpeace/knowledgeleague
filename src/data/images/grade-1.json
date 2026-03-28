@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What animal is this?",
+    "choices": ["Dog", "Cat", "Horse", "Bear"],
+    "correctIndex": 0,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/dog.png"
+  },
+  {
+    "question": "What animal is this?",
+    "choices": ["Dog", "Cat", "Rabbit", "Mouse"],
+    "correctIndex": 1,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/cat.png"
+  },
+  {
+    "question": "What animal is this?",
+    "choices": ["Horse", "Elephant", "Cow", "Hippo"],
+    "correctIndex": 1,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/elephant.png"
+  },
+  {
+    "question": "What animal is this?",
+    "choices": ["Parrot", "Duck", "Penguin", "Seagull"],
+    "correctIndex": 2,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/penguin.png"
+  },
+  {
+    "question": "What animal is this?",
+    "choices": ["Tiger", "Bear", "Wolf", "Lion"],
+    "correctIndex": 3,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/lion.png"
+  },
+  {
+    "question": "What animal is this?",
+    "choices": ["Shark", "Whale", "Dolphin", "Fish"],
+    "correctIndex": 2,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/dolphin.png"
+  },
+  {
+    "question": "What is this?",
+    "choices": ["Banana", "Orange", "Apple", "Pear"],
+    "correctIndex": 2,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/apple.png"
+  },
+  {
+    "question": "What instrument is this?",
+    "choices": ["Drum", "Piano", "Guitar", "Flute"],
+    "correctIndex": 2,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/guitar.png"
+  },
+  {
+    "question": "What is this?",
+    "choices": ["Moon", "Sun", "Earth", "Star"],
+    "correctIndex": 2,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/earth.png"
+  },
+  {
+    "question": "What insect is this?",
+    "choices": ["Bee", "Ladybug", "Dragonfly", "Butterfly"],
+    "correctIndex": 3,
+    "category": "visual-id",
+    "difficulty": "easy",
+    "imageUrl": "/pixelart/images/butterfly.png"
+  }
+]

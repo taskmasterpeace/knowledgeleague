@@ -15,7 +15,3 @@ export function getLastGameAnalytics() {
   return { analytics: lastAnalytics, playerNames: lastPlayerNames }
 }
 
-export function clearGameAnalytics() {
-  lastAnalytics = null
-  lastPlayerNames = null
-}

@@ -15,6 +15,7 @@ const CPU_NAME_MAP: Record<string, string> = {
   Sally: 'sally',
   Benny: 'benny',
   Mia: 'mia',
+  Jayden: 'jayden',
 }
 
 const FALLBACK_COLORS: Record<string, string> = {
@@ -22,6 +23,7 @@ const FALLBACK_COLORS: Record<string, string> = {
   sally: '#a855f7',
   benny: '#22c55e',
   mia: '#f97316',
+  jayden: '#06b6d4',
   'default-player': '#3b82f6',
 }
 
@@ -43,7 +45,7 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
   const hasDirtTrack = !!TILESETS['dirt-track']
   const hasGrass = !!TILESETS.grass
   const laneCount = Math.max(players.length, 1)
-  const spriteSize = Math.min(96, Math.floor((SCENE_HEIGHT * 0.45) / laneCount))
+  const spriteSize = Math.min(128, Math.floor((SCENE_HEIGHT * 0.55) / laneCount))
 
   return (
     <div
@@ -77,6 +79,29 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
           />
         )}
       </div>
+
+      {/* Background scenery — trees and crowd */}
+      {OBJECTS['tree'] && (
+        <>
+          <img src={OBJECTS['tree']} alt="" style={{ position: 'absolute', imageRendering: 'pixelated', bottom: '44%', left: '8%', height: 52, width: 'auto', opacity: 0.5 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+          <img src={OBJECTS['tree']} alt="" style={{ position: 'absolute', imageRendering: 'pixelated', bottom: '44%', left: '35%', height: 44, width: 'auto', opacity: 0.4 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+          <img src={OBJECTS['tree']} alt="" style={{ position: 'absolute', imageRendering: 'pixelated', bottom: '44%', right: '20%', height: 48, width: 'auto', opacity: 0.45 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+        </>
+      )}
+      {OBJECTS['bush'] && (
+        <>
+          <img src={OBJECTS['bush']} alt="" style={{ position: 'absolute', imageRendering: 'pixelated', bottom: '42%', left: '22%', height: 20, width: 'auto', opacity: 0.5 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+          <img src={OBJECTS['bush']} alt="" style={{ position: 'absolute', imageRendering: 'pixelated', bottom: '42%', right: '12%', height: 20, width: 'auto', opacity: 0.5 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+        </>
+      )}
+      {OBJECTS['crowd'] && (
+        <img
+          src={OBJECTS['crowd']}
+          alt=""
+          style={{ position: 'absolute', imageRendering: 'pixelated', top: 2, right: '4%', height: 64, width: 'auto', opacity: 0.35 }}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+        />
+      )}
 
       {/* Grass edge */}
       {hasGrass ? (
@@ -184,8 +209,8 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
             {/* Player name label */}
             <div
               style={{
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: '8px',
+                fontFamily: '"Pixelify Sans", "Press Start 2P", monospace',
+                fontSize: '12px',
                 color: player.color,
                 textShadow: '1px 1px 0 rgba(0,0,0,0.9)',
                 whiteSpace: 'nowrap',
@@ -252,6 +277,24 @@ export function MarathonScene({ players, totalSpaces = 20 }: MarathonSceneProps)
           opacity: 0.7,
         }}
       />
+
+      {/* Finish flag pixel art */}
+      {OBJECTS['finish-flag'] && (
+        <img
+          src={OBJECTS['finish-flag']}
+          alt=""
+          style={{
+            position: 'absolute',
+            right: '2.5%',
+            top: '42%',
+            width: 40,
+            height: 40,
+            imageRendering: 'pixelated',
+            opacity: 0.9,
+          }}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+        />
+      )}
     </div>
   )
 }

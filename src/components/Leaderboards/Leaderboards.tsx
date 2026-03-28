@@ -167,7 +167,7 @@ export function Leaderboards() {
             <button
               key={id}
               onClick={() => handleTabChange(id)}
-              className={`flex-1 font-pixel text-[9px] py-2 rounded-lg border transition-all ${
+              className={`flex-1 font-pixel text-sm py-2 rounded-lg border transition-all ${
                 isActive
                   ? `${c.active} ${c.text} border-current`
                   : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/80'
@@ -183,7 +183,7 @@ export function Leaderboards() {
       {profiles.length === 0 && (
         <div className="flex-1 flex items-center justify-center">
           <div className="pixel-card rounded-lg p-8 text-center">
-            <div className="font-pixel text-[10px] text-white/50 leading-loose">
+            <div className="font-pixel-body font-semibold text-base text-white/50 leading-loose">
               No profiles yet —<br />play a game to appear here!
             </div>
           </div>
@@ -195,7 +195,7 @@ export function Leaderboards() {
 
           {/* Overall Rankings */}
           <div>
-            <div className={`font-pixel text-[10px] ${colors.text} mb-2 px-1`}>
+            <div className={`font-pixel text-xs ${colors.text} mb-2 px-1`}>
               OVERALL RANKINGS
             </div>
             <div className="flex flex-col gap-2">
@@ -205,40 +205,40 @@ export function Leaderboards() {
                   className="pixel-card rounded-lg flex items-center gap-3 px-4 py-3"
                 >
                   {/* Rank */}
-                  <div className={`font-pixel text-[10px] w-8 shrink-0 text-center ${RANK_COLORS[Math.min(idx, RANK_COLORS.length - 1)]}`}>
+                  <div className={`font-pixel-body font-bold text-base w-8 shrink-0 text-center ${RANK_COLORS[Math.min(idx, RANK_COLORS.length - 1)]}`}>
                     {idx < 3 ? RANK_LABELS[idx] : `${idx + 1}`}
                   </div>
 
                   {/* Name */}
-                  <div className="font-pixel text-[9px] text-white flex-1 truncate">
+                  <div className="font-pixel-body font-semibold text-sm text-white flex-1 truncate">
                     {agg.profile.name}
                   </div>
 
                   {/* Correct */}
                   <div className="text-center shrink-0">
-                    <div className={`font-pixel text-sm ${colors.accent}`}>{agg.totalCorrect}</div>
-                    <div className="font-pixel text-[6px] text-white/30 uppercase">correct</div>
+                    <div className={`font-pixel-body font-bold text-base ${colors.accent}`}>{agg.totalCorrect}</div>
+                    <div className="font-pixel-body font-semibold text-xs text-white/30 uppercase">correct</div>
                   </div>
 
                   {/* Accuracy */}
                   <div className="text-center shrink-0 w-12">
-                    <div className="font-pixel text-xs text-white/80">
+                    <div className="font-pixel-body font-bold text-sm text-white/80">
                       {formatAccuracy(agg.totalCorrect, agg.totalAttempts)}
                     </div>
-                    <div className="font-pixel text-[6px] text-white/30 uppercase">acc</div>
+                    <div className="font-pixel-body font-semibold text-xs text-white/30 uppercase">acc</div>
                   </div>
 
                   {/* Best streak */}
                   <div className="text-center shrink-0 w-12">
-                    <div className="font-pixel text-xs text-yellow-300">{agg.bestStreak}</div>
-                    <div className="font-pixel text-[6px] text-white/30 uppercase">streak</div>
+                    <div className="font-pixel-body font-bold text-sm text-yellow-300">{agg.bestStreak}</div>
+                    <div className="font-pixel-body font-semibold text-xs text-white/30 uppercase">streak</div>
                   </div>
                 </div>
               ))}
 
               {aggregates.every(a => a.totalAttempts === 0) && (
                 <div className="pixel-card rounded-lg p-4 text-center">
-                  <div className="font-pixel text-[9px] text-white/40">
+                  <div className="font-pixel-body font-semibold text-sm text-white/40">
                     No activity in this subject yet
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export function Leaderboards() {
           {/* Per-Category Breakdown */}
           {categoryBreakdown.length > 0 && (
             <div>
-              <div className={`font-pixel text-[10px] ${colors.text} mb-2 px-1`}>
+              <div className={`font-pixel text-xs ${colors.text} mb-2 px-1`}>
                 BY CATEGORY
               </div>
               <div className="flex flex-col gap-2">
@@ -259,7 +259,7 @@ export function Leaderboards() {
                     className="pixel-card rounded-lg px-4 py-3"
                   >
                     {/* Category label */}
-                    <div className={`font-pixel text-[8px] ${colors.text} mb-2`}>
+                    <div className={`font-pixel text-sm ${colors.text} mb-2`}>
                       {cat.label}
                     </div>
 
@@ -267,19 +267,19 @@ export function Leaderboards() {
                     <div className="flex flex-col gap-1.5">
                       {entries.slice(0, 3).map((entry, idx) => (
                         <div key={entry.profile.id} className="flex items-center gap-3">
-                          <div className={`font-pixel text-[7px] w-6 shrink-0 ${RANK_COLORS[Math.min(idx, RANK_COLORS.length - 1)]}`}>
+                          <div className={`font-pixel-body font-bold text-xs w-6 shrink-0 ${RANK_COLORS[Math.min(idx, RANK_COLORS.length - 1)]}`}>
                             {idx < 3 ? RANK_LABELS[idx] : `${idx + 1}`}
                           </div>
-                          <div className="font-pixel text-[8px] text-white/80 flex-1 truncate">
+                          <div className="font-pixel-body font-semibold text-sm text-white/80 flex-1 truncate">
                             {entry.profile.name}
                           </div>
-                          <div className="font-pixel text-[8px] text-white/60 shrink-0">
+                          <div className="font-pixel-body font-semibold text-sm text-white/60 shrink-0">
                             {entry.stats.correct} correct
                           </div>
-                          <div className="font-pixel text-[7px] text-white/40 shrink-0 w-10 text-right">
+                          <div className="font-pixel-body font-semibold text-xs text-white/40 shrink-0 w-10 text-right">
                             {formatAccuracy(entry.stats.correct, entry.stats.attempts)}
                           </div>
-                          <div className="font-pixel text-[7px] text-yellow-300/70 shrink-0 w-12 text-right">
+                          <div className="font-pixel-body font-semibold text-xs text-yellow-300/70 shrink-0 w-12 text-right">
                             🔥{entry.stats.bestStreak}
                           </div>
                         </div>

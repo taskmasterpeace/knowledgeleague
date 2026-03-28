@@ -20,12 +20,16 @@ import type { PlayerId, Badge, PlayerAnalytics } from '../../types'
 import { getOrCreateProfile, recordAnswer } from '../../utils/playerProfile'
 import { BadgeToast } from '../shared/BadgeToast'
 import { useAnnouncer } from '../../hooks/useAnnouncer'
+import { useLockIn } from '../../hooks/useLockIn'
 import { usePeerContext } from '../../hooks/usePeerContext'
 import { createPlayerAnalytics, recordAnalyticsAnswer } from '../../utils/playerAnalytics'
 import { gradeToStartingTier, adjustTier } from '../../utils/adaptiveDifficulty'
 import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 import { storeGameAnalytics } from '../../utils/gameAnalyticsStore'
 import { MarathonScene } from './MarathonScene'
+import { LockInIndicator } from '../shared/LockInIndicator'
+import Countdown from '../shared/Countdown'
+import { QuitButton } from '../shared/QuitButton'
 
 type RoundAnswer = { choiceIndex: number; correct: boolean; timestamp: number } | null
 
@@ -61,7 +65,12 @@ export function MathMarathon() {
   const [showBurst, setShowBurst] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
   const [, setHoppingPlayers] = useState<Set<PlayerId>>(new Set())
+  const [countdownDone, setCountdownDone] = useState(false)
+  useEffect(() => {
+    if (countdownDone) timerStartRef.current = Date.now()
+  }, [countdownDone])
   const { announceCorrect, announceWrong } = useAnnouncer()
+  const { lockedIn, onLockIn, resetLockIn } = useLockIn(players)
 
   const { broadcastProblem, broadcastResult, broadcastSpectatorUpdate } = usePeerContext()
 
@@ -276,11 +285,12 @@ export function MathMarathon() {
       answersRef.current = new Map()
       roundResolvedRef.current = false
       setEarnedBadge(null)
+      resetLockIn()
       nextProblem()
       timerStartRef.current = Date.now()
       setTimerKey(k => k + 1)
     }, 2000)
-  }, [players, currentProblem, trackLength, timePerQuestion, updatePosition, incrementStreak, resetStreak, incrementScore, setWinner, nextProblem, broadcastResult])
+  }, [players, currentProblem, trackLength, timePerQuestion, updatePosition, incrementStreak, resetStreak, incrementScore, setWinner, nextProblem, broadcastResult, resetLockIn])
 
   const handleAnswer = useCallback((playerId: PlayerId, choiceIndex: number) => {
     if (showingResult) return
@@ -288,12 +298,13 @@ export function MathMarathon() {
 
     const isCorrect = choiceIndex === currentProblem.correctIndex
     answersRef.current.set(playerId, { choiceIndex, correct: isCorrect, timestamp: Date.now() })
+    onLockIn(playerId)
 
     // If all players have answered, resolve immediately
     if (answersRef.current.size >= players.length) {
       resolveRound()
     }
-  }, [currentProblem, showingResult, resolveRound, players.length])
+  }, [currentProblem, showingResult, resolveRound, players.length, onLockIn])
 
   // Register handler for phone controller answers via PeerJS
   useEffect(() => {
@@ -310,7 +321,7 @@ export function MathMarathon() {
       const player = players.find(p => p.id === playerId)
       if (player?.type === 'human') handleAnswer(playerId, choiceIndex)
     },
-    enabled: !showingResult,
+    enabled: countdownDone && !showingResult,
     playerCount: humanCount,
   })
 
@@ -319,7 +330,7 @@ export function MathMarathon() {
     onP2Answer: (i) => {
       if (players[1]?.type === 'human') handleAnswer(2, i)
     },
-    enabled: !showingResult,
+    enabled: countdownDone && !showingResult,
     onControllerChange: setControllerType,
   })
 
@@ -328,7 +339,7 @@ export function MathMarathon() {
   useCPU({
     character: cpuCharacter,
     currentProblem,
-    enabled: !!cpuPlayer && !showingResult,
+    enabled: !!cpuPlayer && countdownDone && !showingResult,
     onAnswer: (i) => { if (cpuPlayer) handleAnswer(cpuPlayer.id as PlayerId, i) },
     streak: cpuPlayer?.streak ?? 0,
   })
@@ -340,6 +351,14 @@ export function MathMarathon() {
   return (
     <ScreenShake trigger={shaking}>
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-indigo-950 to-gray-900 stars-bg screen-enter flex flex-col p-4 gap-4">
+      {!countdownDone && (
+        <Countdown
+          playerNames={players.map(p => p.name)}
+          eventName="Math Marathon"
+          onComplete={() => setCountdownDone(true)}
+        />
+      )}
+      <QuitButton />
       <BadgeToast badge={earnedBadge} />
       <FlashOverlay type={flashType} />
 
@@ -347,7 +366,10 @@ export function MathMarathon() {
       <MarathonScene players={players} totalSpaces={trackLength} />
 
       {/* Timer */}
-      {!showingResult && <Timer onTimeUp={handleTimeUp} resetKey={timerKey} timeLimit={timePerQuestion} />}
+      {countdownDone && !showingResult && <Timer onTimeUp={handleTimeUp} resetKey={timerKey} timeLimit={timePerQuestion} />}
+
+      {/* Lock-in indicators */}
+      {!showingResult && <LockInIndicator players={players} lockedIn={lockedIn} />}
 
       {/* Problem or Results */}
       <div className="flex-1 flex items-center justify-center relative">

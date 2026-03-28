@@ -12,7 +12,7 @@ export interface Settings {
   gradeLevel: GradeLevel
   enabledSubjects: Subject[]
   announcerEnabled: boolean
-  announcerVoice: 'alex' | 'ashley' | 'dennis' | 'darlene'
+  announcerVoice: string
   announcerFrequency: 'chatty' | 'normal' | 'quiet'
   adaptiveMode: 'off' | 'per-player'
   behaviorTags: 'spectators-only' | 'post-game' | 'always'
@@ -32,7 +32,7 @@ const defaults: Settings = {
   gradeLevel: 'grade-1',
   enabledSubjects: ['math'],
   announcerEnabled: false,
-  announcerVoice: 'alex',
+  announcerVoice: 'aiden',
   announcerFrequency: 'normal',
   adaptiveMode: 'off',
   behaviorTags: 'spectators-only',

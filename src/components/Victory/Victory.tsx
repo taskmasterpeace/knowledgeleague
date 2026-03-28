@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { usePeerContext } from '../../hooks/usePeerContext'
 import { PlayerAvatar } from '../shared/PlayerAvatar'
@@ -6,14 +6,18 @@ import { Fireworks } from '../shared/Effects'
 import { useSettings } from '../../hooks/useSettings'
 import { sounds } from '../../utils/sounds'
 import { playMusic, stopMusic } from '../../utils/backgroundMusic'
+import { OBJECTS } from '../../utils/pixelArt'
 
 export function Victory() {
   const { players, winner, resetGame, rematch, setPhase } = useGameState()
   const { broadcastGameOver } = usePeerContext()
   const { soundEnabled } = useSettings()
 
-  // Rank all players by position (descending), then by score
-  const ranked = [...players].sort((a, b) => b.position - a.position || b.score - a.score)
+  // Rank all players by position (descending), then by score — memoize to avoid re-sorting on every render
+  const ranked = useMemo(
+    () => [...players].sort((a, b) => b.position - a.position || b.score - a.score),
+    [players]
+  )
 
   useEffect(() => {
     playMusic('victory')
@@ -70,24 +74,28 @@ export function Victory() {
         />
       ))}
 
-      {/* Trophy SVG */}
-      <svg width="80" height="80" viewBox="0 0 80 80" className="drop-shadow-lg">
-        {/* Cup body */}
-        <path d="M22 10 h36 v28 C58 52 50 58 40 60 C30 58 22 52 22 38 Z"
-          fill="rgba(251,191,36,0.9)" stroke="#d97706" strokeWidth="2" />
-        {/* Cup handles */}
-        <path d="M22 18 C10 18 10 34 22 34" fill="none" stroke="#d97706" strokeWidth="3" strokeLinecap="round" />
-        <path d="M58 18 C70 18 70 34 58 34" fill="none" stroke="#d97706" strokeWidth="3" strokeLinecap="round" />
-        {/* Base stem */}
-        <rect x="34" y="60" width="12" height="6" fill="#d97706" rx="1" />
-        {/* Base platform */}
-        <rect x="26" y="66" width="28" height="5" fill="#b45309" rx="2" />
-        {/* Star on cup */}
-        <polygon points="40,20 42,26 48,26 43,30 45,36 40,32 35,36 37,30 32,26 38,26"
-          fill="rgba(255,255,255,0.9)" />
-        {/* Shine */}
-        <ellipse cx="30" cy="22" rx="5" ry="3" fill="rgba(255,255,255,0.3)" transform="rotate(-20 30 22)" />
-      </svg>
+      {/* Trophy */}
+      {OBJECTS['trophy'] ? (
+        <img
+          src={OBJECTS['trophy']}
+          alt="Trophy"
+          className="drop-shadow-lg"
+          style={{ width: 80, height: 80, imageRendering: 'pixelated' }}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+        />
+      ) : (
+        <svg width="80" height="80" viewBox="0 0 80 80" className="drop-shadow-lg">
+          <path d="M22 10 h36 v28 C58 52 50 58 40 60 C30 58 22 52 22 38 Z"
+            fill="rgba(251,191,36,0.9)" stroke="#d97706" strokeWidth="2" />
+          <path d="M22 18 C10 18 10 34 22 34" fill="none" stroke="#d97706" strokeWidth="3" strokeLinecap="round" />
+          <path d="M58 18 C70 18 70 34 58 34" fill="none" stroke="#d97706" strokeWidth="3" strokeLinecap="round" />
+          <rect x="34" y="60" width="12" height="6" fill="#d97706" rx="1" />
+          <rect x="26" y="66" width="28" height="5" fill="#b45309" rx="2" />
+          <polygon points="40,20 42,26 48,26 43,30 45,36 40,32 35,36 37,30 32,26 38,26"
+            fill="rgba(255,255,255,0.9)" />
+          <ellipse cx="30" cy="22" rx="5" ry="3" fill="rgba(255,255,255,0.3)" transform="rotate(-20 30 22)" />
+        </svg>
+      )}
 
       {/* Winner announcement */}
       <div className="text-center">
@@ -98,7 +106,7 @@ export function Victory() {
       </div>
 
       {/* Podium */}
-      <div className="flex gap-4 items-end flex-wrap justify-center">
+      <div className="flex gap-6 items-end justify-center w-full max-w-2xl mx-auto">
         {ranked.map((player, i) => {
           const isWinner = player.id === winner
           return (
@@ -106,22 +114,22 @@ export function Victory() {
               {/* Place badge */}
               {i === 0 && (
                 <div className="pixel-card rounded-lg px-2 py-0.5 border-yellow-400/50 pulse-glow">
-                  <span className="font-pixel text-[8px] text-yellow-300">1ST</span>
+                  <span className="font-pixel-body font-bold text-sm text-yellow-300">1ST</span>
                 </div>
               )}
               {i === 1 && (
                 <div className="pixel-card rounded-lg px-2 py-0.5">
-                  <span className="font-pixel text-[8px] text-gray-300">2ND</span>
+                  <span className="font-pixel-body font-bold text-sm text-gray-300">2ND</span>
                 </div>
               )}
               {i === 2 && (
                 <div className="pixel-card rounded-lg px-2 py-0.5">
-                  <span className="font-pixel text-[8px] text-amber-600">3RD</span>
+                  <span className="font-pixel-body font-bold text-sm text-amber-600">3RD</span>
                 </div>
               )}
               {i >= 3 && (
                 <div className="pixel-card rounded-lg px-2 py-0.5">
-                  <span className="font-pixel text-[8px] text-white/40">{i + 1}TH</span>
+                  <span className="font-pixel-body font-bold text-sm text-white/40">{i + 1}TH</span>
                 </div>
               )}
 
@@ -135,8 +143,8 @@ export function Victory() {
                   isLosing={!isWinner}
                   avatarUrl={player.avatarUrl}
                 />
-                <span className="font-pixel text-[8px] text-white text-center">{player.name}</span>
-                <span className="font-pixel text-[7px] text-yellow-300">SCORE: {player.score}</span>
+                <span className="font-pixel-body font-bold text-sm text-white text-center">{player.name}</span>
+                <span className="font-pixel-body font-semibold text-xs text-yellow-300">SCORE: {player.score}</span>
               </div>
 
               {/* Podium block */}

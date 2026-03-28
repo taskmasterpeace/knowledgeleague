@@ -59,11 +59,49 @@ function makeSubtraction(): MathProblem {
   return { question: `${a} - ${a - answer}`, correctAnswer: answer, choices, type: 'subtraction', difficulty: 'medium' }
 }
 
+// a + ___ = c  (find missing addend)
 function makeMissing(): MathProblem {
   const answer = randInt(3, 12)
   const a = randInt(1, answer - 1)
   const choices = shuffle([answer, ...generateDistractors(answer)])
   return { question: `${a} + ___ = ${a + answer}`, correctAnswer: answer, choices, type: 'missing', difficulty: 'hard' }
+}
+
+// a - ___ = c  (find missing subtrahend: 14 - ? = 7)
+function makeMissingSubtrahend(): MathProblem {
+  const answer = randInt(2, 10) // the missing number
+  const c = randInt(2, 10)      // the result
+  const a = c + answer           // the starting number
+  const choices = shuffle([answer, ...generateDistractors(answer)])
+  return { question: `${a} - ___ = ${c}`, correctAnswer: answer, choices, type: 'missing' as ProblemType, difficulty: 'medium' }
+}
+
+// ___ + b = c  (find missing first addend: ? + 8 = 14)
+function makeMissingFirst(): MathProblem {
+  const answer = randInt(2, 12) // the missing number
+  const b = randInt(2, 10)
+  const c = answer + b
+  const choices = shuffle([answer, ...generateDistractors(answer)])
+  return { question: `___ + ${b} = ${c}`, correctAnswer: answer, choices, type: 'missing' as ProblemType, difficulty: 'medium' }
+}
+
+// c = ___ + b  OR  c = ___ - b  (flipped equation: 16 = ? + 8)
+function makeEquationFlip(): MathProblem {
+  if (Math.random() < 0.5) {
+    // c = ___ + b
+    const answer = randInt(3, 12)
+    const b = randInt(2, 10)
+    const c = answer + b
+    const choices = shuffle([answer, ...generateDistractors(answer)])
+    return { question: `${c} = ___ + ${b}`, correctAnswer: answer, choices, type: 'missing' as ProblemType, difficulty: 'hard' }
+  } else {
+    // c = ___ - b
+    const answer = randInt(8, 20)
+    const b = randInt(2, answer - 2)
+    const c = answer - b
+    const choices = shuffle([answer, ...generateDistractors(answer)])
+    return { question: `${c} = ___ - ${b}`, correctAnswer: answer, choices, type: 'missing' as ProblemType, difficulty: 'hard' }
+  }
 }
 
 function makeComparison(): MathProblem {
@@ -169,6 +207,9 @@ const EXTENDED_GENERATORS: Record<string, (difficulty: Difficulty) => MathProble
   'order-of-operations': () => makeOrderOfOps(),
   'square-roots': () => makeSquareRoots(),
   'estimation': () => makeEstimation(),
+  'missing-subtrahend': () => makeMissingSubtrahend(),
+  'missing-first': () => makeMissingFirst(),
+  'equation-flip': () => makeEquationFlip(),
 }
 
 function generateForCategory(category: ProblemType | string, difficulty: Difficulty): MathProblem {
@@ -188,8 +229,9 @@ function generateForCategory(category: ProblemType | string, difficulty: Difficu
 
 export const GRADE_MATH_CATEGORIES: Record<string, string[]> = {
   'grade-1': ['addition', 'subtraction', 'missing', 'comparison', 'skip-counting'],
-  'grade-3': ['addition', 'subtraction', 'missing', 'comparison', 'skip-counting', 'multiplication', 'division', 'fractions', 'rounding'],
-  'adult': ['addition', 'subtraction', 'multiplication', 'division', 'fractions', 'percentages', 'order-of-operations', 'square-roots', 'estimation'],
+  'grade-2': ['addition', 'subtraction', 'missing', 'missing-subtrahend', 'missing-first', 'comparison', 'skip-counting', 'multiplication'],
+  'grade-3': ['addition', 'subtraction', 'missing', 'missing-subtrahend', 'missing-first', 'equation-flip', 'comparison', 'skip-counting', 'multiplication', 'division', 'fractions', 'rounding'],
+  'adult': ['addition', 'subtraction', 'missing', 'missing-subtrahend', 'missing-first', 'equation-flip', 'multiplication', 'division', 'fractions', 'percentages', 'order-of-operations', 'square-roots', 'estimation'],
 }
 
 export function generateProblem(difficulty: Difficulty, enabledCategories?: ProblemType[]): MathProblem {

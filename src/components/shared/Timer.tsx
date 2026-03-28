@@ -60,7 +60,7 @@ export function Timer({ onTimeUp, resetKey, timeLimit }: Props) {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="flex items-center gap-3">
-        <span className="font-pixel text-[9px] text-cyan-300/80">TIME</span>
+        <span className="font-pixel-body text-sm font-bold text-cyan-300/80">TIME</span>
         <div className="flex-1 h-4 bg-gray-900/80 rounded-sm border border-gray-600/50 overflow-hidden relative">
           {/* Striped background */}
           <div className="absolute inset-0 opacity-10"
@@ -79,7 +79,7 @@ export function Timer({ onTimeUp, resetKey, timeLimit }: Props) {
             }}
           />
         </div>
-        <span className={`font-pixel text-[11px] min-w-[36px] text-right ${urgent ? 'text-red-400' : 'text-white/70'}`}
+        <span className={`font-pixel-body text-base font-bold min-w-[36px] text-right ${urgent ? 'text-red-400' : 'text-white/70'}`}
           style={urgent ? { animation: 'timer-urgent-flash 0.5s ease-in-out infinite' } : {}}
         >
           {seconds}s

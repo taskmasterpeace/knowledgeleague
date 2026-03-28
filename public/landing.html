@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Knowledge League Kids — Learn. Play. Win.</title>
+  <meta name="description" content="The retro multiplayer quiz game where kids race, tug, hurdle, jump, and spell their way to the top. Math, Science, Reading — powered by pixel art fun." />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep: #0a0520;
+      --bg-mid: #121040;
+      --gold: #facc15;
+      --cyan: #67e8f9;
+      --purple: #c084fc;
+      --green: #4ade80;
+      --red: #f87171;
+      --orange: #fb923c;
+      --pink: #f472b6;
+      --white: #ffffff;
+      --muted: rgba(255,255,255,0.6);
+      --card-bg: rgba(255,255,255,0.07);
+      --card-border: rgba(255,255,255,0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Pixelify Sans', 'Press Start 2P', monospace;
+      background: var(--bg-deep);
+      color: var(--white);
+      line-height: 1.8;
+      overflow-x: hidden;
+    }
+
+    /* Headings use the chunky NES font */
+    h1, h2, h3 {
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    /* ── Animated star field ── */
+    .stars-1 {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5;
+      background-image:
+        radial-gradient(1.5px 1.5px at 10% 20%, white 50%, transparent 100%),
+        radial-gradient(1px 1px at 30% 60%, white 50%, transparent 100%),
+        radial-gradient(2px 2px at 50% 10%, white 50%, transparent 100%),
+        radial-gradient(1px 1px at 70% 40%, white 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 90% 70%, white 50%, transparent 100%),
+        radial-gradient(1px 1px at 15% 80%, white 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 55% 45%, white 50%, transparent 100%),
+        radial-gradient(1px 1px at 85% 15%, white 50%, transparent 100%);
+      background-size: 200px 200px;
+      animation: drift 60s linear infinite;
+    }
+    .stars-2 {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.25;
+      background-image:
+        radial-gradient(2.5px 2.5px at 20% 30%, var(--gold) 50%, transparent 100%),
+        radial-gradient(2px 2px at 60% 70%, var(--cyan) 50%, transparent 100%),
+        radial-gradient(2.5px 2.5px at 80% 20%, var(--gold) 50%, transparent 100%),
+        radial-gradient(2px 2px at 40% 90%, var(--purple) 50%, transparent 100%),
+        radial-gradient(2px 2px at 10% 50%, var(--cyan) 50%, transparent 100%);
+      background-size: 300px 300px;
+      animation: drift 35s linear infinite reverse;
+    }
+
+    @keyframes drift { from { background-position: 0 0; } to { background-position: 200px 200px; } }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes glow-pulse { 0%,100% { box-shadow: 0 0 16px rgba(250,204,21,0.3); } 50% { box-shadow: 0 0 40px rgba(250,204,21,0.6), 0 0 80px rgba(250,204,21,0.2); } }
+    @keyframes wiggle { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+    @keyframes slide-in { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    .scanlines {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px);
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+    /* ════════ HERO ════════ */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      gap: 28px; padding: 48px 24px; position: relative;
+    }
+    .hero-logo {
+      width: 200px; height: 200px; image-rendering: pixelated;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 30px rgba(250,204,21,0.4));
+    }
+    .hero h1 {
+      font-size: clamp(28px, 6vw, 52px); line-height: 1.4;
+      text-shadow: 0 0 30px rgba(250,204,21,0.5), 4px 4px 0 #000;
+    }
+    .hero .gold { color: var(--gold); }
+    .hero .cyan { color: var(--cyan); }
+    .hero-tagline {
+      font-size: clamp(14px, 2.5vw, 20px); color: var(--muted);
+      max-width: 700px; line-height: 1.8; font-weight: 500;
+    }
+
+    /* Subject pills — big and colorful */
+    .subjects {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    }
+    .pill {
+      font-size: 16px; padding: 10px 24px; border-radius: 999px;
+      font-weight: 700; letter-spacing: 2px;
+      border: 2px solid; transition: transform 0.2s;
+    }
+    .pill:hover { transform: scale(1.08); }
+    .pill-math { color: var(--gold); border-color: rgba(250,204,21,0.4); background: rgba(250,204,21,0.1); }
+    .pill-science { color: var(--green); border-color: rgba(74,222,128,0.4); background: rgba(74,222,128,0.1); }
+    .pill-reading { color: var(--cyan); border-color: rgba(103,232,249,0.4); background: rgba(103,232,249,0.1); }
+    .pill-spelling { color: var(--purple); border-color: rgba(192,132,252,0.4); background: rgba(192,132,252,0.1); }
+
+    /* Big juicy CTA */
+    .cta-play {
+      display: inline-block; padding: 22px 56px; font-family: 'Press Start 2P', monospace;
+      font-size: 20px; color: #000; background: var(--gold); border: none;
+      border-radius: 12px; cursor: pointer; text-decoration: none;
+      box-shadow: 0 6px 0 #b8930f, 0 0 30px rgba(250,204,21,0.3);
+      transition: all 0.15s; animation: glow-pulse 2.5s ease-in-out infinite;
+    }
+    .cta-play:hover { transform: translateY(-3px); box-shadow: 0 9px 0 #b8930f, 0 0 50px rgba(250,204,21,0.5); }
+    .cta-play:active { transform: translateY(3px); box-shadow: 0 3px 0 #b8930f; }
+
+    .cta-ghost {
+      display: inline-block; padding: 16px 36px; font-family: 'Press Start 2P', monospace;
+      font-size: 14px; color: var(--cyan); background: transparent;
+      border: 3px solid rgba(103,232,249,0.4); border-radius: 12px; cursor: pointer;
+      text-decoration: none; transition: all 0.15s;
+    }
+    .cta-ghost:hover { background: rgba(103,232,249,0.1); border-color: var(--cyan); transform: translateY(-2px); }
+
+    /* ── Site Code Input ── */
+    .site-code-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      margin-top: 8px;
+    }
+    .site-code-label {
+      font-size: 16px; color: var(--muted); letter-spacing: 1px; font-weight: 600;
+    }
+    .site-code-row {
+      display: flex; gap: 12px; align-items: center;
+    }
+    .site-code-input {
+      font-family: 'Press Start 2P', monospace; font-size: 16px;
+      padding: 14px 24px; width: 280px; text-align: center;
+      background: rgba(255,255,255,0.08); border: 3px solid rgba(103,232,249,0.3);
+      border-radius: 12px; color: var(--cyan); outline: none;
+      text-transform: uppercase; letter-spacing: 4px;
+      transition: all 0.2s;
+    }
+    .site-code-input::placeholder {
+      color: rgba(255,255,255,0.2); letter-spacing: 2px; font-size: 14px;
+    }
+    .site-code-input:focus {
+      border-color: var(--cyan); box-shadow: 0 0 24px rgba(103,232,249,0.25);
+      background: rgba(255,255,255,0.12);
+    }
+    .site-code-active {
+      display: none; align-items: center; gap: 10px;
+      background: rgba(103,232,249,0.1); border: 2px solid rgba(103,232,249,0.3);
+      border-radius: 12px; padding: 12px 20px;
+    }
+    .site-code-active.show { display: flex; }
+    .site-code-active .code-val {
+      font-size: 14px; color: var(--cyan); letter-spacing: 3px;
+    }
+    .site-code-active .code-label {
+      font-size: 12px; color: var(--muted); font-weight: 600;
+    }
+    .site-code-active .code-clear {
+      font-size: 12px; font-weight: 600;
+      background: none; border: 1px solid rgba(248,113,113,0.4);
+      color: var(--red); border-radius: 6px; padding: 4px 10px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .site-code-active .code-clear:hover {
+      background: rgba(248,113,113,0.15); border-color: var(--red);
+    }
+    .site-code-optional {
+      font-size: 13px; color: rgba(255,255,255,0.25); font-weight: 500;
+    }
+
+    /* Scroll hint */
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; color: rgba(255,255,255,0.25); animation: bounce 2s ease-in-out infinite;
+    }
+
+    /* ════════ SECTION HEADINGS ════════ */
+    section { padding: 80px 0; }
+    .sec-head { text-align: center; margin-bottom: 48px; }
+    .sec-head h2 {
+      font-size: clamp(18px, 4vw, 32px); margin-bottom: 14px;
+      text-shadow: 3px 3px 0 #000;
+    }
+    .sec-head p { font-size: clamp(14px, 2vw, 18px); color: var(--muted); line-height: 1.8; font-weight: 500; }
+
+    /* Colored divider bar */
+    .divider {
+      width: 80px; height: 4px; border-radius: 2px; margin: 0 auto 16px;
+    }
+
+    /* ════════ EVENTS ════════ */
+    .events-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+    }
+    .event-card {
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      border-radius: 16px; overflow: hidden; transition: all 0.25s; cursor: default;
+    }
+    .event-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 0 32px rgba(250,204,21,0.2);
+      border-color: rgba(250,204,21,0.4);
+    }
+    .event-card img {
+      width: 100%; aspect-ratio: 1; object-fit: cover; image-rendering: pixelated;
+      border-bottom: 2px solid var(--card-border);
+    }
+    .event-card-body { padding: 16px 14px 18px; }
+    .event-card-title {
+      font-size: 14px; color: var(--gold); margin-bottom: 8px;
+      font-family: 'Press Start 2P', monospace;
+    }
+    .event-card-desc { font-size: 16px; color: var(--muted); line-height: 1.7; font-weight: 500; }
+
+    /* ════════ FEATURES — big icon cards ════════ */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;
+    }
+    .feat {
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      border-radius: 16px; padding: 28px; display: flex; gap: 20px;
+      align-items: flex-start; transition: all 0.25s;
+    }
+    .feat:hover { border-color: rgba(192,132,252,0.4); transform: translateY(-4px); box-shadow: 0 0 24px rgba(192,132,252,0.12); }
+    .feat-icon {
+      flex-shrink: 0; width: 64px; height: 64px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+    }
+    .feat-icon-gold { background: rgba(250,204,21,0.12); border: 2px solid rgba(250,204,21,0.25); }
+    .feat-icon-cyan { background: rgba(103,232,249,0.12); border: 2px solid rgba(103,232,249,0.25); }
+    .feat-icon-purple { background: rgba(192,132,252,0.12); border: 2px solid rgba(192,132,252,0.25); }
+    .feat-icon-green { background: rgba(74,222,128,0.12); border: 2px solid rgba(74,222,128,0.25); }
+    .feat-icon-red { background: rgba(248,113,113,0.12); border: 2px solid rgba(248,113,113,0.25); }
+    .feat-icon-orange { background: rgba(251,146,60,0.12); border: 2px solid rgba(251,146,60,0.25); }
+    .feat h3 { font-size: 14px; margin-bottom: 10px; }
+    .feat p { font-size: 16px; color: var(--muted); line-height: 1.7; font-weight: 500; }
+
+    /* ════════ HOW IT WORKS — big steps ════════ */
+    .steps { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; }
+    .step {
+      text-align: center; flex: 1; min-width: 200px; max-width: 260px;
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      border-radius: 16px; padding: 28px 20px; transition: all 0.25s;
+    }
+    .step:hover { transform: translateY(-4px); border-color: rgba(250,204,21,0.3); }
+    .step-num {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--orange));
+      color: #000; font-size: 22px; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px; box-shadow: 0 0 20px rgba(250,204,21,0.3), 0 4px 0 #b8930f;
+    }
+    .step h3 { font-size: 13px; color: var(--white); margin-bottom: 10px; }
+    .step p { font-size: 16px; color: var(--muted); line-height: 1.7; font-weight: 500; }
+
+    /* ════════ SCREENSHOTS — big carousel ════════ */
+    .shots-wrap {
+      display: flex; gap: 20px; overflow-x: auto; padding: 12px 0 20px;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    }
+    .shots-wrap::-webkit-scrollbar { height: 6px; }
+    .shots-wrap::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+    .shots-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+    .shot-item {
+      flex-shrink: 0; scroll-snap-align: center; text-align: center;
+    }
+    .shot-item img {
+      height: 400px; border-radius: 16px; border: 3px solid var(--card-border);
+      transition: all 0.25s; image-rendering: auto;
+    }
+    .shot-item img:hover { border-color: rgba(250,204,21,0.4); transform: scale(1.02); }
+    .shot-item .caption {
+      font-size: 14px; color: var(--muted); margin-top: 12px; font-weight: 600;
+    }
+
+    /* ════════ FINAL CTA ════════ */
+    .final-cta {
+      text-align: center; padding: 80px 24px;
+      background: linear-gradient(180deg, transparent 0%, rgba(99,102,241,0.06) 50%, transparent 100%);
+    }
+    .final-cta h2 {
+      font-size: clamp(20px, 4vw, 36px); color: var(--gold); margin-bottom: 16px;
+      text-shadow: 3px 3px 0 #000;
+    }
+    .final-cta .subtitle {
+      font-size: 18px; color: var(--muted); margin-bottom: 32px; line-height: 1.6; font-weight: 500;
+    }
+    .final-cta .note {
+      font-size: 14px; color: rgba(255,255,255,0.35); margin-top: 24px; line-height: 1.6; font-weight: 500;
+    }
+
+    /* ════════ PARENT TRUST BAR ════════ */
+    .trust-bar {
+      display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;
+      padding: 40px 24px; border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .trust-item { text-align: center; }
+    .trust-item .emoji { font-size: 40px; margin-bottom: 10px; }
+    .trust-item p { font-size: 14px; color: var(--muted); line-height: 1.6; font-weight: 600; }
+
+    /* ════════ FOOTER ════════ */
+    footer { padding: 48px 0; text-align: center; }
+    footer .brand { font-size: 12px; color: var(--gold); margin-bottom: 10px; font-family: 'Press Start 2P', monospace; }
+    footer .tagline { font-size: 16px; color: var(--muted); font-weight: 500; }
+    footer .love { font-size: 14px; color: rgba(255,255,255,0.25); margin-top: 16px; line-height: 1.6; }
+
+    /* ════════ RESPONSIVE ════════ */
+    @media (max-width: 768px) {
+      .hero { padding: 32px 16px; gap: 20px; }
+      .hero-logo { width: 140px; height: 140px; }
+      .hero h1 { font-size: 24px; }
+      .cta-play { font-size: 14px; padding: 18px 40px; }
+      .events-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .steps { gap: 16px; }
+      .step { min-width: 140px; }
+      section { padding: 48px 0; }
+      .shot-item img { height: 220px; }
+    }
+    @media (max-width: 480px) {
+      .hero-logo { width: 110px; height: 110px; }
+      .events-grid { grid-template-columns: 1fr; max-width: 300px; margin: 0 auto; }
+      .feat { flex-direction: column; align-items: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars-1"></div>
+  <div class="stars-2"></div>
+  <div class="scanlines"></div>
+
+  <!-- ════════════════════ HERO ════════════════════ -->
+  <section class="hero">
+    <img src="/logo.png" alt="Knowledge League Kids" class="hero-logo" />
+    <h1>
+      <span class="gold">KNOWLEDGE</span><br>
+      <span class="cyan">LEAGUE KIDS</span>
+    </h1>
+    <p class="hero-tagline">
+      The multiplayer quiz game where learning feels like playing.
+      Race, pull, hurdle, jump & spell your way to victory!
+    </p>
+    <div class="subjects">
+      <span class="pill pill-math">MATH</span>
+      <span class="pill pill-science">SCIENCE</span>
+      <span class="pill pill-reading">READING</span>
+      <span class="pill pill-spelling">SPELLING</span>
+    </div>
+    <!-- Site Code (optional) -->
+    <div class="site-code-wrap" id="site-code-section">
+      <div class="site-code-label">GOT A SITE CODE?</div>
+      <div class="site-code-row" id="site-code-entry">
+        <input
+          type="text"
+          id="site-code-input"
+          class="site-code-input"
+          placeholder="ENTER CODE"
+          maxlength="20"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <div class="site-code-active" id="site-code-badge">
+        <div>
+          <div class="code-label">SITE CODE</div>
+          <div class="code-val" id="site-code-display"></div>
+        </div>
+        <button class="code-clear" id="site-code-clear">CLEAR</button>
+      </div>
+      <div class="site-code-optional">Optional — from your teacher or group leader</div>
+    </div>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 12px;">
+      <a href="/" class="cta-play" id="play-btn">PLAY NOW!</a>
+      <a href="#events" class="cta-ghost">SEE EVENTS</a>
+    </div>
+    <div class="scroll-hint">SCROLL DOWN</div>
+  </section>
+
+  <!-- ════════════════════ EVENTS ════════════════════ -->
+  <section id="events">
+    <div class="container">
+      <div class="sec-head">
+        <div class="divider" style="background: var(--gold);"></div>
+        <h2 style="color: var(--gold);">PICK YOUR EVENT!</h2>
+        <p>Five totally different game modes — which one's your favorite?</p>
+      </div>
+      <div class="events-grid">
+        <div class="event-card">
+          <img src="/pixelart/events/marathon.png" alt="Math Marathon" />
+          <div class="event-card-body">
+            <div class="event-card-title">MATH MARATHON</div>
+            <div class="event-card-desc">Race to the finish! Answer questions to sprint ahead. First to cross the line wins!</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="/pixelart/events/tug-of-war.png" alt="Tug of War" />
+          <div class="event-card-body">
+            <div class="event-card-title">TUG OF WAR</div>
+            <div class="event-card-desc">Pull your opponent into the mud! Get answers right to power up your team!</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="/pixelart/events/hurdle-dash.png" alt="Hurdle Dash" />
+          <div class="event-card-body">
+            <div class="event-card-title">HURDLE DASH</div>
+            <div class="event-card-desc">Jump over hurdles with brainpower! Wrong answers make you trip!</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="/pixelart/events/long-jump.png" alt="Long Jump" />
+          <div class="event-card-body">
+            <div class="event-card-title">LONG JUMP</div>
+            <div class="event-card-desc">Build speed with correct answers, then LAUNCH! Longest jump wins!</div>
+          </div>
+        </div>
+        <div class="event-card">
+          <img src="/pixelart/events/spelling-bee.png" alt="Spelling Bee" />
+          <div class="event-card-body">
+            <div class="event-card-title">SPELLING BEE</div>
+            <div class="event-card-desc">Last speller standing! Pick the right letters or you're OUT!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ SCREENSHOTS ════════════════════ -->
+  <section id="screenshots">
+    <div class="container">
+      <div class="sec-head">
+        <div class="divider" style="background: var(--green);"></div>
+        <h2 style="color: var(--green);">SEE IT IN ACTION!</h2>
+        <p>Real gameplay — scroll to explore</p>
+      </div>
+      <div class="shots-wrap">
+        <div class="shot-item"><img src="/screenshots/menu.png" alt="Main Menu" /><div class="caption">MAIN MENU</div></div>
+        <div class="shot-item"><img src="/screenshots/event-select.png" alt="Event Select" /><div class="caption">PICK AN EVENT</div></div>
+        <div class="shot-item"><img src="/screenshots/marathon.png" alt="Math Marathon" /><div class="caption">MATH MARATHON</div></div>
+        <div class="shot-item"><img src="/screenshots/tug-of-war.png" alt="Tug of War" /><div class="caption">TUG OF WAR</div></div>
+        <div class="shot-item"><img src="/screenshots/hurdle-dash.png" alt="Hurdle Dash" /><div class="caption">HURDLE DASH</div></div>
+        <div class="shot-item"><img src="/screenshots/long-jump.png" alt="Long Jump" /><div class="caption">LONG JUMP</div></div>
+        <div class="shot-item"><img src="/screenshots/spelling-bee.png" alt="Spelling Bee" /><div class="caption">SPELLING BEE</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ HOW IT WORKS ════════════════════ -->
+  <section id="how">
+    <div class="container">
+      <div class="sec-head">
+        <div class="divider" style="background: var(--cyan);"></div>
+        <h2 style="color: var(--cyan);">HOW TO PLAY</h2>
+        <p>From couch to competition in 30 seconds!</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>CHOOSE PLAYERS</h3>
+          <p>1-4 players! Play solo against CPU friends or bring your family!</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>PICK AN EVENT</h3>
+          <p>Marathon, Tug of War, Hurdles, Long Jump, or Spelling Bee!</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>ANSWER & COMPETE</h3>
+          <p>Questions pop up — answer fast and correctly to win!</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>WIN TROPHIES!</h3>
+          <p>Earn badges, see your stats, and become the champion!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ FEATURES ════════════════════ -->
+  <section id="features">
+    <div class="container">
+      <div class="sec-head">
+        <div class="divider" style="background: var(--purple);"></div>
+        <h2 style="color: var(--purple);">WHY KIDS LOVE IT</h2>
+        <p>Built for family game night, classrooms, and anywhere learning happens</p>
+      </div>
+      <div class="features-grid">
+        <div class="feat">
+          <div class="feat-icon feat-icon-gold">&#127918;</div>
+          <div>
+            <h3 style="color: var(--gold);">5 GAME MODES</h3>
+            <p>Every session feels different! Marathon racing, Tug of War battles, Hurdle Dashes, Long Jumps, and Spelling Bee showdowns.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon feat-icon-green">&#129504;</div>
+          <div>
+            <h3 style="color: var(--green);">SMART DIFFICULTY</h3>
+            <p>Questions automatically get harder or easier based on how you're doing. Everyone stays challenged!</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon feat-icon-cyan">&#128241;</div>
+          <div>
+            <h3 style="color: var(--cyan);">PHONE CONTROLLERS</h3>
+            <p>Friends join by scanning a QR code with their phone. No extra controllers needed!</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon feat-icon-purple">&#127912;</div>
+          <div>
+            <h3 style="color: var(--purple);">PIXEL ART STYLE</h3>
+            <p>Retro 16-bit vibes with animated characters, custom avatars, and hand-crafted game scenes.</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon feat-icon-orange">&#128218;</div>
+          <div>
+            <h3 style="color: var(--orange);">REAL SCHOOL STUFF</h3>
+            <p>Math, Science, and Reading questions aligned to K-8 grade levels. Learning that doesn't feel like homework!</p>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon feat-icon-red">&#127942;</div>
+          <div>
+            <h3 style="color: var(--red);">TROPHIES & STATS</h3>
+            <p>Earn badges for every win, track your accuracy, and watch yourself improve over time!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ PARENT TRUST ════════════════════ -->
+  <div class="trust-bar">
+    <div class="trust-item">
+      <div class="emoji">&#128274;</div>
+      <p>NO ADS</p>
+    </div>
+    <div class="trust-item">
+      <div class="emoji">&#128100;</div>
+      <p>NO SIGN-UP NEEDED</p>
+    </div>
+    <div class="trust-item">
+      <div class="emoji">&#128187;</div>
+      <p>WORKS ON ANY DEVICE</p>
+    </div>
+    <div class="trust-item">
+      <div class="emoji">&#127968;</div>
+      <p>FAMILY FRIENDLY</p>
+    </div>
+    <div class="trust-item">
+      <div class="emoji">&#128218;</div>
+      <p>CURRICULUM ALIGNED</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════ FINAL CTA ════════════════════ -->
+  <section class="final-cta">
+    <h2>READY TO PLAY?</h2>
+    <p class="subtitle">Jump in — it's free and takes zero setup!</p>
+    <a href="/" class="cta-play">LET'S GO!</a>
+    <p class="note">Free to play. No downloads. No accounts. Just fun.</p>
+  </section>
+
+  <!-- ════════════════════ FOOTER ════════════════════ -->
+  <footer>
+    <div class="container">
+      <p class="brand">KNOWLEDGE LEAGUE KIDS</p>
+      <p class="tagline">Learn. Play. Win.</p>
+      <p class="love">Built with pixel art, love, and a whole lot of math.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      const input = document.getElementById('site-code-input');
+      const entry = document.getElementById('site-code-entry');
+      const badge = document.getElementById('site-code-badge');
+      const display = document.getElementById('site-code-display');
+      const clearBtn = document.getElementById('site-code-clear');
+      const playBtn = document.getElementById('play-btn');
+
+      // Check for existing site code
+      const stored = localStorage.getItem('klk-site-code');
+      if (stored) showBadge(stored);
+
+      // Auto-uppercase as they type
+      input.addEventListener('input', function() {
+        this.value = this.value.toUpperCase().replace(/[^A-Z0-9\-]/g, '');
+      });
+
+      // Enter key to confirm
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && this.value.trim()) {
+          const code = this.value.trim();
+          localStorage.setItem('klk-site-code', code);
+          showBadge(code);
+        }
+      });
+
+      // Also confirm on blur if there's a value
+      input.addEventListener('blur', function() {
+        if (this.value.trim()) {
+          const code = this.value.trim();
+          localStorage.setItem('klk-site-code', code);
+          showBadge(code);
+        }
+      });
+
+      // Clear button
+      clearBtn.addEventListener('click', function() {
+        localStorage.removeItem('klk-site-code');
+        hideBadge();
+      });
+
+      // Play button — save code if entered, then navigate
+      playBtn.addEventListener('click', function(e) {
+        if (input.value.trim()) {
+          localStorage.setItem('klk-site-code', input.value.trim().toUpperCase());
+        }
+      });
+
+      function showBadge(code) {
+        display.textContent = code;
+        entry.style.display = 'none';
+        badge.classList.add('show');
+      }
+
+      function hideBadge() {
+        input.value = '';
+        entry.style.display = 'flex';
+        badge.classList.remove('show');
+      }
+    })();
+  </script>
+</body>
+</html>
