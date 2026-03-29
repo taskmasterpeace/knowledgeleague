@@ -7,7 +7,7 @@ import { Settings } from '../Settings/Settings'
 import { useSettings } from '../../hooks/useSettings'
 import { sounds, preloadSounds } from '../../utils/sounds'
 import { playMusic, toggleMute, isMusicMuted } from '../../utils/backgroundMusic'
-import { speak } from '../../utils/announcer'
+import { speak, isAnnouncerBusy } from '../../utils/announcer'
 import { getGameContext, getContextualGreeting, getContextualFact } from '../../utils/contextEngine'
 import { MenuScene } from './MenuScene'
 
@@ -95,6 +95,8 @@ export function Menu() {
   // Rotating "Did You Know?" facts every 30 seconds, randomly skip some cycles
   useEffect(() => {
     const showFact = () => {
+      // Don't interrupt if announcer is still speaking
+      if (isAnnouncerBusy()) return
       // ~30% chance to skip this cycle (so it's not every single time)
       if (Math.random() < 0.3) return
 

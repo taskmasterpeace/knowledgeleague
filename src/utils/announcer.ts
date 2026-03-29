@@ -1,6 +1,6 @@
 import type { Subject } from '../types'
 import { speakLocal, isAvailable as isSpeechAvailable } from './speechSynthesis'
-import { speakTTS, stopTTS } from './ttsCache'
+import { speakTTS, stopTTS, isSpeaking } from './ttsCache'
 
 export interface AnnouncerLine {
   text: string
@@ -23,6 +23,16 @@ const RATE_LIMITS: Record<string, number> = {
 let lastSpoken = 0
 const recentLines = new Set<string>()
 
+/**
+ * Check if the announcer is currently speaking (TTS or browser speech).
+ * Useful for callers that want to skip low-priority lines when busy.
+ */
+export function isAnnouncerBusy(): boolean {
+  if (isSpeaking()) return true
+  if ('speechSynthesis' in window && window.speechSynthesis.speaking) return true
+  return false
+}
+
 export function speak(line: AnnouncerLine, config: AnnouncerConfig): void {
   if (!config.enabled) return
 
@@ -35,18 +45,22 @@ export function speak(line: AnnouncerLine, config: AnnouncerConfig): void {
   // Quiet mode only plays high priority
   if (config.frequency === 'quiet' && line.priority !== 'high') return
 
+  // Low/normal priority lines don't interrupt current speech — just drop them
+  if (line.priority !== 'high' && isAnnouncerBusy()) return
+
   // Don't repeat same line within 30s
   if (recentLines.has(line.text)) return
   recentLines.add(line.text)
   setTimeout(() => recentLines.delete(line.text), 30000)
 
-  // Stop any currently playing TTS audio
+  // Stop ALL current audio — TTS audio element AND browser speechSynthesis
   stopTTS()
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel()
 
   lastSpoken = now
 
-  // Primary path: Qwen3 TTS with 3-tier cache (static → IndexedDB → API)
-  // Falls back to browser SpeechSynthesis if TTS fails or is unavailable
+  // Primary: Qwen3 TTS with IndexedDB cache
+  // Fallback: browser SpeechSynthesis
   speakTTS(line.text, config.voice).then((played) => {
     if (!played && isSpeechAvailable()) {
       speakLocal(line.text)

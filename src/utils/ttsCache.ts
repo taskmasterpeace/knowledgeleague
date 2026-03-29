@@ -13,7 +13,7 @@ const DB_NAME = 'knowledgeLeagueKids-tts'
 const DB_VERSION = 1
 const STORE_NAME = 'audioCache'
 
-// ─── IndexedDB (Tier 2 Cache) ───────────────────────────────
+// ─── IndexedDB Cache ────────────────────────────────────────
 
 let dbPromise: Promise<IDBDatabase> | null = null
 
@@ -61,7 +61,6 @@ async function setCached(key: string, blob: Blob): Promise<void> {
 
 // ─── Cache Key Generation ───────────────────────────────────
 
-/** Create a stable cache key from text + voice config */
 function cacheKey(text: string, voice: string): string {
   return `${voice}:${text.toLowerCase().trim()}`
 }
@@ -70,7 +69,7 @@ function cacheKey(text: string, voice: string): string {
 
 interface TTSConfig {
   voice: string
-  style?: string // "speak with excitement", "speak slowly and calmly", etc.
+  style?: string
 }
 
 /** Map our game voice names → Qwen3 preset speaker names */
@@ -101,7 +100,7 @@ export const AVAILABLE_VOICES = [
 /** Default style instruction for a kids game announcer */
 const DEFAULT_STYLE = 'Speak with enthusiasm and energy, like a fun kids game show host. Be encouraging and upbeat.'
 
-async function generateWithQwen3(text: string, config: TTSConfig): Promise<Blob | null> {
+async function generateWithQwen3(text: string, config: TTSConfig, signal?: AbortSignal): Promise<Blob | null> {
   try {
     const speaker = VOICE_MAP[config.voice] || 'Aiden'
     const styleInstruction = config.style || DEFAULT_STYLE
@@ -118,6 +117,7 @@ async function generateWithQwen3(text: string, config: TTSConfig): Promise<Blob 
           style_instruction: styleInstruction,
         },
       }),
+      signal,
     })
 
     if (!response.ok) return null
@@ -127,8 +127,11 @@ async function generateWithQwen3(text: string, config: TTSConfig): Promise<Blob 
 
     // Poll for result (max 15 seconds)
     for (let i = 0; i < 30; i++) {
+      if (signal?.aborted) return null
       await new Promise(r => setTimeout(r, 500))
-      const statusRes = await fetch(`/api/replicate/v1/predictions/${id}`)
+      if (signal?.aborted) return null
+
+      const statusRes = await fetch(`/api/replicate/v1/predictions/${id}`, { signal })
       const status = await statusRes.json()
 
       if (status.status === 'succeeded' && status.output) {
@@ -136,51 +139,79 @@ async function generateWithQwen3(text: string, config: TTSConfig): Promise<Blob 
           ? status.output
           : Array.isArray(status.output) ? status.output[0] : null
         if (!audioUrl || typeof audioUrl !== 'string') return null
-        const audioRes = await fetch(audioUrl)
+        const audioRes = await fetch(audioUrl, { signal })
         if (audioRes.ok) return audioRes.blob()
       }
 
       if (status.status === 'failed') return null
     }
-  } catch {
-    // TTS generation is non-critical
+  } catch (e) {
+    // AbortError is expected when a newer speak() call cancels us
+    if (e instanceof DOMException && e.name === 'AbortError') return null
+    // Other errors are non-critical
   }
   return null
 }
 
-// ─── Main TTS Function ──────────────────────────────────────
+// ─── Playback State ─────────────────────────────────────────
 
 let currentAudio: HTMLAudioElement | null = null
+let currentAbort: AbortController | null = null
+
+// Monotonically increasing ID — each speakTTS call gets one.
+// If a newer call starts, older calls check this and bail out
+// before playing audio, preventing overlap.
+let speakGeneration = 0
 
 export async function speakTTS(text: string, voice: string, style?: string): Promise<boolean> {
+  // Cancel any in-flight API requests from previous speak calls
+  if (currentAbort) {
+    currentAbort.abort()
+    currentAbort = null
+  }
+
   // Stop any currently playing audio
   if (currentAudio) {
     currentAudio.pause()
     currentAudio.currentTime = 0
     currentAudio = null
+    unduckMusic()
   }
+
+  // Claim a new generation — older async chains will see they're stale
+  const myGeneration = ++speakGeneration
+  const abort = new AbortController()
+  currentAbort = abort
 
   const key = cacheKey(text, voice)
 
   // Tier 1: Check IndexedDB cache
   const cached = await getCached(key)
+  if (myGeneration !== speakGeneration) return false // preempted
   if (cached) {
-    return playBlob(cached)
+    currentAbort = null
+    return playBlob(cached, myGeneration)
   }
 
   // Tier 2: Generate with Qwen3 TTS, then cache
-  const blob = await generateWithQwen3(text, { voice, style })
+  const blob = await generateWithQwen3(text, { voice, style }, abort.signal)
+  if (myGeneration !== speakGeneration) return false // preempted
   if (blob) {
-    // Cache for next time (Tier 2)
     await setCached(key, blob)
-    return playBlob(blob)
+    if (myGeneration !== speakGeneration) return false // preempted
+    currentAbort = null
+    return playBlob(blob, myGeneration)
   }
 
+  currentAbort = null
   return false
 }
 
-function playBlob(blob: Blob): Promise<boolean> {
+function playBlob(blob: Blob, generation: number): Promise<boolean> {
   return new Promise((resolve) => {
+    // Final preemption check right before playing
+    if (generation !== speakGeneration) { resolve(false); return }
+
     const url = URL.createObjectURL(blob)
     const audio = new Audio(url)
     audio.volume = 0.75
@@ -193,12 +224,25 @@ function playBlob(blob: Blob): Promise<boolean> {
 }
 
 export function stopTTS(): void {
+  // Cancel in-flight API requests
+  if (currentAbort) {
+    currentAbort.abort()
+    currentAbort = null
+  }
+  // Bump generation so any pending async chains bail out
+  speakGeneration++
+
   if (currentAudio) {
     currentAudio.pause()
     currentAudio.currentTime = 0
     currentAudio = null
     unduckMusic()
   }
+}
+
+/** Check if TTS is currently playing audio */
+export function isSpeaking(): boolean {
+  return currentAudio !== null && !currentAudio.paused
 }
 
 // ─── Pre-warm Cache ─────────────────────────────────────────
@@ -246,4 +290,3 @@ export async function prewarmPlayerCache(playerName: string, voice: string): Pro
     await new Promise(r => setTimeout(r, 1000))
   }
 }
-
