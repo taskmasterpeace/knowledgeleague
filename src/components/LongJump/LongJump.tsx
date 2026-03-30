@@ -133,7 +133,7 @@ export function LongJump() {
   // Broadcast current problem to phone controllers
   useEffect(() => {
     if (phase === 'building') {
-      broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject)
+      broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject, currentProblem.correctIndex)
     }
   }, [currentProblem, broadcastProblem, phase])
 

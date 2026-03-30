@@ -109,7 +109,7 @@ export function HurdleDash() {
 
   // Broadcast current problem to phone controllers
   useEffect(() => {
-    broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject)
+    broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject, currentProblem.correctIndex)
   }, [currentProblem, broadcastProblem])
 
   const resolveRound = useCallback(() => {

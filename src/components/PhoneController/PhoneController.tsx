@@ -123,7 +123,7 @@ export function PhoneController({ roomId }: Props) {
   const [showStats, setShowStats] = useState(false)
   const {
     connected, connectionError, playerId, role, question, choices, subject,
-    lockedIn, correctIndex, myChoiceIndex, gameOver,
+    lockedIn, correctIndex, myChoiceIndex, hintCorrectIndex, gameOver,
     spectatorData, personalStats, superlatives,
     sendAnswer, connect,
   } = usePeerClient()
@@ -503,6 +503,7 @@ export function PhoneController({ roomId }: Props) {
       lockedIn={lockedIn}
       correctIndex={correctIndex}
       myChoiceIndex={myChoiceIndex}
+      hintCorrectIndex={hintCorrectIndex}
       sendAnswer={sendAnswer}
     />
   )
@@ -513,7 +514,7 @@ export function PhoneController({ roomId }: Props) {
 // ═══════════════════════════════════════════════════════════════
 
 function GameplayScreen({
-  name, question, choices, subject, lockedIn, correctIndex, myChoiceIndex, sendAnswer,
+  name, question, choices, subject, lockedIn, correctIndex, myChoiceIndex, hintCorrectIndex, sendAnswer,
 }: {
   name: string
   question: string | null
@@ -522,12 +523,41 @@ function GameplayScreen({
   lockedIn: boolean
   correctIndex: number | null
   myChoiceIndex: number | null
+  hintCorrectIndex: number
   sendAnswer: (i: number) => void
 }) {
   const maxChoiceLen = Math.max(...choices.map(c => c.length))
   const isLongText = maxChoiceLen > 8
   const showResult = correctIndex !== null
   const wasCorrect = myChoiceIndex !== null && correctIndex === myChoiceIndex
+
+  // ─── Phone-local hint state ───
+  const [hintsLeft, setHintsLeft] = useState(3)
+  const [hintUsed, setHintUsed] = useState(false)
+  const [hiddenChoices, setHiddenChoices] = useState<number[]>([])
+
+  // Reset hint state when a new question arrives
+  const prevQuestion = useRef(question)
+  useEffect(() => {
+    if (question !== prevQuestion.current) {
+      prevQuestion.current = question
+      setHintUsed(false)
+      setHiddenChoices([])
+    }
+  }, [question])
+
+  const handleHint = useCallback(() => {
+    if (hintUsed || hintsLeft <= 0 || hintCorrectIndex < 0 || lockedIn) return
+    vibrate(30)
+    // Pick 2 random wrong answers to hide
+    const wrongIndices = choices
+      .map((_, i) => i)
+      .filter(i => i !== hintCorrectIndex)
+    const shuffled = wrongIndices.sort(() => Math.random() - 0.5)
+    setHiddenChoices(shuffled.slice(0, 2))
+    setHintUsed(true)
+    setHintsLeft(prev => prev - 1)
+  }, [hintUsed, hintsLeft, hintCorrectIndex, lockedIn, choices])
 
   const handleAnswer = useCallback((i: number) => {
     if (lockedIn) return
@@ -635,6 +665,28 @@ function GameplayScreen({
         )}
       </div>
 
+      {/* ── Hint button ── */}
+      {!showResult && !lockedIn && hintCorrectIndex >= 0 && (
+        <div className="shrink-0 flex justify-center py-1.5 relative z-20">
+          <button
+            onClick={handleHint}
+            disabled={hintUsed || hintsLeft <= 0}
+            className="font-pixel text-[9px] px-5 py-1.5 transition-all active:scale-95"
+            style={{
+              background: hintUsed || hintsLeft <= 0
+                ? 'rgba(255,255,255,0.05)'
+                : 'linear-gradient(180deg, #f59e0b22, #d9770622)',
+              border: `2px solid ${hintUsed || hintsLeft <= 0 ? 'rgba(255,255,255,0.1)' : '#f59e0b66'}`,
+              color: hintUsed ? 'rgba(255,255,255,0.2)' : hintsLeft <= 0 ? 'rgba(255,255,255,0.2)' : '#fbbf24',
+              boxShadow: hintUsed || hintsLeft <= 0 ? 'none' : '0 0 8px rgba(251,191,36,0.2)',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            {hintUsed ? 'HINT USED' : `HINT (${hintsLeft})`}
+          </button>
+        </div>
+      )}
+
       {/* ── Answer buttons — arcade cabinet style ── */}
       <div className={`flex-1 grid ${isLongText ? 'grid-cols-1' : 'grid-cols-2'} gap-2.5 p-3 relative z-20`}>
         {choices.map((choice, i) => {
@@ -688,11 +740,22 @@ function GameplayScreen({
             }
           }
 
+          // Hint-hidden state — dim the button
+          const isHintHidden = hiddenChoices.includes(i)
+          if (isHintHidden && !showResult) {
+            btnBg = '#1a1a2e'
+            btnShadow = '#0f0f1e'
+            btnHighlight = '#2a2a4e'
+            btnOpacity = 0.15
+            borderColor = '#2a2a4e'
+            labelColor = '#4a4a6e'
+          }
+
           return (
             <button
               key={i}
-              onClick={() => handleAnswer(i)}
-              disabled={lockedIn}
+              onClick={() => !isHintHidden && handleAnswer(i)}
+              disabled={lockedIn || isHintHidden}
               className="relative flex flex-col items-center justify-center select-none overflow-hidden transition-opacity duration-200"
               style={{
                 opacity: btnOpacity,

@@ -12,7 +12,7 @@ interface HostMessage {
   question?: string
   choices?: string[]
   subject?: string
-  correctIndex?: number
+  correctIndex?: number   // sent both in 'problem' (for hints) and 'result' (for reveal)
   playerId?: number
   name?: string
   winnerName?: string
@@ -31,6 +31,7 @@ export function usePeerClient() {
   const [lockedIn, setLockedIn] = useState(false)
   const [correctIndex, setCorrectIndex] = useState<number | null>(null)
   const [myChoiceIndex, setMyChoiceIndex] = useState<number | null>(null)
+  const [hintCorrectIndex, setHintCorrectIndex] = useState<number>(-1)
   const [gameOver, setGameOver] = useState<GameOverData | null>(null)
   const [spectatorData, setSpectatorData] = useState<Record<string, unknown> | null>(null)
   const [personalStats, setPersonalStats] = useState<Record<string, unknown> | null>(null)
@@ -88,6 +89,7 @@ export function usePeerClient() {
           setQuestion(data.question ?? null)
           setChoices(data.choices)
           setSubject(data.subject ?? 'math')
+          setHintCorrectIndex(data.correctIndex ?? -1)
           setLockedIn(false)
           setCorrectIndex(null)
           setMyChoiceIndex(null)
@@ -129,7 +131,7 @@ export function usePeerClient() {
 
   return {
     connected, connectionError, playerId, role, question, choices, subject,
-    lockedIn, correctIndex, myChoiceIndex, gameOver,
+    lockedIn, correctIndex, myChoiceIndex, hintCorrectIndex, gameOver,
     spectatorData, personalStats, superlatives,
     sendAnswer, connect,
   }

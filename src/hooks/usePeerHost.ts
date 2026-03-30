@@ -39,12 +39,15 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
   const currentQuestionRef = useRef<string>('')
   const currentSubjectRef = useRef<string>('')
 
-  const broadcastProblem = useCallback((question: string, choices: string[], subject: string) => {
+  const currentCorrectIndexRef = useRef<number>(-1)
+
+  const broadcastProblem = useCallback((question: string, choices: string[], subject: string, correctIndex?: number) => {
     currentChoicesRef.current = choices
     currentQuestionRef.current = question
     currentSubjectRef.current = subject
+    currentCorrectIndexRef.current = correctIndex ?? -1
     for (const conn of connsRef.current.values()) {
-      conn.send({ type: 'problem', question, choices, subject })
+      conn.send({ type: 'problem', question, choices, subject, correctIndex })
     }
   }, [])
 
@@ -109,6 +112,7 @@ export function usePeerHost({ enabled, onRemoteAnswer }: UsePeerHostProps) {
             question: currentQuestionRef.current,
             choices: currentChoicesRef.current,
             subject: currentSubjectRef.current,
+            correctIndex: currentCorrectIndexRef.current >= 0 ? currentCorrectIndexRef.current : undefined,
           })
         }
       })

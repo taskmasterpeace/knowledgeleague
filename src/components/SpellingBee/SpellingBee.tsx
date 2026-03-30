@@ -117,7 +117,7 @@ export function SpellingBee() {
 
   // Broadcast problem to phone controllers
   useEffect(() => {
-    broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject)
+    broadcastProblem(currentProblem.question, currentProblem.choices, currentProblem.subject, currentProblem.correctIndex)
   }, [currentProblem, broadcastProblem])
 
   const activePlayers = players.filter(p => !eliminated.has(p.id as PlayerId))
