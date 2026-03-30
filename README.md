@@ -2,7 +2,11 @@
 
 A multiplayer educational game where kids answer math, science, reading, and spelling questions to compete in retro pixel art game events. Built with React, TypeScript, and WebRTC for real-time multiplayer on any device.
 
-![Menu](public/screenshots/menu.png)
+![Main Menu](public/screenshots/menu.png)
+
+## Pick Your Opponent
+
+![CPU Select](public/screenshots/cpu-select.png)
 
 ## Game Events
 
