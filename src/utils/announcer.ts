@@ -146,3 +146,49 @@ export function gameStartLine(playerCount: number): AnnouncerLine {
   if (playerCount >= 4) return { text: `${playerCount} players ready! Let the games begin!`, priority: 'high' }
   return { text: "Let's do this! Game on!", priority: 'high' }
 }
+
+// Party mode announcer lines
+const EVENT_NAMES: Record<string, string> = {
+  'marathon': 'Math Marathon',
+  'tug-of-war': 'Tug of War',
+  'hurdle-dash': 'Hurdle Dash',
+  'long-jump': 'Long Jump',
+  'spelling-bee': 'Spelling Bee',
+}
+
+export function partyEventLine(eventName: string, current: number, total: number): AnnouncerLine {
+  const name = EVENT_NAMES[eventName] || eventName
+  const lines = [
+    `Event ${current} of ${total}: ${name}!`,
+    `Next up: ${name}! Event ${current} of ${total}!`,
+    `Get ready for ${name}! ${total - current} events to go!`,
+    `Here comes ${name}! Can you take the lead?`,
+  ]
+  return { text: lines[Math.floor(Math.random() * lines.length)], priority: 'high' }
+}
+
+export function partyChampionLine(playerName: string): AnnouncerLine {
+  const lines = [
+    `${playerName} is the Party Champion! What a performance!`,
+    `And the crown goes to ${playerName}! Party Champion!`,
+    `${playerName} dominates the party! Champion!`,
+    `Nobody could stop ${playerName}! Party Champion!`,
+  ]
+  return { text: lines[Math.floor(Math.random() * lines.length)], priority: 'high' }
+}
+
+export function powerUpLine(playerName: string, powerUpName: string): AnnouncerLine {
+  const lines = [
+    `${playerName} earned a ${powerUpName}!`,
+    `Power up! ${playerName} gets ${powerUpName}!`,
+    `${powerUpName} for ${playerName}! Watch out!`,
+  ]
+  return { text: lines[Math.floor(Math.random() * lines.length)], priority: 'normal' }
+}
+
+export function streakMilestoneLine(playerName: string, streak: number): AnnouncerLine {
+  if (streak >= 10) return { text: `${playerName} hits TEN in a row! Absolutely incredible!`, priority: 'high' }
+  if (streak >= 7) return { text: `${playerName} is on a legendary ${streak} streak!`, priority: 'high' }
+  if (streak >= 5) return { text: `${playerName} is unstoppable! ${streak} in a row!`, priority: 'high' }
+  return { text: `${playerName} is on fire! ${streak} streak!`, priority: 'normal' }
+}

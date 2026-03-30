@@ -1,10 +1,12 @@
 import { useState, useCallback } from 'react'
 import { generateQuestion, getDifficulty, resetQuestionEngine } from '../utils/questionEngine'
 import { useSettings } from './useSettings'
+import { useGameState } from './useGameState'
 import type { GameQuestion, Difficulty, Subject } from '../types'
 
 export function useQuestionEngine(fixedDifficulty?: Difficulty, forceSubject?: Subject) {
   const { enabledSubjects, gradeLevel, enabledCategories } = useSettings()
+  const resetHintForQuestion = useGameState(s => s.resetHintForQuestion)
   const [problemCount, setProblemCount] = useState(1)
 
   const subjects = forceSubject ? [forceSubject] : enabledSubjects
@@ -25,7 +27,8 @@ export function useQuestionEngine(fixedDifficulty?: Difficulty, forceSubject?: S
     const next = problemCount + 1
     setProblemCount(next)
     setCurrentProblem(makeQuestion(next))
-  }, [problemCount, makeQuestion])
+    resetHintForQuestion()
+  }, [problemCount, makeQuestion, resetHintForQuestion])
 
   const reset = useCallback(() => {
     resetQuestionEngine()

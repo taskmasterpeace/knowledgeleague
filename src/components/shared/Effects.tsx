@@ -138,6 +138,91 @@ export function FlashOverlay({ type }: FlashOverlayProps) {
   )
 }
 
+// ===== STREAK CELEBRATION =====
+// Big celebratory burst when a player hits a milestone streak (3, 5, 7, 10)
+
+interface StreakCelebrationProps {
+  streak: number
+  playerColor: string
+  playerName: string
+}
+
+export function StreakCelebration({ streak, playerColor, playerName }: StreakCelebrationProps) {
+  const milestones = [3, 5, 7, 10]
+  if (!milestones.includes(streak)) return null
+
+  const messages: Record<number, string> = {
+    3: 'ON FIRE!',
+    5: 'UNSTOPPABLE!',
+    7: 'LEGENDARY!',
+    10: 'G.O.A.T.!',
+  }
+
+  const sizes: Record<number, number> = { 3: 1, 5: 1.2, 7: 1.4, 10: 1.6 }
+  const scale = sizes[streak] ?? 1
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+        zIndex: 9997,
+        animation: 'streak-celebrate 1.5s ease-out forwards',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 8,
+          transform: `scale(${scale})`,
+        }}
+      >
+        <span
+          className="font-pixel text-2xl"
+          style={{
+            color: playerColor,
+            textShadow: `0 0 20px ${playerColor}, 0 0 40px ${playerColor}, 2px 2px 0 #000`,
+            animation: 'bounce 0.3s ease-in-out',
+          }}
+        >
+          {messages[streak]}
+        </span>
+        <span className="font-pixel-body font-bold text-sm text-white/80">
+          {playerName} — {streak} in a row!
+        </span>
+        {/* Ring of emojis */}
+        {Array.from({ length: streak >= 7 ? 12 : streak >= 5 ? 8 : 6 }, (_, i) => {
+          const angle = (i / (streak >= 7 ? 12 : streak >= 5 ? 8 : 6)) * 360
+          const rad = (angle * Math.PI) / 180
+          const dist = 60 + streak * 5
+          return (
+            <span
+              key={i}
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: `translate(-50%, -50%) translate(${Math.cos(rad) * dist}px, ${Math.sin(rad) * dist}px)`,
+                fontSize: streak >= 7 ? 24 : 18,
+                animation: `particle-burst 1s ease-out ${i * 50}ms forwards`,
+                opacity: 0.8,
+              }}
+            >
+              {streak >= 10 ? '🌟' : streak >= 7 ? '💥' : streak >= 5 ? '🔥' : '⚡'}
+            </span>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ===== FIREWORKS =====
 
 interface FireworksProps {

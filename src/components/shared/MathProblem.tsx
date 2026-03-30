@@ -1,6 +1,8 @@
 import type { GameQuestion } from '../../types'
 import type { ControllerType } from '../../hooks/useGamepad'
 import { ControllerButton } from './ControllerButtons'
+import { useGameState } from '../../hooks/useGameState'
+import { HINTS_PER_GAME } from '../../utils/constants'
 
 interface Props {
   problem: GameQuestion
@@ -10,6 +12,7 @@ interface Props {
   p1Keys: string[]
   p2Keys: string[]
   controllerType?: ControllerType
+  showHint?: boolean  // whether to show the hint button (default true)
 }
 
 const CARD_COLORS = [
@@ -35,7 +38,20 @@ const SUBJECT_COLORS: Record<string, string> = {
   images: 'bg-orange-500',
 }
 
-export function MathProblem({ problem, onAnswer, lockedP1, lockedP2, p1Keys, p2Keys, controllerType }: Props) {
+export function MathProblem({ problem, onAnswer, lockedP1, lockedP2, p1Keys, p2Keys, controllerType, showHint = true }: Props) {
+  const { hintsRemaining, hintUsedThisQuestion, hiddenChoices, useHint: applyHint, players } = useGameState()
+
+  // Use Player 1's hint state (in multiplayer, each player manages their own)
+  const p1Id = players[0]?.id
+  const remaining = hintsRemaining[p1Id] ?? HINTS_PER_GAME
+  const canHint = showHint && remaining > 0 && !hintUsedThisQuestion && hiddenChoices.length === 0
+
+  const handleHint = () => {
+    if (canHint) {
+      applyHint(p1Id, problem.correctIndex, problem.choices.length)
+    }
+  }
+
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-2xl">
       {/* Question card */}
@@ -94,18 +110,46 @@ export function MathProblem({ problem, onAnswer, lockedP1, lockedP2, p1Keys, p2K
         </div>
       </div>
 
+      {/* Hint button */}
+      {showHint && (
+        <button
+          onClick={handleHint}
+          disabled={!canHint}
+          className={`font-pixel text-[9px] px-4 py-2 rounded-lg border-2 transition-all ${
+            canHint
+              ? 'bg-amber-500/20 border-amber-400/60 text-amber-300 hover:bg-amber-500/30 hover:scale-105 active:scale-95'
+              : hintUsedThisQuestion
+                ? 'bg-white/5 border-white/10 text-white/20 cursor-default'
+                : 'bg-white/5 border-white/10 text-white/20 cursor-not-allowed'
+          }`}
+          title={canHint ? 'Remove 2 wrong answers (resets streak)' : hintUsedThisQuestion ? 'Hint used!' : 'No hints left'}
+        >
+          {hintUsedThisQuestion ? 'HINT USED' : `HINT (${remaining})`}
+        </button>
+      )}
+
       {/* Answer grid */}
       <div className="grid grid-cols-2 gap-3 w-full">
         {problem.choices.map((choice, i) => {
           const colors = CARD_COLORS[i]
+          const isHidden = hiddenChoices.includes(i)
           return (
             <div
               key={i}
-              className={`relative flex items-center justify-center bg-gradient-to-b ${colors.bg} rounded-lg border-2 ${colors.border} py-6 px-3 select-none cursor-pointer
-                transition-all duration-150 hover:scale-[1.03] hover:brightness-110 active:scale-95`}
-              style={{ boxShadow: `0 4px 12px ${colors.glow}, inset 0 1px 0 rgba(255,255,255,0.15)` }}
-              onClick={() => onAnswer(i)}
+              className={`relative flex items-center justify-center bg-gradient-to-b ${colors.bg} rounded-lg border-2 ${colors.border} py-6 px-3 select-none
+                transition-all duration-300 ${
+                  isHidden
+                    ? 'opacity-15 scale-95 cursor-not-allowed grayscale'
+                    : 'cursor-pointer hover:scale-[1.03] hover:brightness-110 active:scale-95'
+                }`}
+              style={{ boxShadow: isHidden ? 'none' : `0 4px 12px ${colors.glow}, inset 0 1px 0 rgba(255,255,255,0.15)` }}
+              onClick={() => !isHidden && onAnswer(i)}
             >
+              {isHidden && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <span className="font-pixel text-3xl text-white/20">X</span>
+                </div>
+              )}
               {problem.category === 'pattern' && choice.startsWith('/') ? (
                 <img
                   src={choice}
@@ -120,13 +164,13 @@ export function MathProblem({ problem, onAnswer, lockedP1, lockedP2, p1Keys, p2K
                 </span>
               )}
               <div className="absolute bottom-1.5 left-2 flex gap-2 items-center">
-                <span className={`font-pixel-body text-xs ${lockedP1 ? 'text-white/20 line-through' : 'text-white/40'}`}>
+                <span className={`font-pixel-body text-xs ${lockedP1 || isHidden ? 'text-white/20 line-through' : 'text-white/40'}`}>
                   [{p1Keys[i]}]
                 </span>
-                <span className={`font-pixel-body text-xs ${lockedP2 ? 'text-white/20 line-through' : 'text-white/40'}`}>
+                <span className={`font-pixel-body text-xs ${lockedP2 || isHidden ? 'text-white/20 line-through' : 'text-white/40'}`}>
                   [{p2Keys[i]}]
                 </span>
-                {controllerType && (
+                {controllerType && !isHidden && (
                   <ControllerButton controllerType={controllerType} choiceIndex={i} locked={lockedP1} />
                 )}
               </div>

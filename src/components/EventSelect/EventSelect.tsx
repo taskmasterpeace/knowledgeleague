@@ -5,6 +5,8 @@ import { useSettings } from '../../hooks/useSettings'
 import { useGamepadNav } from '../../hooks/useGamepadNav'
 
 const EVENTS = ['marathon', 'tug-of-war', 'hurdle-dash', 'long-jump', 'spelling-bee'] as const
+// Total selectable items: 5 events + 1 stories (disabled) + 1 party mode = 7 (party is index 6)
+const TOTAL_ITEMS = 7
 
 export function EventSelect() {
   const { setEvent, setPhase, playerCount } = useGameState()
@@ -16,15 +18,25 @@ export function EventSelect() {
     setPhase('playing')
   }, [soundEnabled, setEvent, setPhase])
 
+  const handlePartyMode = useCallback(() => {
+    if (soundEnabled) sounds.select()
+    setPhase('party-setup')
+  }, [soundEnabled, setPhase])
+
   const handleBack = useCallback(() => {
     if (soundEnabled) sounds.navigate()
     setPhase('avatar-select')
   }, [soundEnabled, setPhase])
 
+  const handleSelect = useCallback((i: number) => {
+    if (i < EVENTS.length) selectEvent(EVENTS[i])
+    else if (i === 6) handlePartyMode()
+  }, [selectEvent, handlePartyMode])
+
   const { focusIndex } = useGamepadNav({
-    itemCount: EVENTS.length,
+    itemCount: TOTAL_ITEMS,
     columns: 3,
-    onSelect: (i) => selectEvent(EVENTS[i]),
+    onSelect: handleSelect,
     onBack: handleBack,
     enabled: true,
   })
@@ -198,6 +210,24 @@ export function EventSelect() {
           </div>
           <span className="font-pixel-body font-semibold text-xs text-white/50 text-center">Adventure awaits!</span>
         </div>
+
+        {/* Party Mode card */}
+        <button
+          onClick={handlePartyMode}
+          className={`pixel-card rounded-lg flex flex-col items-center gap-3 p-4 hover:scale-105 transition-all active:scale-95 w-56 group hover:shadow-[0_0_24px_rgba(168,85,247,0.4)] border-2 border-purple-400/40 ${focusIndex === 6 ? 'gamepad-focus' : ''}`}
+          style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(236,72,153,0.15) 100%)' }}
+        >
+          <div
+            className="w-full aspect-video rounded-lg flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.3) 0%, rgba(236,72,153,0.3) 50%, rgba(251,191,36,0.3) 100%)' }}
+          >
+            <span className="text-5xl" style={{ filter: 'drop-shadow(0 0 12px rgba(168,85,247,0.6))' }}>🎉</span>
+          </div>
+          <span className="font-pixel text-sm text-purple-300 group-hover:text-purple-200 transition-colors" style={{ textShadow: '0 0 10px rgba(168,85,247,0.5)' }}>
+            PARTY MODE
+          </span>
+          <span className="font-pixel-body font-semibold text-xs text-white/50 text-center">Play 3-5 events!</span>
+        </button>
       </div>
 
       {/* CSS animations */}

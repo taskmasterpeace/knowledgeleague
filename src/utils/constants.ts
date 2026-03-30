@@ -35,6 +35,21 @@ export const PLAYER_COLORS = [
   '#8b5cf6', '#d946ef', '#0ea5e9', '#65a30d',
 ]
 
+// Hints
+export const HINTS_PER_GAME = 3              // hints each player gets per game
+export const HINT_REMOVES_COUNT = 2          // wrong answers removed by a hint
+
+// Power-ups
+export const POWERUP_STREAK_THRESHOLD = 3    // correct streak to earn a power-up
+export const POWERUP_TIME_FREEZE_BONUS = 5000 // ms added by time freeze
+export const POWERUP_DOUBLE_MULTIPLIER = 2    // score multiplier for double points
+export const POWERUP_MAX_INVENTORY = 3        // max power-ups a player can hold
+
+// Party Mode
+export const PARTY_EVENT_COUNTS = [3, 5] as const  // selectable event counts
+export const PARTY_MEDAL_POINTS = [3, 2, 1, 0] as const  // 1st, 2nd, 3rd, 4th+
+export const PARTY_TRANSITION_DURATION = 4000  // ms to show transition screen
+
 // Keyboard mapping — both players press 1-2-3-4
 // P1 uses number row (Digit1-Digit4), P2 uses numpad (Numpad1-Numpad4)
 export const P1_CODES: Record<string, number> = { 'Digit1': 0, 'Digit2': 1, 'Digit3': 2, 'Digit4': 3 }

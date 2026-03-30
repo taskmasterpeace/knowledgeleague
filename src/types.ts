@@ -2,8 +2,33 @@ export type GamePhase =
   | 'menu' | 'cpu-select' | 'avatar-select' | 'event-select'
   | 'phone-lobby' | 'playing' | 'victory' | 'stats' | 'trophies' | 'leaderboards'
   | 'daily-challenge'
+  | 'party-setup' | 'party-transition' | 'party-results'
 
 export type GameEvent = 'marathon' | 'tug-of-war' | 'hurdle-dash' | 'long-jump' | 'spelling-bee'
+
+// Power-up types
+export type PowerUpType = 'time-freeze' | 'double-points' | 'fifty-fifty' | 'streak-shield'
+
+export interface PowerUp {
+  type: PowerUpType
+  label: string
+  description: string
+  icon: string  // emoji for now
+}
+
+export const POWER_UP_DEFS: Record<PowerUpType, PowerUp> = {
+  'time-freeze':   { type: 'time-freeze',   label: 'Time Freeze',   description: '+5 seconds on the clock',    icon: '🧊' },
+  'double-points': { type: 'double-points',  label: 'Double Points',  description: 'Next correct = 2x points',  icon: '⭐' },
+  'fifty-fifty':   { type: 'fifty-fifty',    label: '50/50',          description: 'Remove 2 wrong answers',     icon: '✂️' },
+  'streak-shield': { type: 'streak-shield',  label: 'Streak Shield',  description: 'Keep your streak if wrong',  icon: '🛡️' },
+}
+
+// Party mode types
+export interface PartyEventResult {
+  event: GameEvent
+  rankings: { playerId: PlayerId; position: number; score: number }[]
+  medalPoints: Record<PlayerId, number>  // 1st=3, 2nd=2, 3rd=1
+}
 
 export type PlayerType = 'human' | 'cpu'
 

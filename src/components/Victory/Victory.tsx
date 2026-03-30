@@ -9,7 +9,7 @@ import { playMusic, stopMusic } from '../../utils/backgroundMusic'
 import { OBJECTS } from '../../utils/pixelArt'
 
 export function Victory() {
-  const { players, winner, resetGame, rematch, setPhase } = useGameState()
+  const { players, winner, resetGame, rematch, setPhase, isPartyMode, recordPartyEventResult, advancePartyEvent, partyCurrentIndex, partyEvents } = useGameState()
   const { broadcastGameOver } = usePeerContext()
   const { soundEnabled } = useSettings()
 
@@ -37,11 +37,22 @@ export function Victory() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Auto-advance to stats after 4 seconds
+  // Record party event result on mount
   useEffect(() => {
-    const timer = setTimeout(() => setPhase('stats'), 4000)
+    if (isPartyMode) recordPartyEventResult()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-advance: party mode goes to next event, normal mode goes to stats
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isPartyMode) {
+        advancePartyEvent()
+      } else {
+        setPhase('stats')
+      }
+    }, 4000)
     return () => clearTimeout(timer)
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!winner) return null
   const winnerPlayer = players.find(p => p.id === winner)!
@@ -156,25 +167,60 @@ export function Victory() {
 
       {/* Buttons */}
       <div className="flex gap-4 mt-4">
-        <button
-          onClick={rematch}
-          className="pixel-btn font-pixel py-4 px-8 bg-cyan-600 hover:bg-cyan-500 text-white text-xs rounded-lg transition-colors"
-        >
-          REMATCH
-        </button>
-        <button
-          onClick={() => setPhase('stats')}
-          className="pixel-btn font-pixel py-4 px-8 bg-purple-700 hover:bg-purple-600 text-white text-xs rounded-lg transition-colors"
-        >
-          SKIP
-        </button>
-        <button
-          onClick={resetGame}
-          className="pixel-btn font-pixel py-4 px-8 bg-indigo-700 hover:bg-indigo-600 text-white text-xs rounded-lg transition-colors"
-        >
-          MENU
-        </button>
+        {isPartyMode ? (
+          <>
+            <button
+              onClick={advancePartyEvent}
+              className="pixel-btn font-pixel py-4 px-8 bg-cyan-600 hover:bg-cyan-500 text-white text-xs rounded-lg transition-colors"
+            >
+              {partyCurrentIndex < partyEvents.length - 1 ? 'NEXT EVENT' : 'FINAL RESULTS'}
+            </button>
+            <button
+              onClick={resetGame}
+              className="pixel-btn font-pixel py-4 px-8 bg-indigo-700 hover:bg-indigo-600 text-white text-xs rounded-lg transition-colors"
+            >
+              QUIT PARTY
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={rematch}
+              className="pixel-btn font-pixel py-4 px-8 bg-cyan-600 hover:bg-cyan-500 text-white text-xs rounded-lg transition-colors"
+            >
+              REMATCH
+            </button>
+            <button
+              onClick={() => setPhase('stats')}
+              className="pixel-btn font-pixel py-4 px-8 bg-purple-700 hover:bg-purple-600 text-white text-xs rounded-lg transition-colors"
+            >
+              SKIP
+            </button>
+            <button
+              onClick={resetGame}
+              className="pixel-btn font-pixel py-4 px-8 bg-indigo-700 hover:bg-indigo-600 text-white text-xs rounded-lg transition-colors"
+            >
+              MENU
+            </button>
+          </>
+        )}
       </div>
+
+      {/* Party progress indicator */}
+      {isPartyMode && (
+        <div className="flex items-center gap-2 mt-2">
+          {partyEvents.map((_, i) => (
+            <div
+              key={i}
+              className={`w-3 h-3 rounded-full transition-all ${
+                i < partyCurrentIndex ? 'bg-yellow-400' :
+                i === partyCurrentIndex ? 'bg-cyan-400 animate-pulse' :
+                'bg-white/20'
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

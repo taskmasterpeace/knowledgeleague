@@ -20,6 +20,9 @@ import { Leaderboards } from './components/Leaderboards/Leaderboards'
 import { DailyChallenge } from './components/DailyChallenge/DailyChallenge'
 import { PhoneController } from './components/PhoneController/PhoneController'
 import { PhoneLobby } from './components/PhoneLobby/PhoneLobby'
+import { PartySetup } from './components/PartyMode/PartySetup'
+import { PartyTransition } from './components/PartyMode/PartyTransition'
+import { PartyResults } from './components/PartyMode/PartyResults'
 import { PLAYER_COLORS } from './utils/constants'
 import { useSettings } from './hooks/useSettings'
 import { speak, playerJoinLine, gameStartLine } from './utils/announcer'
@@ -151,6 +154,9 @@ function HostApp({ peerEnabled, setPeerEnabled, phase, event }: {
       {phase === 'trophies' && <TrophyShelf />}
       {phase === 'leaderboards' && <Leaderboards />}
       {phase === 'daily-challenge' && <DailyChallenge />}
+      {phase === 'party-setup' && <PartySetup />}
+      {phase === 'party-transition' && <PartyTransition />}
+      {phase === 'party-results' && <PartyResults />}
     </PeerContext.Provider>
   )
 }

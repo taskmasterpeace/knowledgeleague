@@ -215,6 +215,28 @@ body {
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
 
+/* ===== STREAK CELEBRATION ===== */
+@keyframes streak-celebrate {
+  0% { opacity: 0; transform: scale(0.5); }
+  15% { opacity: 1; transform: scale(1.1); }
+  30% { transform: scale(1); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: scale(0.8) translateY(-30px); }
+}
+
+/* ===== POWER-UP GLOW ===== */
+@keyframes powerup-glow {
+  0%, 100% { box-shadow: 0 0 8px currentColor; }
+  50% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
+}
+
+/* ===== PARTY ENTRANCE ===== */
+@keyframes party-entrance {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
 /* ===== GAMEPAD NAV FOCUS ===== */
 @keyframes nav-focus-pulse {
   0%, 100% { box-shadow: 0 0 0 3px rgba(250,204,21,0.6), 0 0 12px rgba(250,204,21,0.3); }

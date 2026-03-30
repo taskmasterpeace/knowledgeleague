@@ -19,11 +19,13 @@ npm run test:browser # Playwright E2E (requires dev server running)
 ### Game Flow
 ```
 Menu → CPU Select → Avatar Select → Event Select → Playing → Victory → Stats
+                                   ↓ (Party Mode)
+                              Party Setup → Transition → Event 1 → Victory → ... → Party Results
 ```
 
 ### Key Systems
 
-- **State**: Zustand store in `src/hooks/useGameState.ts` — single source of truth for game phase, players, scores, positions
+- **State**: Zustand store in `src/hooks/useGameState.ts` — single source of truth for game phase, players, scores, positions, party mode, power-ups
 - **Questions**: `src/utils/questionEngine.ts` — rotates subjects (math/science/reading), loads JSON question banks lazily, prevents repeat questions (last 100)
 - **Math Generator**: `src/utils/mathProblems.ts` — procedural math problems by grade level and difficulty
 - **Adaptive Difficulty**: `src/utils/adaptiveDifficulty.ts` — tiers 1-3, adjusts based on rolling accuracy of last 10 answers (80%+ → up, <40% → down)
@@ -32,10 +34,17 @@ Menu → CPU Select → Avatar Select → Event Select → Playing → Victory �
 - **Multiplayer**: PeerJS WebRTC — host (`usePeerHost`) broadcasts problems/results, phone clients (`usePeerClient`) send answers. Join via QR code at `/join/:roomId`
 - **Custom Characters**: `src/utils/customCharacters.ts` — PixelLab-generated pixel art stored as base64 in localStorage
 - **Pixel Art**: `src/utils/pixelArt.ts` — maps static sprite files, `AnimatedSprite` component cycles frame arrays
+- **Party Mode**: `src/components/PartyMode/` — tournament system, play 3-5 random events, cumulative medal scoring, overall champion
+- **Power-ups**: State in `useGameState` — earned on streaks, types: time-freeze, double-points, fifty-fifty, streak-shield
+- **Quick Play**: One-tap random game from menu — picks random CPU + random event
 
 ### Game Modes
 - **Math Marathon** (`src/components/MathMarathon/`) — race to finish line, correct answers advance
 - **Tug of War** (`src/components/TugOfWar/`) — team pull with 3 arena types (mud-pit, stadium, schoolyard)
+- **Hurdle Dash** (`src/components/HurdleDash/`) — jump hurdles with correct answers
+- **Long Jump** (`src/components/LongJump/`) — build momentum and leap
+- **Spelling Bee** (`src/components/SpellingBee/`) — last speller standing
+- **Party Mode** (`src/components/PartyMode/`) — play 3-5 events in sequence, medal points (3/2/1), overall champion
 
 ### Component Pattern
 - Game scenes: `MarathonScene.tsx`, `TugArena.tsx`, `MenuScene.tsx` — pixel art rendering with CSS gradient fallbacks

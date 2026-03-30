@@ -6,6 +6,8 @@ import { ControllerHint } from '../shared/ControllerButtons'
 import { Settings } from '../Settings/Settings'
 import { useSettings } from '../../hooks/useSettings'
 import { sounds, preloadSounds } from '../../utils/sounds'
+import { CPU_CHARACTERS } from '../../utils/constants'
+import type { GameEvent } from '../../types'
 import { playMusic, toggleMute, isMusicMuted } from '../../utils/backgroundMusic'
 import { speak, isAnnouncerBusy } from '../../utils/announcer'
 import { getGameContext, getContextualGreeting, getContextualFact } from '../../utils/contextEngine'
@@ -135,25 +137,41 @@ export function Menu() {
     return () => clearInterval(interval)
   }, [announcerConfig.enabled, announcerConfig.voice])
 
-  // Menu items: 0=1P, 1=2P, 2=3P, 3=4P, 4=Phone, 5=Daily, 6=Trophies, 7=Leaderboards, 8=Settings
+  // Quick Play: picks 1P + random CPU + random event, jumps straight in
+  const handleQuickPlay = useCallback(() => {
+    preloadSounds()
+    if (soundEnabled) sounds.select()
+    const events: GameEvent[] = ['marathon', 'tug-of-war', 'hurdle-dash', 'long-jump', 'spelling-bee']
+    const randomEvent = events[Math.floor(Math.random() * events.length)]
+    const randomCPU = CPU_CHARACTERS[Math.floor(Math.random() * CPU_CHARACTERS.length)]
+    startSinglePlayer()
+    const state = useGameState.getState()
+    state.setCPUCharacter(randomCPU)
+    state.setEvent(randomEvent)
+    state.setPhase('playing')
+  }, [soundEnabled, startSinglePlayer])
+
+  // Menu items: 0=Quick, 1=1P, 2=2P, 3=3P, 4=4P, 5=Party, 6=Phone, 7=Daily, 8=Trophies, 9=Leaderboards, 10=Settings
   const menuActions = useCallback((index: number) => {
     preloadSounds()
     if (soundEnabled) sounds.select()
     switch (index) {
-      case 0: startSinglePlayer(); setPhase('cpu-select'); break
-      case 1: setPlayerCount(2); setPhase('avatar-select'); break
-      case 2: setPlayerCount(3); setPhase('avatar-select'); break
-      case 3: setPlayerCount(4); setPhase('avatar-select'); break
-      case 4: setPeerEnabled(true); setPhase('phone-lobby'); break
-      case 5: setPhase('daily-challenge'); break
-      case 6: setPhase('trophies'); break
-      case 7: setPhase('leaderboards'); break
-      case 8: setShowSettings(true); break
+      case 0: handleQuickPlay(); break
+      case 1: startSinglePlayer(); setPhase('cpu-select'); break
+      case 2: setPlayerCount(2); setPhase('avatar-select'); break
+      case 3: setPlayerCount(3); setPhase('avatar-select'); break
+      case 4: setPlayerCount(4); setPhase('avatar-select'); break
+      case 5: startSinglePlayer(); setPhase('cpu-select'); break // Party mode — same flow, party-setup option on EventSelect
+      case 6: setPeerEnabled(true); setPhase('phone-lobby'); break
+      case 7: setPhase('daily-challenge'); break
+      case 8: setPhase('trophies'); break
+      case 9: setPhase('leaderboards'); break
+      case 10: setShowSettings(true); break
     }
-  }, [soundEnabled, startSinglePlayer, setPhase, setPlayerCount, setPeerEnabled])
+  }, [soundEnabled, startSinglePlayer, setPhase, setPlayerCount, setPeerEnabled, handleQuickPlay])
 
   const { focusIndex } = useGamepadNav({
-    itemCount: 9,
+    itemCount: 11,
     columns: 2,
     onSelect: menuActions,
     enabled: !showSettings,
@@ -224,46 +242,62 @@ export function Menu() {
 
       {/* Play buttons */}
       <div className="flex flex-col gap-3 w-full max-w-sm relative z-10">
+        {/* QUICK PLAY — the star of the show */}
+        <button
+          onClick={() => menuActions(0)}
+          className={`pixel-btn font-pixel w-full py-5 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 hover:from-yellow-300 hover:via-orange-300 hover:to-red-300 text-gray-900 text-base rounded-lg transition-all shadow-[0_0_20px_rgba(251,191,36,0.4)] hover:shadow-[0_0_30px_rgba(251,191,36,0.6)] hover:scale-[1.02] ${focusIndex === 0 ? 'gamepad-focus' : ''}`}
+        >
+          QUICK PLAY
+        </button>
+
         {/* Local play grid */}
         <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => menuActions(0)}
-            className={`pixel-btn font-pixel py-4 bg-yellow-500 hover:bg-yellow-400 text-gray-900 text-sm rounded-lg transition-colors ${focusIndex === 0 ? 'gamepad-focus' : ''}`}
+            onClick={() => menuActions(1)}
+            className={`pixel-btn font-pixel py-4 bg-yellow-500 hover:bg-yellow-400 text-gray-900 text-sm rounded-lg transition-colors ${focusIndex === 1 ? 'gamepad-focus' : ''}`}
           >
             1 PLAYER
           </button>
           <button
-            onClick={() => menuActions(1)}
-            className={`pixel-btn font-pixel py-4 bg-green-500 hover:bg-green-400 text-gray-900 text-sm rounded-lg transition-colors ${focusIndex === 1 ? 'gamepad-focus' : ''}`}
+            onClick={() => menuActions(2)}
+            className={`pixel-btn font-pixel py-4 bg-green-500 hover:bg-green-400 text-gray-900 text-sm rounded-lg transition-colors ${focusIndex === 2 ? 'gamepad-focus' : ''}`}
           >
             2 PLAYERS
           </button>
           <button
-            onClick={() => menuActions(2)}
-            className={`pixel-btn font-pixel py-4 bg-cyan-500 hover:bg-cyan-400 text-gray-900 text-sm rounded-lg transition-colors ${focusIndex === 2 ? 'gamepad-focus' : ''}`}
+            onClick={() => menuActions(3)}
+            className={`pixel-btn font-pixel py-4 bg-cyan-500 hover:bg-cyan-400 text-gray-900 text-sm rounded-lg transition-colors ${focusIndex === 3 ? 'gamepad-focus' : ''}`}
           >
             3 PLAYERS
           </button>
           <button
-            onClick={() => menuActions(3)}
-            className={`pixel-btn font-pixel py-4 bg-orange-500 hover:bg-orange-400 text-gray-900 text-sm rounded-lg transition-colors ${focusIndex === 3 ? 'gamepad-focus' : ''}`}
+            onClick={() => menuActions(4)}
+            className={`pixel-btn font-pixel py-4 bg-orange-500 hover:bg-orange-400 text-gray-900 text-sm rounded-lg transition-colors ${focusIndex === 4 ? 'gamepad-focus' : ''}`}
           >
             4 PLAYERS
           </button>
         </div>
 
-        {/* Phone play — full width accent */}
+        {/* Party Mode — the big party feature */}
         <button
-          onClick={() => menuActions(4)}
-          className={`pixel-btn font-pixel w-full py-4 bg-purple-500 hover:bg-purple-400 text-white text-sm rounded-lg transition-colors ${focusIndex === 4 ? 'gamepad-focus' : ''}`}
+          onClick={() => menuActions(5)}
+          className={`pixel-btn font-pixel w-full py-5 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-400 hover:via-purple-400 hover:to-indigo-400 text-white text-base rounded-lg transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] hover:scale-[1.02] ${focusIndex === 5 ? 'gamepad-focus' : ''}`}
+        >
+          PARTY MODE
+        </button>
+
+        {/* Phone play */}
+        <button
+          onClick={() => menuActions(6)}
+          className={`pixel-btn font-pixel w-full py-4 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-lg transition-colors ${focusIndex === 6 ? 'gamepad-focus' : ''}`}
         >
           PHONE PLAY
         </button>
 
-        {/* Daily Challenge — full width */}
+        {/* Daily Challenge */}
         <button
-          onClick={() => menuActions(5)}
-          className={`pixel-btn font-pixel w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white text-sm rounded-lg transition-colors ${focusIndex === 5 ? 'gamepad-focus' : ''}`}
+          onClick={() => menuActions(7)}
+          className={`pixel-btn font-pixel w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white text-sm rounded-lg transition-colors ${focusIndex === 7 ? 'gamepad-focus' : ''}`}
         >
           DAILY CHALLENGE
         </button>
@@ -271,14 +305,14 @@ export function Menu() {
         {/* Secondary actions */}
         <div className="grid grid-cols-2 gap-3 mt-1">
           <button
-            onClick={() => menuActions(6)}
-            className={`pixel-btn font-pixel py-3 bg-amber-600 hover:bg-amber-500 text-white text-xs rounded-lg transition-colors ${focusIndex === 6 ? 'gamepad-focus' : ''}`}
+            onClick={() => menuActions(8)}
+            className={`pixel-btn font-pixel py-3 bg-amber-600 hover:bg-amber-500 text-white text-xs rounded-lg transition-colors ${focusIndex === 8 ? 'gamepad-focus' : ''}`}
           >
             TROPHIES
           </button>
           <button
-            onClick={() => menuActions(7)}
-            className={`pixel-btn font-pixel py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded-lg transition-colors ${focusIndex === 7 ? 'gamepad-focus' : ''}`}
+            onClick={() => menuActions(9)}
+            className={`pixel-btn font-pixel py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded-lg transition-colors ${focusIndex === 9 ? 'gamepad-focus' : ''}`}
           >
             LEADERBOARDS
           </button>
