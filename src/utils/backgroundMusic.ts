@@ -18,8 +18,8 @@ const SHUFFLE_POOLS: Record<string, string[]> = {
 
 function startAudio(src: string, trackName: string, volume: number, onEnded?: () => void): void {
   const audio = new Audio(src)
-  audio.volume = volume
   baseVolume = volume
+  audio.volume = muted ? 0 : volume
   if (onEnded) {
     audio.onended = onEnded
   } else {
@@ -96,6 +96,6 @@ export function duckMusic(): void {
 
 export function unduckMusic(): void {
   if (currentTrack) {
-    currentTrack.volume = baseVolume
+    currentTrack.volume = muted ? 0 : baseVolume
   }
 }
